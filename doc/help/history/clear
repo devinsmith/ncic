@@ -1,0 +1,2 @@
+SYNTAX: history clear
+	Clears the input history.

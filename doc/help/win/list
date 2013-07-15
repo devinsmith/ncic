@@ -1,0 +1,2 @@
+SYNTAX: win list
+	Print a listing of the open windows. The listing displays each window's reference number, target, and type.

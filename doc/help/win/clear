@@ -1,0 +1,2 @@
+SYNTAX: win clear
+	Clears the current window. The text that was displayed in the window before it was cleared can be recovered by scrolling up.

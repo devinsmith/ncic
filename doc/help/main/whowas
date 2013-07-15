@@ -1,0 +1,5 @@
+SYNTAX: whowas <username>
+	Retrieves the userinfo of the user specified.
+
+PARAMETERS
+	<username>: The screen name whose userinfo is to be retrieved.

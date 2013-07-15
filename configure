@@ -1,0 +1,730 @@
+#!/bin/sh
+#
+# ncic: naken chat in curses
+# configure script
+# Copyright (c) Devin Smith 2009
+#
+# This script is based on various scripts from other open source projects.
+# Major portions are straight from qemu, ffmpeg, and gxemul.
+
+###############################################################################
+# default parameters
+CC="gcc"
+PREFIX="/usr/local"
+
+###############################################################################
+# Check for command line arguments
+for arg in $*; do
+optarg=`echo $arg | sed 's/[-a-z]*=//'`
+case $arg in
+    --prefix=*)
+      PREFIX="$optarg"
+      ;;
+    *)
+      echo "ncic build configuration script"
+      echo
+      echo "Target directories:"
+      echo " --prefix=PREFIX        path to install to"
+      echo
+      exit 1
+      ;;
+esac
+done
+
+
+
+#  Try with the simplest possible test program. Actually, test static variables
+#  as well, because GXemul uses things like NULL-initialized global pointers,
+#  and it is important that they work. (GCC on Solaris is known to be completely
+#  broken, for instance.)
+
+echo '#include <stdio.h>
+
+int main(int argc, char *argv[])
+{
+	static int x = 0;
+	static int y = 1;
+	printf("%i,%i", x, y);
+	return 0;
+}
+' > _testprog.c
+
+
+if $CC $CFLAGS -c -o _testprog _testprog.c > /dev/null 2> /dev/null ; then
+  : C compiler works ok
+else
+	echo "ERROR: \"$CC\" either does not exist or does not work"
+	exit 1
+fi
+rm -f _testprog*
+
+####
+# Create config.h
+#  Head of config.h:
+printf "/*
+ *  THIS FILE IS AUTOMATICALLY CREATED BY configure!
+ *  DON'T EDIT THIS FILE MANUALLY, IT WILL BE OVERWRITTEN.
+ */
+\n#ifndef __CONFIG_H__\n#define __CONFIG_H__\n\n" > config.h
+
+printf "#define NCIC_HELP_PATH \"${PREFIX}/share/ncic/help\"\n" >> config.h
+
+# Check size of void * pointer.
+printf "checking size of void *... "
+echo '#include <stdio.h>
+int main(void)
+{
+	printf("%d", sizeof(void *));
+	return (0);
+}
+' > _test_void.c
+$CC $CFLAGS _test_void.c -o _test_void 2> /dev/null
+X=`./_test_void`
+printf "$X\n"
+printf "#define SIZEOF_VOID_P $X\n" >> config.h
+rm -f _test_void*
+
+printf "checking for struct sockaddr_storage... "
+echo '#include <sys/types.h>
+#include <sys/socket.h>
+int
+main (void)
+{
+	struct sockaddr_storage ss;
+	;
+	return 0;
+}
+' > _testprog.c
+$CC $CFLAGS _testprog.c -o _testprog 2> /dev/null
+if [ -x _testprog ]; then
+	printf "yes\n"
+	printf "#define HAVE_STRUCT_SOCKADDR_STORAGE 1\n" >> config.h
+else
+	printf "no\n"
+fi
+rm -f _testprog*
+
+printf "checking for gai_strerror... "
+echo '
+/* Define gai_strerror to an innocuous variant, in case <limits.h> declares gai_strerror.
+   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+#define gai_strerror innocuous_gai_strerror
+
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char gai_strerror (); below.
+    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+    <limits.h> exists even on freestanding compilers.  */
+
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+
+#undef gai_strerror
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char gai_strerror ();
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_gai_strerror) || defined (__stub___gai_strerror)
+choke me
+#else
+char (*f) () = gai_strerror;
+#endif
+#ifdef __cplusplus
+}
+#endif
+
+int
+main ()
+{
+return f != gai_strerror;
+  ;
+  return 0;
+}
+' > _testprog.c
+$CC $CFLAGS _testprog.c -o _testprog 2> /dev/null
+if [ -x _testprog ]; then
+	printf "yes\n"
+	printf "#define HAVE_GAI_STRERROR 1\n" >> config.h
+else
+	printf "no\n"
+fi
+rm -f _testprog*
+
+printf "checking for freeaddrinfo... "
+echo '
+/* Define freeaddrinfo to an innocuous variant, in case <limits.h> declares freeaddrinfo.
+   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+#define freeaddrinfo innocuous_freeaddrinfo
+
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char freeaddrinfo (); below.
+    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+    <limits.h> exists even on freestanding compilers.  */
+
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+
+#undef freeaddrinfo
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char freeaddrinfo ();
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_freeaddrinfo) || defined (__stub___freeaddrinfo)
+choke me
+#else
+char (*f) () = freeaddrinfo;
+#endif
+#ifdef __cplusplus
+}
+#endif
+
+int
+main ()
+{
+return f != freeaddrinfo;
+  ;
+  return 0;
+}
+' > _testprog.c
+$CC $CFLAGS _testprog.c -o _testprog 2> /dev/null
+if [ -x _testprog ]; then
+	printf "yes\n"
+	printf "#define HAVE_FREEADDRINFO 1\n" >> config.h
+else
+	printf "no\n"
+fi
+rm -f _testprog*
+
+printf "checking for getaddrinfo... "
+echo '
+/* Define getaddrinfo to an innocuous variant, in case <limits.h> declares getaddrinfo.
+   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+#define getaddrinfo innocuous_getaddrinfo
+
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char getaddrinfo (); below.
+    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+    <limits.h> exists even on freestanding compilers.  */
+
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+
+#undef getaddrinfo
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char getaddrinfo ();
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_getaddrinfo) || defined (__stub___getaddrinfo)
+choke me
+#else
+char (*f) () = getaddrinfo;
+#endif
+#ifdef __cplusplus
+}
+#endif
+
+int
+main ()
+{
+return f != getaddrinfo;
+  ;
+  return 0;
+}
+' > _testprog.c
+$CC $CFLAGS _testprog.c -o _testprog 2> /dev/null
+if [ -x _testprog ]; then
+	printf "yes\n"
+	printf "#define HAVE_GETADDRINFO 1\n" >> config.h
+else
+	printf "no\n"
+fi
+rm -f _testprog*
+
+printf "checking for getnameinfo... "
+echo '
+/* Define getnameinfo to an innocuous variant, in case <limits.h> declares getnameinfo.
+   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+#define getnameinfo innocuous_getnameinfo
+
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char getnameinfo (); below.
+    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+    <limits.h> exists even on freestanding compilers.  */
+
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+
+#undef getnameinfo
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char getnameinfo ();
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_getnameinfo) || defined (__stub___getnameinfo)
+choke me
+#else
+char (*f) () = getnameinfo;
+#endif
+#ifdef __cplusplus
+}
+#endif
+
+int
+main ()
+{
+return f != getnameinfo;
+  ;
+  return 0;
+}
+' > _testprog.c
+$CC $CFLAGS _testprog.c -o _testprog 2> /dev/null
+if [ -x _testprog ]; then
+	printf "yes\n"
+	printf "#define HAVE_GETNAMEINFO 1\n" >> config.h
+else
+	printf "no\n"
+fi
+rm -f _testprog*
+
+printf "checking for getopt_long... "
+echo '
+/* Define getopt_long to an innocuous variant, in case <limits.h> declares getopt_long.
+   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+#define getopt_long innocuous_getopt_long
+
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char getnameinfo (); below.
+    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+    <limits.h> exists even on freestanding compilers.  */
+
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+
+#include <getopt.h>
+
+#undef getopt_long
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char getopt_long();
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_getopt_long2) || defined (__stub___getopt_long2)
+choke me
+#else
+char (*f) () = getopt_long;
+#endif
+#ifdef __cplusplus
+}
+#endif
+
+int
+main ()
+{
+return f != getopt_long;
+  ;
+  return 0;
+}
+' > _testprog.c
+$CC $CFLAGS _testprog.c -o _testprog 2> /dev/null
+if [ -x _testprog ]; then
+	printf "yes\n"
+	printf "#define HAVE_GETOPT_LONG 1\n" >> config.h
+else
+	printf "no\n"
+fi
+rm -f _testprog*
+
+printf "checking for inet_ntop... "
+echo '
+/* Define inet_ntop to an innocuous variant, in case <limits.h> declares inet_ntop.
+   For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+#define inet_ntop innocuous_inet_ntop
+
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char inet_ntop (); below.
+    Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+    <limits.h> exists even on freestanding compilers.  */
+
+#ifdef __STDC__
+# include <limits.h>
+#else
+# include <assert.h>
+#endif
+
+#undef inet_ntop
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char inet_ntop ();
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_inet_ntop) || defined (__stub___inet_ntop)
+choke me
+#else
+char (*f) () = inet_ntop;
+#endif
+#ifdef __cplusplus
+}
+#endif
+
+int
+main ()
+{
+return f != inet_ntop;
+  ;
+  return 0;
+}
+' > _testprog.c
+$CC $CFLAGS _testprog.c -o _testprog 2> /dev/null
+if [ -x _testprog ]; then
+	printf "yes\n"
+	printf "#define HAVE_INET_NTOP 1\n" >> config.h
+else
+	printf "no\n"
+fi
+rm -f _testprog*
+
+printf "checking for resizeterm in -lncurses... "
+echo '
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char resizeterm ();
+int
+main ()
+{
+resizeterm ();
+  ;
+  return 0;
+}
+' > _testprog.c
+$CC $CFLAGS _testprog.c -o _testprog -lncurses 2> /dev/null
+if [ -x _testprog ]; then
+	printf "yes\n"
+	printf "#define HAVE_RESIZETERM 1\n" >> config.h
+else
+	printf "no\n"
+fi
+rm -f _testprog*
+
+printf "checking for snprintf... "
+echo '
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char snprintf ();
+int
+main ()
+{
+snprintf ();
+  ;
+  return 0;
+}
+' > _testprog.c
+$CC $CFLAGS _testprog.c -o _testprog 2> /dev/null
+if [ -x _testprog ]; then
+	printf "yes\n"
+	printf "#define HAVE_SNPRINTF 1\n" >> config.h
+else
+	printf "no\n"
+fi
+rm -f _testprog*
+
+printf "checking for strsep... "
+echo '
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char strsep ();
+int
+main ()
+{
+strsep ();
+  ;
+  return 0;
+}
+' > _testprog.c
+$CC $CFLAGS _testprog.c -o _testprog 2> /dev/null
+if [ -x _testprog ]; then
+	printf "yes\n"
+	printf "#define HAVE_STRSEP 1\n" >> config.h
+else
+	printf "no\n"
+fi
+rm -f _testprog*
+
+printf "checking for struct addrinfo... "
+echo '#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+int
+main (void)
+{
+	struct addrinfo a;
+	;
+	return 0;
+}
+' > _testprog.c
+$CC $CFLAGS _testprog.c -o _testprog 2> /dev/null
+if [ -x _testprog ]; then
+	printf "yes\n"
+	printf "#define HAVE_STRUCT_ADDRINFO 1\n" >> config.h
+else
+	printf "no\n"
+fi
+rm -f _testprog*
+
+printf "checking for struct in6_addr... "
+echo '#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+int
+main (void)
+{
+	struct in6_addr in6;
+	;
+	return 0;
+}
+' > _testprog.c
+$CC $CFLAGS _testprog.c -o _testprog 2> /dev/null
+if [ -x _testprog ]; then
+	printf "yes\n"
+	printf "#define HAVE_STRUCT_IN6_ADDR 1\n" >> config.h
+else
+	printf "no\n"
+fi
+rm -f _testprog*
+
+printf "checking for struct sockaddr_in6... "
+echo '#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+int
+main (void)
+{
+	struct sockaddr_in6 sa_in6;
+	;
+	return 0;
+}
+' > _testprog.c
+$CC $CFLAGS _testprog.c -o _testprog 2> /dev/null
+if [ -x _testprog ]; then
+	printf "yes\n"
+	printf "#define HAVE_STRUCT_SOCKADDR_IN6 1\n" >> config.h
+else
+	printf "no\n"
+fi
+rm -f _testprog*
+
+printf "checking for termios.h... "
+echo '
+#include <termios.h>
+int
+main (void)
+{
+	tcdrain(0);
+	return 0;
+}
+' > _testprog.c
+$CC $CFLAGS _testprog.c -o _testprog 2> /dev/null
+if [ -x _testprog ]; then
+	printf "yes\n"
+	printf "#define HAVE_TERMIOS_H 1\n" >> config.h
+else
+	printf "no\n"
+fi
+rm -f _testprog*
+
+printf "checking for sys/termios.h... "
+echo '
+#include <sys/termios.h>
+int
+main (void)
+{
+	tcdrain(0);
+	return 0;
+}
+' > _testprog.c
+$CC $CFLAGS _testprog.c -o _testprog 2> /dev/null
+if [ -x _testprog ]; then
+	printf "yes\n"
+	printf "#define HAVE_SYS_TERMIOS_H 1\n" >> config.h
+else
+	printf "no\n"
+fi
+rm -f _testprog*
+
+printf "checking for vasprintf... "
+echo '
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char vasprintf ();
+int
+main ()
+{
+vasprintf ();
+  ;
+  return 0;
+}
+' > _testprog.c
+$CC $CFLAGS _testprog.c -o _testprog 2> /dev/null
+if [ -x _testprog ]; then
+	printf "yes\n"
+	printf "#define HAVE_VASPRINTF 1\n" >> config.h
+else
+	printf "no\n"
+fi
+rm -f _testprog*
+
+printf "checking for vsnprintf... "
+echo '
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char vsnprintf ();
+int
+main ()
+{
+vsnprintf ();
+  ;
+  return 0;
+}
+' > _testprog.c
+$CC $CFLAGS _testprog.c -o _testprog 2> /dev/null
+if [ -x _testprog ]; then
+	printf "yes\n"
+	printf "#define HAVE_VSNPRINTF 1\n" >> config.h
+else
+	printf "no\n"
+fi
+rm -f _testprog*
+
+printf "\n#endif /* __CONFIG_H__ */\n" >> config.h
+
+###############################################################################
+# Build the config.mak file
+echo "# Generated by $0 $*" > config.mak
+echo >> config.mak
+echo "PREFIX=${PREFIX}" >> config.mak
+echo >> config.mak
+
+# Build the top level Makefile
+echo "Creating Makefile"
+echo '# ncic master makefile
+
+PREFIX = /usr/local
+
+include config.mak
+
+all:
+	@(cd src && $(MAKE))
+	@if [ -f src/ncic ]; then \
+		mv src/ncic .; \
+	fi
+
+clean:
+	@(cd src && $(MAKE) clean)
+
+install:
+	@if [ ! -d $(PREFIX)/bin ]; then mkdir $(PREFIX)/bin; fi;
+	cp ncic $(PREFIX)/bin/
+	@if [ ! -d $(PREFIX)/share ]; then mkdir $(PREFIX)/share; fi;
+	@if [ ! -d $(PREFIX)/share/ncic ]; then mkdir $(PREFIX)/share/ncic; fi;
+	cp doc/ncicrc $(PREFIX)/share/ncic/
+	@if [ ! -d $(PREFIX)/share/ncic/help ]; then mkdir $(PREFIX)/share/ncic/help; fi;
+	cp -R doc/help/* $(PREFIX)/share/ncic/help/
+' > Makefile
+
+echo
+echo "Configuration:"
+echo "  Install to: ${PREFIX}"
+echo
+echo "Now type: make (or gmake on a BSD system)"
+echo
+

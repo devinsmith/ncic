@@ -1,0 +1,14 @@
+SYNTAX: connect [-<protocol>] <username> [<protocol args>]
+	This command connects the account with the given user name. If no protocol is specified, AIM is assumed.
+
+PARAMETERS
+	<protocol>     : (Optional) The protocol to use. Examples are irc and aim.
+	<screen name>  : The screen name to connect.
+	<protocol args>: (Optional) Arguments specific to the protocol of the account being connected.
+
+EXAMPLES
+	%Gconnect exampleuser%x Connects "exampleuser" to AIM.
+	%Gconnect -aim exampleuser%x Same as above.
+	%Gconnect exampleuser pencil%x Connects "exampleuser" to AIM and uses the password "pencil" to login.
+	%Gconnect -irc test irc.example.org:6667%x Connects to irc.example.org, port 6667 and uses the nick test.
+	%Gconnect -irc test irc.example.org:6667:pencil%x Same as above but also uses "pencil" as the server password.

@@ -1,0 +1,2 @@
+SYNTAX: input end
+	Moves the cursor to the end of the input line.

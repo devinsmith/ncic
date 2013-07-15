@@ -1,0 +1,5 @@
+SYNTAX: buddy remove_permit <screen name>
+	Removes a screen name from the current account's permitted users list.
+
+PARAMETERS
+	<screen name>: The screen name to remove from the permitted users list.

@@ -1,0 +1,2 @@
+SYNTAX: blist warn
+	Warns the user the buddy list cursor is on. If the buddy list cursor is on a group entry, no action is taken.

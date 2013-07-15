@@ -1,0 +1,2 @@
+SYNTAX: scroll page_down
+	Scrolls the current window's display down by one page (i.e. the number of visible rows in the display).

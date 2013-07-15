@@ -1,0 +1,11 @@
+SYNTAX: timer add <interval> <times to run> <command>
+  Add a timer event that will cause a command to be run some number of times at a specified interval.
+
+PARAMETERS
+	<interval>    : The interval at which the command will be run.
+	<times to run>: The number of times to run the command. 0 means unlimited.
+	<command>     : The command that will be run. The command can be any command that can be entered on the command line.
+
+EXAMPLES
+	timer_add 30 10 echo testing
+		- Causes the command "echo testing" to be executed every 30 seconds, a total of 10 times.

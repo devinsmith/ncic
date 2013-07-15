@@ -1,0 +1,9 @@
+SYNTAX: buddy add <user> <group>
+	Adds a user to the current account's buddy list as a member of the specified group. The group must already exist.
+
+PARAMETERS
+	<user> : The screen name of the user to be added.
+	<group>: The group to add the screen name to.
+
+SEE ALSO
+	buddy add_group

@@ -1,0 +1,2 @@
+SYNTAX: refresh
+	Repaints and refreshes the terminal. This is useful for when the screen gets messed up.

@@ -1,0 +1,8 @@
+SYNTAX: win unignore <refnum>
+	Restore the reporting of activity for a window in the active windows list. If no window is specified, the current window is assumed.
+
+PARAMETERS
+	<refnum>: (Optional) The reference of the number to unignore.
+
+SEE ALSO
+	win ignore

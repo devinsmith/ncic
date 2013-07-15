@@ -1,0 +1,12 @@
+SYNTAX: buddy privacy_mode <mode>
+	Sets the privacy mode for the current account.
+
+	Below are the valid mode values and the settings to which they correspond:
+		1 - Allow all users.
+		2 - Block all users.
+		3 - Allow only the users on the permit list.
+		4 - Block only the users on the block list.
+		5 - Allow only users on my buddy list.
+
+PARAMETERS
+	<mode>: The privacy mode to set for the current account.

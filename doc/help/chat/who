@@ -1,0 +1,5 @@
+SYNTAX: chat who [<chat room>]
+	Prints a list of users in the specified chat room. If no chat room is specified and the current window is a chat window, the chat room displayed in that window is assumed.
+
+PARAMETERS
+	<chat room>: The name/exchange combination of the chat room whose users will be listed.

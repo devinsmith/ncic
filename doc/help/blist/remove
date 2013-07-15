@@ -1,0 +1,2 @@
+SYNTAX: blist remove
+	Remove the user the buddy list cursor is on from the current user's buddy list. If the cursor is on a group entry, do nothing.

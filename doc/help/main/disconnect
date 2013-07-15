@@ -1,0 +1,6 @@
+SYNTAX: disconnect [<refnum> <logout message>]
+	Disconnects a screen name. If no account refnum is given, the account bound to the current window is disconnected.
+
+PARAMETERS
+	<refnum>        : (Optional) The refnum of the account to disconnect.
+	<logout message>: (Optional) Quit message, if the account's protocol supports it.

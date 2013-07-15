@@ -1,0 +1,9 @@
+SYNTAX: unbind <keycode>
+	Removes the binding, if any, that exist for a keycode.
+
+PARAMETERS
+	<keycode>: The name of the key for which bindings are to be removed.
+
+SEE ALSO
+	bind
+	keys

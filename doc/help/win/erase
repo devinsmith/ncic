@@ -1,0 +1,2 @@
+SYNTAX: win erase
+	Clears the current window. The text that was displayed in the window before the win erase command was executed is gone for good.

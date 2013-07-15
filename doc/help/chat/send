@@ -1,0 +1,6 @@
+SYNTAX: chat send [<chat room>] <message>
+	Sends a message to the specified chat room.
+
+PARAMETERS
+	<chat room>: The name/exchange combination of the chat room to which to send the message.
+	<message>  : The message to send.

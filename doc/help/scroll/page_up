@@ -1,0 +1,2 @@
+SYNTAX: scroll page_up
+	Scrolls the current window's display up by one page (i.e. the number of visible rows in the display).

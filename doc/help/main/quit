@@ -1,0 +1,5 @@
+SYNTAX: quit <[quit message]>
+	Exits the program.
+
+PARAMETERS
+    <quit message>: (Optional) Quit message (not supported by all protocols).

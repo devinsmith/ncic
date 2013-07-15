@@ -1,0 +1,6 @@
+SYNTAX: file send <user> <file>
+	Initiates a request to send a file to a user.
+
+PARAMETERS
+	<user>: The user to whom to send the file.
+	<file>: The file to be sent.

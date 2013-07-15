@@ -1,0 +1,2 @@
+SYNTAX: input next_word
+	Moves the cursor to the start of the next word.

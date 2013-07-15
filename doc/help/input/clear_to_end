@@ -1,0 +1,2 @@
+SYNTAX: input clear_to_end
+	Clears from the cursor to the end of the input line.

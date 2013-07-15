@@ -1,0 +1,9 @@
+SYNTAX: bind [<keycode> [<command>]]
+	Binds a key to a command; whenever the key is pressed, its binding, if any, will be executed.
+
+PARAMETERS
+	<keycode>: The key to which to bind the specified command.
+	<command>: The command to execute when the specified key is pressed.
+
+SEE ALSO
+	keys

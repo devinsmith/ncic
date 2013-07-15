@@ -1,0 +1,2 @@
+SYNTAX: win close
+	Close the current window. If the current window is a chat window, you will exit the chat room bound to that window.

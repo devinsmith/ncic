@@ -1,0 +1,15 @@
+SYNTAX: alias <alias string> <alias value>
+	Makes <alias string> an alias for <alias_value>.
+
+PARAMETERS
+	<alias_string>: The name of the new alias.
+	<alias_value> : The value of the new alias.
+
+EXAMPLES
+	alias ws win swap
+		- Adds an alias such that typing /ws 1 is equivalent to typing win swap 1
+
+	Type /alias or consult the global porkrc file for more examples.
+
+SEE ALSO
+	unalias

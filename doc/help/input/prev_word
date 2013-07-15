@@ -1,0 +1,2 @@
+SYNTAX: input prev_word
+	Moves the input cursor to the start of the previous word.

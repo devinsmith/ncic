@@ -1,0 +1,2 @@
+SYNTAX: scroll end
+	Scrolls the current window's display down to its bottom.

@@ -1,0 +1,5 @@
+SYNTAX: away [<away message>]
+	Marks a screen name away or marks it not away, if it is already away. If a parameter is specified, the current screen name will be set away with the away message specified by the parameter. If no parameters are given, the screen name will be set as no longer away if it was away.
+
+PARAMETERS
+	<away message>: (Optional) The away message.

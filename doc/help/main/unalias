@@ -1,0 +1,8 @@
+SYNTAX: unalias <alias>
+	Removes an alias.
+
+PARAMETERS
+	<alias>: The name of the alias to be removed.
+
+SEE ALSO
+	alias

@@ -1,0 +1,2 @@
+SYNTAX: buddy list_permit
+	Prints the list of screen names in the current account's permitted users list to the screen.

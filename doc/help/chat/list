@@ -1,0 +1,2 @@
+SYNTAX: chat list
+	Prints the list of the chats that the current user is joined to.

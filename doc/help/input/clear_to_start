@@ -1,0 +1,2 @@
+SYNTAX: input clear_to_start
+	Clears from the cursor to the start of the input line.

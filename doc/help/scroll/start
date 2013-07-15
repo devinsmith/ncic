@@ -1,0 +1,2 @@
+SYNTAX: scroll start
+	Scrolls the current window's display up to its top.

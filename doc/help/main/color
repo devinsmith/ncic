@@ -1,0 +1,32 @@
+PORK COLOR CODES
+	Pork defines color codes that allow the color of characters in strings to be specified. Color codes are of the format %%<foreground>[,<background>]. Foreground and background are valid color specifiers (described below). The comma and <background> parameter are optional. If no background color is specified, the default background color will be assumed.
+
+	Background colors will show up as non-bold, even if they're specified as bold. This is a limitation of the terminal.
+
+Valid color codes are:
+  d = black   (%dsample%x)    D = bold black   (%Dsample%x)
+  r = red     (%rsample%x)    R = bold red     (%Rsample%x)
+  g = green   (%gsample%x)    G = bold green   (%Gsample%x)
+  y = yellow  (%ysample%x)    Y = bold yellow  (%Ysample%x)
+  b = blue    (%bsample%x)    B = bold blue    (%Bsample%x)
+  m = magenta (%msample%x)    P = bold magenta (%Msample%x)
+  c = cyan    (%csample%x)    C = bold cyan    (%Csample%x)
+  w = white   (%wsample%x)    W = bold white   (%Wsample%x)
+
+  x = clear all color codes for the current string.
+
+  In addition, the following highlighting attributes can be used:
+     1 = bold      (%1sample%x)   2 = reverse (%2sample%x)
+	 3 = underline (%3sample%x)   4 = blink (%4sample%x)
+     5 = standout  (%5sample%x)   6 = dim (%6sample%x)
+
+  Highligting modes can be turned off by using -<num>.
+  For example, '%%1bold%%-1 not bold' is displayed as '%1bold%-1 not bold'.
+
+  Highlighting attributes, unlike colors, cascade, meaning you can accumulate highlighting attributes by specifing them one after another in a string. For example '%%b%%1%%2%%3' is bold, reverse, underline blue (%b%1%2%3like this%x). Specifying a color code in a string causes all attributes in the string to that point to be cleared. For example, '%%1%%2%%3%%b' is just blue (%1%2%3%blike this%x); '%%1%%2%%b%%3' is underline blue (%1%2%b%3like this%x).
+
+  %%%% = literal '%'
+
+EXAMPLES
+	%%Y,b is yellow text on a blue background. (%Y,bsample%x)
+	%%m is magenta text on a black background. (%msample%x)

@@ -1,0 +1,8 @@
+SYNTAX: win bind <account refnum>
+	Binds the account with the given reference number to the current window. Pork allows for an unlimited number of accounts to be logged in at the same time. Each window has 0 or 1 accounts bound to it. Any commands executed in a window are executed on behalf of the account that is bound to the window.
+
+PARAMETERS
+	<account refnum>: The reference number of the account to bind to the current window.
+
+SEE ALSO
+	acct list

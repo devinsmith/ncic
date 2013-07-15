@@ -1,0 +1,5 @@
+SYNTAX: win dump <file>
+	Dumps all text in the window to the specified file. If the file exists, the text will be appended. If the file does not exist, it will be created.
+
+PARAMETERS
+	<file>: File to which the window's contents will be written.

@@ -1,0 +1,467 @@
+SYNTAX: set [<variable name> [<new_value>]]
+	Sets a global variable. Many global variables have analogous per-window options. For example, there's a global LOG option and a per-window LOG option. Changing a global variable has no effect on per-window options in currently open windows. Any new windows that are created, though, will inherit the applicable global options when they are created.
+
+	There are 5 types of values set variable can take: boolean, integer, string, format string, and color string. The argument for a boolean variable can either be true (or on or 1), false (or off or 0), or toggle. Toggle reverses the variables current value. Integer variables take integer values. String variables take strings that may contain embedded color codes. Color strings take one color code without the leading '%' char, or take a color code string that must begin with '%' and may specify highlighting attributes (see the help for 'color' for info). Format strings contain strings that may contain embedded color codes. Additionally, each format string recognizes one or more variables beginning with a '$' character that will be filled-in dynamically. All format variables for each format string are described below.
+
+	The following global variables exist. Type /set for examples, or type /set <variable> for an example for a particular global variable.
+	
+ AUTO_RECONNECT (boolean)
+	Automatically reconnect when disconnected.
+
+ AUTO_REJOIN (boolean)
+	Automatically rejoin chat rooms when kicked.
+
+ AUTOSEND_AWAY (boolean)
+	When away, respond to messages by replying with your away message.
+
+ BANNER (string)
+	The banner used to display status messages ('*** ' by default).
+
+ BEEP (boolean)
+	Beep when a ^G (control-G) character is printed.
+
+ BEEP_MAX (integer)
+	The maximum number of times to beep when a string containing one or more ^G characters is printed.
+
+ BEEP_ON_OUTPUT (boolean)
+	Beep when new messages are received.
+
+ CMDCHARS (character)
+	The character that denotes that an input string is a command.
+
+ COLOR_BLIST_FOCUS (color string)
+	The color of the buddy list's border when the buddy list has input focus.
+
+ COLOR_BLIST_NOFOCUS (color string)
+	The color of the buddy list's border when the buddy list has input focus.
+
+ COLOR_BLIST_SELECTOR (color string)
+	The color of the buddy list's cursor.
+
+ CONNECT_TIMEOUT (integer)
+	Number of seconds after which connections will be aborted if they haven't completed successfully.
+
+ DUMP_MSGS_TO_STATUS (boolean)
+	Print private messages (both those sent and received) in the status window instead of creating separate query windows for each conversation.
+
+ FORMAT_ACTION_RECV (format string)
+ FORMAT_ACTION_RECV_STATUS (format string)
+	The format string that specifies how private actions will be displayed.
+
+	Variables:
+	  $N - Action sender's screen name.
+	  $R - Action recipient's screen name.
+	  $r - Action recipient as specified by its sender.
+	  $M - Action text.
+	  $H - Userhost of $R, if available.
+	  $h - Userhost of $N, if available.
+
+ FORMAT_BLIST (format string)
+	The format string that specifies how buddy list entries will be displayed.
+
+	Variables:
+	  $B - Buddy status (active/idle/away) string.
+	  $N - Buddy's username.
+	  $I - Buddy's idle time.
+	  $i - Buddy's idle time (evaluates to the empty string if idle time is 0).
+	  $W - Buddy's warning level.
+	  $w - Buddy's warning level (evaluates to the empty string if warning level is 0).
+	  $> - Right-justify anything that follows.
+
+ FORMAT_BLIST_GROUP (format string)
+	The format string that specifies how buddy list group entries will be displayed.
+
+	Variables:
+	  $E - Expanded / collapsed text.
+	  $N - Group name.
+	  $T - The number of buddies in the group.
+	  $O - The number of buddies in the group who are signed on.
+	  $> - Right-justify anything that follows.
+
+ FORMAT_BLIST_IDLE (format string)
+	The format string that specifies how buddies' idle time is displayed in the buddy list window.
+
+	Variables:
+	  $I - Buddy's idle time.
+ 
+ FORMAT_BLIST_WARN (format string)
+	The format string that specifies how users' warning times will be displayed in the buddy list window.
+
+	Variables:
+	  $W - Buddy's warning level.
+
+ FORMAT_CHAT_CREATE (format string)
+	The format string that specifies how the announcement that a new chat room has been created will be displayed.
+
+	Variables:
+	  $N - User who created the chat room.
+	  $R - Chat room's name.
+	  $U - Chat room's full name.
+	  $H - Hostname of $N (if available).
+
+ FORMAT_CHAT_IGNORE (format string)
+	The format string that specifies how announcements of users being ignored will be displayed.
+
+	Variables:
+	  $N - User who ignored another user.
+	  $D - User who was ignored.
+	  $R - Chat room's name.
+	  $M - Chat room's full name.
+	  $H - Hostname of $N (if available).
+	  $h - Hostname of $D (if available).
+
+ FORMAT_CHAT_INVITE (format string)
+	The format string that specifies how announcements of having been invited to a chat room will be displayed.
+
+	Variables:
+	  $N - Username of the user who sent the invitation.
+	  $D - User who was invited.
+	  $R - Chat room's name.
+	  $U - Chat room's full name.
+	  $H - Hostname of $N (if available).
+	  $h - Hostname of $D (if available).
+
+  FORMAT_CHAT_JOIN (format_string)
+	The format string that specifies how chat join notices will be displayed.
+
+	Varibles:
+	  $N - Username of the user who joined.
+	  $R - Chat room's name.
+	  $U - Chat room's full name.
+	  $H - Hostname of $N (if available).
+
+  FORMAT_CHAT_KICK (format string)
+	The format string that specifies how announcements of users being forcibly removed from chat rooms will be displayed.
+
+	Variables:
+	  $N - Username of the user who initiated the kick.
+	  $D - User who was kicked.
+	  $R - Chat room's name.
+	  $U - Chat room's full name.
+	  $M - Kick message (if any).
+	  $H - Hostname of $N (if available).
+	  $h - hostname of $D (if available).
+
+  FORMAT_CHAT_LEAVE (format_string)
+	The format string that specifies how chat part notices will be displayed.
+
+	Varibles:
+	  $N - Username of the user who left.
+	  $R - Chat room's name.
+	  $U - Chat room's full name.
+	  $H - Hostname of $N (if available).
+
+  FORMAT_CHAT_LEAVE (format_string)
+	The format string that specifies how channel mode changes will be displayed.
+
+	Varibles:
+	  $N - Username of the user changed the mode.
+	  $R - Chat room's name.
+	  $U - Chat room's full name.
+	  $H - Hostname of $N (if available).
+	  $M - Mode string that was set.
+
+ FORMAT_CHAT_QUIT (format string)
+	The format string that specifies how chat quit notices will be displayed.
+
+	Varibles:
+	  $N - Username of the user who quit.
+	  $R - Chat room's name.
+	  $U - Chat room's full name.
+	  $M - Quit message (if any).
+	  $H - Hostname of $N (if available).
+
+ FORMAT_CHAT_RECV
+ FORMAT_CHAT_RECV_ACTION
+ FORMAT_CHAT_RECV_NOTICE
+	The format string that specifies how incoming chat messages will be displayed.
+
+	Variables:
+	  $C - The chatroom in which the message was received. 
+	  $c - The message destination as specified by its sender.
+	  $N - Message sender.
+	  $h - Userhost of $N, if available.
+	  $M - Message text.
+
+ FORMAT_CHAT_SEND
+ FORMAT_CHAT_SEND_ACTION
+ FORMAT_CHAT_SEND_NOTICE
+	The format string that specifies how outgoing chat messages will be displayed.
+
+	Variables:
+	  $C - The chatroom to which the message was sent. 
+	  $c - The message destination as specified by its sender.
+	  $N - Message sender.
+	  $H - Userhost of $N, if available.
+	  $M - Message text.
+
+ FORMAT_CHAT_UNIGNORE (format string)
+	The format string that specifies how announcements of users being unignored will be displayed.
+
+	Variables:
+	  $N - User who unignored another user.
+	  $D - User who was unignored.
+	  $R - Chat room's name.
+	  $U - Chat room's full name.
+	  $H - Hostname of $N (if available).
+	  $h - Hostname of $D (if available).
+
+ FORMAT_IM_RECV (format string)
+ FORMAT_IM_RECV_STATUS (format string)
+	The format string that specifies how incoming messages will be displayed.
+
+	Variables:
+	  $N - Message sender's screen name.
+	  $R - Message recipient's screen name.
+	  $r - Message recipient as specified by its sender.
+	  $M - Message text.
+	  $H - Userhost of $R, if available.
+	  $h - Userhost of $N, if available.
+
+ FORMAT_IM_RECV_AUTO (format string)
+	The format string that specifies how incoming auto-reply messages will be displayed.
+
+	Variables:
+	  $N - Message sender's screen name.
+	  $M - Message text.
+
+ FORMAT_IM_SEND (format string)
+ FORMAT_IM_SEND_STATUS (format string)
+	The format string that specifies how outgoing messages will be displayed.
+
+	Variables:
+	  $N - Notice sender's screen name.
+	  $R - Notice recipient's screen name.
+	  $r - Notice recipient as specified by its sender.
+	  $M - Notice text.
+	  $H - Userhost of $R, if available.
+	  $h - Userhost of $N, if available.
+ 
+ FORMAT_NOTICE_RECV (format string)
+ FORMAT_NOTICE_RECV_STATUS (format string)
+	The format string that specifies how private notices will be displayed.
+
+	Variables:
+	  $N - Notice sender's screen name.
+	  $R - Notice recipient's screen name.
+	  $M - Notice text.
+	  $H - Userhost of $R, if available.
+	  $h - Userhost of $N, if available.
+
+ FORMAT_STATUS (format string)
+ FORMAT_STATUS_CHAT (format string)
+	The format string that specifies how the status bar will be displayed. FORMAT_STATUS_CHAT controls the appearance of the status bar in chat windows. FORMAT_STATUS controls the appearance of the status bar in all other windows.
+
+	Variables:
+	  $N - Current screen name.
+	  $Z - Current window's name.
+	  $C - Chat room inactive string.
+	  $T - Timestamp string.
+	  $S - Current server.
+	  $P - Current port on remote server.
+	  $A - Activity string.
+	  $Y - Typing string.
+	  $H - Held string.
+	  $I - Idle time string.
+	  $W - Warning level string.
+	  $M - Chat room mode, including arguments (keys, limit numbers, etc.), if applicable.
+	  $m - Chat room mode, excluding arguments, if applicable.
+	  $@ - Chat room status (op, halfop, voice), if applicable.
+	  $U - User mode.
+	  $! - User status (online/away/disconnected/reconnecting).
+	  $? - Account protocol.
+	  $> - Right-justify everything that follows (can be specified only once).
+
+ FORMAT_STATUS_ACTIVITY (format string)
+	The format string that specifies how active windows (i.e. windows in which a message has been received since the last time they were visible) will be denoted in the status bar.
+
+	Variables:
+	  $A - A comma-delimited list of the reference numbers of windows in which there is activity.
+
+ FORMAT_STATUS_HELD (format string)
+	The format string that specifies the way the number of held lines will be displayed in the status bar.
+
+	Variables:
+	  $H - The number of held lines.
+
+ FORMAT_STATUS_IDLE (format string)
+	The format string that specifies how the current account's idle time will be displayed in the status bar.
+
+	Variables:
+	  $I - The current username's idle time.
+	  $i - If the current window is an IM window, the target's idle time. If it's not an IM window, the current username's idle time.
+
+ FORMAT_STATUS_TIMESTAMP (format string)
+	The format string that specifies how the current time will be displayed in the status bar.
+
+	Variables:
+	  $H - Hour (24 hour format).
+	  $h - Hour (12 hour format).
+	  $m - Minutes.
+	  $s - Seconds.
+	  $h - AM/PM
+
+ FORMAT_STATUS_TYPING (format string)
+	The format string that specifies how typing notifications will be displayed in the status bar.
+
+	Variables:
+	  $Y - Typing status (typing/paused)
+
+ FORMAT_STATUS_WARN (format string)
+	The format string that specifies how the current account's warning level will be displayed in the status bar.
+
+	Variables:
+	  $W - The current username's warning level.
+	  $w - If the current window is an IM window, the target's warning level. If it's not an IM window, the current username's warning level.
+
+ FORMAT_WARN (format string)
+	The format string that specifies how the status message announcing that the current account's username has been warned by another user will be displayed.
+
+	Variables:
+	  $N - The user who was warned. 
+	  $U - The user who sent the warning.
+	  $W - The new warning level of the user who was warned.
+
+ FORMAT_WHOIS_AWAY (format string)
+	The format string that controls the appearance of the away line in /whois output.
+
+ FORMAT_WHOIS_IDLE (format string)
+	The format string that controls the appearance of the idle time line in /whois output.
+
+	Variables
+	  $I - The idle time.
+
+ FORMAT_WHOIS_MEMBER (format string)
+	The format string that controls the appearance of the member since line in /whois output.
+
+	Variables
+	  $D - The date the user became a member.
+
+ FORMAT_WHOIS_NAME (format string)
+	The format string that controls the appearance of the username line in /whois output.
+
+	Variables
+	  $N - Username.
+
+ FORMAT_WHOIS_SIGNON (format string)
+	The format string that controls the appearance of the signon time line in /whois output.
+
+	Variables
+	  $S - Time of login.
+
+ FORMAT_WHOIS_USERINFO (format string)
+	The format string that controls the appearance of the user info line in /whois output.
+
+ FORMAT_WHOIS_WARNLEVEL (format string)
+	The format string that controls the appearance of the warning level  line in /whois output.
+
+	Variables
+	  $W - Warning level.
+	
+ HISTORY_LEN (integer)
+	The maximum number of input lines to be retained in the input history.
+
+ IDLE_AFTER (integer)
+	The number of seconds after which accounts will be set idle.
+
+ LOG (boolean)
+	Log all screen output to log files.
+
+ LOGIN_ON_STARTUP (boolean)
+	Log in when the client is started.
+
+ OUTGOING_MSG_FONT (string)
+	The font to be used for outgoing messages on AIM.
+
+ OUTGOING_MSG_FONT_BGCOLOR (string)
+	The background color to be used for outgoing messages on AIM. Specify colors as you would in an HTML font tag (e.g., "white" or "#ffffff").
+
+ OUTGOING_MSG_FONT_FGCOLOR (string)
+	The foreground color to be used for outgoing messages on AIM. Specify colors as you would in an HTML font tag (e.g., "white" or "#ffffff").
+
+ OUTGOING_MSG_FONT_SIZE (string)
+	The font size to be used for outgoing messages on AIM. Specify size as you would in an HTML font tag (e.g., "+3" or "-1").
+
+ PORK_DIR (string)
+	The directory where pork stores user-preferences and account information.
+
+ PRIVATE_INPUT (boolean)
+	Give each window its own input line and history. By default, all windows share a global input line and history.
+
+ PROMPT (string)
+	The string to be used as the input prompt.
+
+ RECONNECT_INTERVAL (integer)
+	The interval used to determine the next time to try to reconnect a disconnected account. An account will attempt to be reconnected every (number_of_tries * reconnect_interval) seconds.
+
+ RECONNECT_MAX_INTERVAL (integer)
+	The maximum amount of time to wait between attempts to reconnect an account that has been disconnected.
+
+ RECONNECT_TRIES (integer)
+	Number of times to attempt to reconnect a disconnect account before giving up.
+
+ RECURSIVE_EVENTS (boolean)
+	Allow events to be recursively generated. For example, if a handler for the event SEND_PROFILE called a function that generated the SEND_PROFILE event, if RECURSIVE_EVENTS were enabled, the second event would be generated. If it were disabled, the second event would not be generated.
+
+ REPORT_IDLE (boolean)
+	Report idle time.
+
+ SAVE_PASSWD (boolean)
+	Save the passwords for accounts in PORK_DIR/<screenname>/account.
+
+ SCROLL_ON_INPUT (boolean)
+	If a window is scrolled up, scroll it down on any user input.
+
+ SCROLL_ON_OUTPUT (boolean)
+	If a window is scrolled up, scroll it down on any new window messages.
+
+ SCROLLBUF_LEN (integer)
+	The number of lines of text to be saved in each window.
+
+ SEND_REMOVES_AWAY (boolean)
+	If the current account is away and it sends a message, remove its away status.
+
+ SHOW_BLIST (boolean)
+	Show the buddy list in all windows.
+
+ SHOW_BUDDY_AWAY (boolean)
+	Show announcements that a user has gone away and returned from being away in conversation windows with the user, if any.
+
+ SHOW_BUDDY_IDLE (boolean)
+	Show announcements that a user has become idle and become not idle in conversation windows with the user, if any.
+
+ SHOW_BUDDY_SIGNOFF (boolean)
+	Show announcements that a user has signed on and signed off in conversation windows with the user, if any.
+
+ TEXT_BUDDY_ACTIVE (string)
+	The format string that specifies how the buddy list status indicator for active (not idle or away) users will be displayed. The status indicator is the string that appears to the left of users' names on the buddy list, and is a colored '*' character by default.
+
+ TEXT_BLIST_GROUP_EXPANDED (string)
+	The string used to denote a group node in the buddy list that has been expanded.
+
+ TEXT_BLIST_GROUP_COLLAPSED (string)
+	The string used to denote a group node in the buddy list that has been expanded.
+
+ TEXT_BUDDY_AWAY (string)
+	The format string that specifies how the buddy list status indicator for users who are away will be displayed.
+
+ TEXT_BUDDY_IDLE (string)
+	The format string that specifies how the buddy list status indicator for idle users will be displayed.
+
+ TEXT_NO_NAME (string)
+	The string displayed in the status bar to indicate that no screen name has been specified yet. This string is displayed before logging in with any account.
+
+ TEXT_NO_ROOM (string)
+	The string displayed in the status bar of chat windows that indicates that you are not presently joined to the chat room that is bound to the window.
+
+ TEXT_TYPING (string)
+	The string displayed when a user is actively typing to you.
+
+ TEXT_TYPING_PAUSED (string)
+	The string displayed when a user has begun typing to you and then paused typing.
+
+ TEXT_WARN_ANONYMOUS (string)
+	The text that's displayed when warned anonymously.
+
+ TIMESTAMP (boolean)
+	Display timestamps for messages.

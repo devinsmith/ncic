@@ -1,0 +1,6 @@
+SYNTAX: blist select
+	If the entry the buddy list cursor is on is a group entry, the "blist collapse" command is run. If the entry the cursor is on is a user entry, the "blist goto" command is run. This command exists to provide the current behavior of hitting the enter key while the buddy list bindings are active.
+
+SEE ALSO
+	blist select
+	blist collapse

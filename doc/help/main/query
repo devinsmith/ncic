@@ -1,0 +1,2 @@
+SYNTAX: query [<target screen name>]
+	Opens a new query window with a user. If there is already a query window open with that user, that query window is made visible. If no screen name is specified and the current window is an IM (query) window, it will be closed.

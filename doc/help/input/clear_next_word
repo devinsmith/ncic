@@ -1,0 +1,2 @@
+SYNTAX: input clear_next_word
+	Clears the word to the right of the cursor.

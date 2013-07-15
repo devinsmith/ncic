@@ -1,0 +1,5 @@
+SYNTAX: input insert <string>
+	Inserts a string at the cursor position.
+
+PARAMETERS
+	<string>: The string to be inserted.

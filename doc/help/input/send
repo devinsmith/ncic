@@ -1,0 +1,5 @@
+SYNTAX: input send [<str>]
+	"Sends" the input line. If the input line begins with the command character ('/' by default), the contents of the input line will be treated as a command. If not, and the current window is an IM window, the contents of the input line will be sent as an IM to the target of the window. If the current window is a chat window, the contents of the input line will be send to the chat room bound to the current window.
+
+PARAMETERS
+	<str>: (Optional) A string to send. If this parameter is specified, it will be sent instead of the input buffer.

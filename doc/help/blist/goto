@@ -1,0 +1,2 @@
+SYNTAX: blist goto
+	Opens a new query window for the user that the buddy list cursor is currently on. If there is already a query window open for that user, that query window is made visible. If the cursor is on a group entry, no action is taken.

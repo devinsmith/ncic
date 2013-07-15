@@ -1,0 +1,6 @@
+SYNTAX: auto <user> <message>
+	Sends an auto-reply message, if supported.
+
+PARAMETERS
+	<user>   : The user to whom to send the message.
+	<message>: The message to send.

@@ -1,0 +1,2 @@
+SYNTAX: blist up
+	Moves the buddy list's cursor up one line, if possible.

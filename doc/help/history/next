@@ -1,0 +1,2 @@
+SYNTAX: history next
+	Writes the next entry in the history list to the command-line. This command has a similar effect to hitting the up arrow on a shell command line.

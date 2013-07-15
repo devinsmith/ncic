@@ -1,0 +1,6 @@
+SYNTAX: msg <user> <message>
+	Sends a message (IM).
+
+PARAMETERS
+	<user>   : The user to whom to send the message.
+	<message>: The message to send.

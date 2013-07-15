@@ -1,0 +1,5 @@
+SYNTAX: win bind_next
+	Binds the next screen name in the account list to the current window. This command is only useful when you're logged in with more than one screen name. You can use it to cycle through logged-in accounts.
+
+SEE ALSO
+	win bind

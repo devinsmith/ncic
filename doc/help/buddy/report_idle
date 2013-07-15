@@ -1,0 +1,5 @@
+SYNTAX: buddy report_idle <mode>
+	Turns the reporting of the current screen name's idle time on and off.
+
+PARAMETERS
+	<mode>: An integer value. 0 disables the reporting of idle time. Any non-zero value enables it.

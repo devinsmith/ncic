@@ -1,0 +1,4 @@
+THE CHAT COMMAND SET
+	The chat command set is made-up of commands that implement functionality used for chat rooms.
+
+	AIM chat rooms are identified by a name/exchange combination. Names consist of alphanumeric characters. The exchange portion of the chat room's name is an integer between 4 and 16, inclusive.

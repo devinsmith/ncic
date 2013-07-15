@@ -1,0 +1,5 @@
+SYNTAX: quote <string>
+	Sends the string specified to the server as a raw command. This command is only supported for IRC.
+
+PARAMETERS
+	<string>: The string to send.

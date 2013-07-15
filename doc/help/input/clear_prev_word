@@ -1,0 +1,2 @@
+SYNTAX: input clear_prev_word
+	Clears the word to the left of the cursor.

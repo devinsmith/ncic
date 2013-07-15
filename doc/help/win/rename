@@ -1,0 +1,5 @@
+SYNTAX: win rename <new name>
+	Renames a window.
+
+PARAMETERS
+	<new name>: The new name of the window.

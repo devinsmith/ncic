@@ -1,0 +1,2 @@
+SYNTAX: input start
+	Moves the cursor to the start of the input line.

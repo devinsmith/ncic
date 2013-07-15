@@ -1,0 +1,5 @@
+SYNTAX: nick <new nick>
+	Changes the current user's nick (username), if supported.
+
+PARAMETERS
+	<new nick>: New nick.

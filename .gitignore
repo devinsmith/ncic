@@ -1,17 +1,9 @@
-# Object files
-*.o
-
-# Libraries
-*.lib
-*.a
-
-# Shared objects (inc. Windows DLLs)
-*.dll
-*.so
-*.so.*
-*.dylib
-
-# Executables
-*.exe
-*.out
-*.app
+ncic
+config.h
+config.mak
+Makefile
+src/*.d
+src/*.o
+src/missing/*.d
+src/missing/*.o
+src/missing/libmissing.a

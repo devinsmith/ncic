@@ -1,0 +1,5 @@
+SYNTAX: buddy seen <user>
+	Displays the time the specified user was last seen online by the currently active account.
+
+PARAMETERS
+	<user>: The user whose "last online" time to display.

@@ -1,0 +1,2 @@
+SYNTAX: input backspace
+	Deletes the character directly before the input cursor.

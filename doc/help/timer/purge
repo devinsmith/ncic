@@ -1,0 +1,2 @@
+SYNTAX: timer purge
+	Delete all timer events.

@@ -1,0 +1,9 @@
+SYNTAX: lastlog [flags] [regex]
+	Search the current window's history buffer for strings matching an extended regular expression, and print all matches to the screen. The lastlog command supports the following optional flags:
+
+	-b     Don't use extended regular expressions; use basic regular expressions.
+	-i     Ignore case.
+
+PARAMETERS
+	<flags>: (Optional) Options for the search.
+	<regex>: Regular expression to match.

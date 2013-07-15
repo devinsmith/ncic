@@ -1,0 +1,5 @@
+SYNTAX: scroll by <num lines>
+	Scrolls the current window's display by the specified number of lines.
+
+PARAMETERS
+	<num lines>: The number of lines by which the current window will be scrolled. A negative number will cause the display to be scroll up. A positive number will cause the display to be scrolled down.

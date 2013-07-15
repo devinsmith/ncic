@@ -1,0 +1,5 @@
+SYNTAX: acct
+	Prints a list of the names, protocols, and reference numbers of all connected accounts.
+
+SEE ALSO
+	connect

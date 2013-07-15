@@ -1,0 +1,5 @@
+SYNTAX: buddy search <email address>
+	Searches for any screen names that are registered to an email address.
+
+PARAMETERS
+	<email address>: The email address whose screen names are to be searched for.

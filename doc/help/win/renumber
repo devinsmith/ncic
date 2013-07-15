@@ -1,0 +1,5 @@
+SYNTAX: win renumber <new refnum>
+	Changes the reference number of the current window. If the reference number that is requested is currently in use, the window that has that reference number and the current window will have their reference numbers swapped.
+
+PARAMETERS
+	<new refnum>: The new reference number for the current window.

@@ -1,0 +1,5 @@
+SYNTAX: win swap <refnum>
+	Switches to the window with the specified reference number.
+
+PARAMETERS
+	<refnum>: The reference number of the window to which to switch.

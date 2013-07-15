@@ -1,0 +1,2 @@
+SYNTAX: blist add_block
+	Adds the user the buddy list cursor is on to the current account's blocked users list. If the cursor is on a group, no action is taken.

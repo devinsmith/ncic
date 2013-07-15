@@ -1,0 +1,9 @@
+SYNTAX: chat ignore [<chat room>] <user>
+	Ignores a user in a chat room. The <chat room> parameter may be omitted of the current window is a chat window, in which case the chat room displayed in the current window is assumed.
+
+PARAMETERS
+	<chat room>: The name/exchange combination of the chat room in which to ignore the specified user user.
+	<user>     : The user to ignore.
+
+SEE ALSO
+	chat

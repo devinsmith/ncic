@@ -1,0 +1,2 @@
+SYNTAX: input delete
+	Deletes the character that the cursor is on.

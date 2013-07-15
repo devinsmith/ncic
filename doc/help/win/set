@@ -1,0 +1,37 @@
+SYNTAX: win set [<variable> [<value>]]
+	Sets a per-window variable. Each window has a set of per-window variables that control particular settings for only that window. The default values for these variables are inherited from the global variables having the same name, if any.
+
+	The following per-window variables exist. Type /win set for examples.
+
+ BEEP_ON_OUTPUT (boolean)
+	Beep when new messages are received in the window.
+
+ HISTORY_LEN (integer)
+	The maximum number of lines to be saved in the window's input history.
+
+ LOG (boolean)
+	Log messages in the window.
+
+ LOGFILE (string)
+	The file to which messages in the window will be logged if LOG is set to true.
+
+ PRIVATE_INPUT (boolean)
+	Give the window its own input line and history.
+
+ SCROLL_ON_INPUT (boolean)
+	If the display is scrolled up, scroll to the bottom when any input is received in the window.
+
+ SCROLL_ON_OUTPUT (boolean)
+	If the display is scrolled up, scroll to the bottom when any new messages are displayed in the window.
+
+ SCROLLBUF_LEN (integer)
+	The number of lines to retain in the scroll buffer.
+
+ SHOW_BLIST (boolean)
+	Show the buddy list in the window.
+
+ TIMESTAMP (boolean)
+	Display timestamps on messages in the window.
+
+SEE ALSO
+	set

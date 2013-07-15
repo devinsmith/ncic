@@ -1,0 +1,5 @@
+SYNTAX: file get <transfer refnum>
+	Accepts the file transfer whose reference number is specified. This command is used to accept files sent by other users.
+
+PARAMETERS
+	<transfer refnum>: The reference number of the transfer to accept.

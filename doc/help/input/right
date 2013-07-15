@@ -1,0 +1,2 @@
+SYNTAX: input right
+	Moves the input cursor right one cell.

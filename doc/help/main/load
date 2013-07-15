@@ -1,0 +1,5 @@
+SYNTAX: load <filename>
+	Loads a ncicrc-style file. The format of this file is one ncic command per line.
+
+PARAMETERS
+	<filename>: The filename to load.

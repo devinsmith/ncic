@@ -1,0 +1,8 @@
+SYNTAX: input prompt <string>
+	Sets the input prompt.
+
+PARAMETERS
+	<string>: The string to which to set the input prompt. This string may contain embedded color codes.
+
+SEE ALSO
+	color

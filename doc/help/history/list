@@ -1,0 +1,2 @@
+SYNTAX: history [list]
+	Prints the input history to the screen.

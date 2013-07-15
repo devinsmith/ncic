@@ -1,0 +1,8 @@
+SYNTAX: chat join <chat room>
+	Joins the specified chat room.
+
+PARAMETERS
+	<chat room>: The name/exchange combination of the chat room to join.
+
+SEE ALSO
+	chat

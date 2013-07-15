@@ -1,0 +1,8 @@
+SYNTAX: buddy block <screen name>
+	Adds a screen name to the current account's blocked users list. Note that for AIM, in order to activate the blocked users list, your privacy mode must be set to 4.
+
+PARAMETERS
+	<screen name>: The screen name to block.
+
+SEE ALSO
+	buddy privacy_mode

@@ -1,0 +1,5 @@
+SYNTAX: profile [<profile text>]
+	Sets the profile for the current screen name. If no parameters are specified, the profile for the current user is removed.
+
+PARAMETERS
+	<profile text>: (Optional) The profile to be set.

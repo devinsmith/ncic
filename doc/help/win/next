@@ -1,0 +1,2 @@
+SYNTAX: win next
+	Switch to the next window in the window list. The window list is circular and sorted by reference number, so executing this command when the window with the highest reference number is active will make the window with the lowest reference number current.

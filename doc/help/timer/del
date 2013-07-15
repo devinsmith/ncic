@@ -1,0 +1,5 @@
+SYNTAX: timer del <command>
+	Delete the timer entry that executes the specified command. If there are multiple timer entries that execute the same command, the first (i.e. the most recently added) matching timer event will be deleted.
+
+PARAMETERS
+  	<command>: The command executed by the timer event that is to be deleted.

@@ -1,0 +1,8 @@
+SYNTAX: chat leave [<chat room>]
+	Leaves a chat room. If the <chat room> parameter is omitted, and the current window is a chat window, the chat room displayed in that window is assumed.
+
+PARAMETERS
+	<chat room>: The name/exchange combination of the chat room to leave.
+
+SEE ALSO
+	chat

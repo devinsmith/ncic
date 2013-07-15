@@ -1,0 +1,2 @@
+SYNTAX: blist down
+	Moves the buddy list's cursor down one line, if possible.

@@ -1,0 +1,5 @@
+SYNTAX: buddy unblock <screen name>
+	Removes a screen name from the current account's blocked users list.
+
+PARAMETERS
+	<screen name>: The screen name to remove from the blocked users list.

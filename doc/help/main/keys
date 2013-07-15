@@ -1,0 +1,54 @@
+PORK KEYCODES
+	Pork allows keys to be bound such that when a bound key is pressed, the command to which it is bound is executed. This help text describes the format of keycodes used by the commands that manipulate key bindings.
+
+The following strings are names of keycodes:
+  BACKSPACE    - The backspace key.
+  BREAK        - The break key.
+  DELETE       - The delete key.
+  DOWN_ARROW   - The down arrow key.
+  END          - The end key.
+  ENTER        - The enter key.
+  F1           - The F1 key.
+  F2           - The F2 key.
+  F3           - The F3 key.
+  F4           - The F4 key.
+  F5           - The F5 key.
+  F6           - The F6 key.
+  F7           - The F7 key.
+  F8           - The F8 key.
+  F9           - The F9 key.
+  F10          - The F10 key.
+  F11          - The F11 key.
+  F12          - The F12 key.
+  HOME         - The home key.
+  INSERT       - The insert key.
+  LEFT_ARROW   - The left arrow key.
+  PAGE_DOWN    - The page down key.
+  PAGE_UP      - The page up key.
+  RETURN       - The return key.
+  RIGHT_ARROW  - The right arrow key.
+  SPACE        - The spacebar key.
+  SUSPEND      - The suspend key.
+  TAB          - The tab key.
+  UP_ARROW     - The up arrow key.
+
+The keys that cause printing characters (see isprint(3)) to be entered may be bound by specifying the character entered by pressing the key (e.g. the A key can be bound by specifying A).
+
+Control keys can be specified using the ^<KEY> format (e.g. CTRL-A can be specified by ^A). Note that ^a and ^A are equivalent.
+
+Meta key sequences can be specified by prepending META- to a keycode (e.g. META-a). The meta key is "alt" key on PC keyboards. The escape key will work on all keyboards. Note that META-a and META-A are not equivalent and refer to different keycodes. METAN- can be used to specify multiple instances of the meta key being pressed. For example, META2-1 corresponds to ALT+ESC-1 (or ESC-ESC-1).
+
+Keycodes can also be specified by their hexadecimal values.
+
+EXAMPLES
+	META-^C   - meta+control-C
+	META-a    - meta+lowercase a
+	META10-^A - the escape key pressed 10 times followed by control-A
+	b         - lowercase b
+    D         - uppercase d
+    PAGE_UP   - the page up key
+	0x41      - A
+
+SEE ALSO
+	bind
+	unbind

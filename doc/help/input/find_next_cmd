@@ -1,0 +1,2 @@
+SYNTAX: input find_next_cmd
+	Cycles through the commands that will complete the partial string typed so far.  Often used for 'tab completion' of commands.

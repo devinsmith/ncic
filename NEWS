@@ -1,0 +1,38 @@
+Version 0.0.6 (Released July 15th, 2013)
+===============================================================================
+- SSL connection
+
+Version 0.0.5 (Released May 7th, 2009)
+===============================================================================
+- Auto-rejoin the same channel that you were in on a reconnection
+- Fix the text that is sent when you are away.
+- Fix a delay in processing name changes.  Also while fixing that, add code
+  to update the UI to show nickname updates.
+- configure now creates the Makefile
+
+Version 0.0.4 (Released April 28th, 2009)
+===============================================================================
+- If we receive a user delete command from naken chat server, verify that it
+  isn't a duplicate and if it is don't continue. This is a work-around to
+  compensate for a bug in Mike's naken chat server.
+- Check for a user add and user delete only within the first part of the input
+  stream.
+- Fixed another crash that was caused by another uninitialized pointer.
+
+Version 0.0.3 (Releaseed March 24th, 2009)
+===============================================================================
+- Fixed a crash that was caused by using an uninitialized pointer.
+- No longer interpret emotes because they can not be matched with 100% success.
+- Fixed a crash when the buddy list cursor is on a user that signed off.
+- The default setting for FORMAT_BLIST that gets saved in the ncicrc file will
+  now show the user's ID in the buddy list. If you have FORMAT_BLIST in your
+  ncicrc file you might want to remove it if you are upgrading from 0.0.2
+
+
+Version 0.0.2 (Released March 17th, 2009)
+===============================================================================
+- Rewrite and cleanup. Now heavily based on pork
+
+Version 0.0.1 (Released February 25th, 2007)
+===============================================================================
+- Initial release.
