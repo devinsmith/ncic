@@ -33,7 +33,7 @@
 #endif
 
 #include "ncic.h"
-#include <pork_missing.h>
+#include <ncic_missing.h>
 #include "ncic_util.h"
 #include "ncic_inet.h"
 
