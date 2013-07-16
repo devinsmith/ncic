@@ -711,6 +711,10 @@ all:
 clean:
 	@(cd src && $(MAKE) clean)
 
+pristine: clean
+	@(cd src && $(MAKE) pristine)
+	rm -f Makefile config.mak config.h
+
 install:
 	@if [ ! -d $(PREFIX)/bin ]; then mkdir $(PREFIX)/bin; fi;
 	cp ncic $(PREFIX)/bin/
@@ -720,6 +724,114 @@ install:
 	@if [ ! -d $(PREFIX)/share/ncic/help ]; then mkdir $(PREFIX)/share/ncic/help; fi;
 	cp -R doc/help/* $(PREFIX)/share/ncic/help/
 ' > Makefile
+
+# Build the src level Makefile
+echo "Creating src/Makefile"
+echo '# ncic/src makefile
+
+include ../config.mak
+
+.PHONY: all clean install
+
+SRCS = ncic.c ncic_acct.c ncic_alias.c ncic_bind.c ncic_buddy.c \
+       ncic_buddy_list.c ncic_chat.c ncic_color.c ncic_command.c ncic_conf.c \
+       ncic_cstr.c ncic_format.c ncic_help.c ncic_imsg.c \
+       ncic_imwindow.c ncic_inet.c ncic_input.c ncic_io.c ncic_list.c \
+       ncic_misc.c ncic_msg.c ncic_opt.c ncic_proto.c \
+       ncic_queue.c ncic_screen.c ncic_screen_io.c ncic_set.c ncic_slist2.c \
+       ncic_status.c ncic_swindow.c ncic_timer.c ncic_transfer.c ncic_util.c
+
+SRCS += ncic_irc.c ncic_irc_dcc.c ncic_irc_input.c ncic_irc_output.c \
+        ncic_naken.c
+
+OBJS = $(SRCS:.c=.o)
+
+CC = gcc
+SYSTEM_NCICRC = $(PREFIX)/share/ncic/ncicrc
+DEFINES = -DSYSTEM_NCICRC=\"$(SYSTEM_NCICRC)\"
+INTERNAL_CFLAGS = -Wall -funsigned-char -fno-strict-aliasing $(DEFINES) -Imissing
+CPPFLAGS += -MMD -MP -MT $@
+CFLAGS= -O2 -pipe
+LIBS = -Lmissing -lmissing -lncurses -lcrypto -lssl
+
+INSTALL=/usr/bin/install
+INSTALL_PREFIX=/usr/local
+
+EXE = ncic
+
+all: libmissing $(EXE)
+
+libmissing:
+	@(cd missing && $(MAKE))
+
+$(EXE): $(OBJS)
+	$(CC) $(INTERNAL_CFLAGS) $(CFLAGS) -o $(EXE) $(OBJS) $(LFLAGS) $(LIBS)
+
+install:
+	$(INSTALL) -s -m 755 $(EXE) $(INSTALL_PREFIX)/bin
+
+clean:
+	@(cd missing && $(MAKE) clean)
+	rm -f $(OBJS) $(EXE)
+	rm -f *.d
+
+pristine: clean
+	@(cd missing && $(MAKE) pristine)
+	rm -f Makefile
+
+.c.o:
+	$(CC) $(INTERNAL_CFLAGS) $(CFLAGS) $(CPPFLAGS) -o $@ -c $<
+
+# Include automatically generated dependency files
+-include $(wildcard *.d)
+' > src/Makefile
+
+# Build the src level Makefile
+echo "Creating src/missing/Makefile"
+echo '# ncic libmissing makefile
+
+include ../../config.mak
+
+.PHONY: all clean install
+
+SRCS = getopt.c inet_ntop.c ipv6_missing.c snprintf.c strsep.c vasprintf.c
+OBJS = $(SRCS:.c=.o)
+
+STATIC_LIB = libmissing.a
+AR = ar
+CC = gcc
+CFLAGS= -O2 -pipe
+INTERNAL_CFLAGS = -Wall -I.. -I. -fno-strict-aliasing
+CPPFLAGS += -MMD -MP -MT $@
+LIBS = -lncurses
+
+INSTALL=/usr/bin/install
+INSTALL_PREFIX=/usr/local
+
+EXE = ncic
+
+all: $(STATIC_LIB)
+
+$(STATIC_LIB): Makefile $(OBJS)
+	$(AR) rc $(STATIC_LIB) $(OBJS)
+	ranlib $(STATIC_LIB)
+
+install:
+	$(INSTALL) -s -m 755 $(EXE) $(INSTALL_PREFIX)/bin
+
+clean:
+	rm -f $(OBJS) $(STATIC_LIB)
+	rm -f *.d
+
+pristine: clean
+	rm -f Makefile
+
+.c.o:
+	$(CC) $(INTERNAL_CFLAGS) $(CFLAGS) $(CPPFLAGS) -o $@ -c $<
+
+# Include automatically generated dependency files
+-include $(wildcard *.d)
+' > src/missing/Makefile
 
 echo
 echo "Configuration:"
