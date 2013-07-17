@@ -1,3 +1,8 @@
+Version 0.0.7 (Released July 16th, 2013)
+===============================================================================
+- Improve configure script.
+- Fix build issues on Linux.
+
 Version 0.0.6 (Released July 15th, 2013)
 ===============================================================================
 - SSL connection
