@@ -28,4 +28,15 @@ ncic
    | MacOS X Server  | 10.4.10  | i386     |
    | Slackware Linux | 12.2     | i386     |
 
+Building
+========
+Under Ubuntu you will need to install ncurses-dev.
+sudo apt-get install ncurses-dev
 
+Other versions of Linux/Unix typically have ncurses installed by default.
+
+After, type:
+
+./configure
+make
+sudo make install
