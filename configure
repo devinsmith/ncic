@@ -11,6 +11,7 @@
 # default parameters
 CC="gcc"
 PREFIX="/usr/local"
+VERSION="0.0.7"
 
 ###############################################################################
 # Check for command line arguments
@@ -66,6 +67,8 @@ printf "/*
  *  DON'T EDIT THIS FILE MANUALLY, IT WILL BE OVERWRITTEN.
  */
 \n#ifndef __CONFIG_H__\n#define __CONFIG_H__\n\n" > config.h
+
+printf "#define VERSION \"${VERSION}\"\n" >> config.h
 
 printf "#define NCIC_HELP_PATH \"${PREFIX}/share/ncic/help\"\n" >> config.h
 
@@ -749,7 +752,7 @@ OBJS = $(SRCS:.c=.o)
 CC = gcc
 SYSTEM_NCICRC = $(PREFIX)/share/ncic/ncicrc
 DEFINES = -DSYSTEM_NCICRC=\"$(SYSTEM_NCICRC)\"
-INTERNAL_CFLAGS = -Wall -funsigned-char -fno-strict-aliasing $(DEFINES) -Imissing
+INTERNAL_CFLAGS = -Wall -funsigned-char -fno-strict-aliasing $(DEFINES) -Imissing -I..
 CPPFLAGS += -MMD -MP -MT $@
 CFLAGS= -O2 -pipe
 LIBS = -Lmissing -lmissing -lncurses -lcrypto -lssl
@@ -801,7 +804,7 @@ STATIC_LIB = libmissing.a
 AR = ar
 CC = gcc
 CFLAGS= -O2 -pipe
-INTERNAL_CFLAGS = -Wall -I.. -I. -fno-strict-aliasing
+INTERNAL_CFLAGS = -Wall -I.. -I. -I../.. -fno-strict-aliasing
 CPPFLAGS += -MMD -MP -MT $@
 LIBS = -lncurses
 
