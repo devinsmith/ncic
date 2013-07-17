@@ -713,6 +713,7 @@ all:
 
 clean:
 	@(cd src && $(MAKE) clean)
+	rm -f ncic
 
 pristine: clean
 	@(cd src && $(MAKE) pristine)
