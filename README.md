@@ -37,6 +37,8 @@ Other versions of Linux/Unix typically have ncurses installed by default.
 
 After, type:
 
+```
 ./configure
 make
 sudo make install
+```
