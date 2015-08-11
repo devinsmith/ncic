@@ -91,8 +91,8 @@ buddy_remove(struct pork_acct *acct, const char *screen_name, int id) {
 
 	blist_del(acct->blist, buddy);
 
-	buddy_cleanup(buddy);
 	buddy->group->buddy_list[id] = NULL;
+	buddy_cleanup(buddy);
 	return (0);
 }
 
