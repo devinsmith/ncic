@@ -86,12 +86,8 @@ buddy_remove(struct pork_acct *acct, const char *screen_name, int id) {
 	if (buddy->status != STATUS_OFFLINE)
 		buddy_offline(acct, buddy);
 
-	buddy->group->num_members--;
 	acct->buddy_pref->num_buddies--;
 
-	blist_del(acct->blist, buddy);
-
-	buddy->group->buddy_list[id] = NULL;
 	buddy_cleanup(buddy);
 	return (0);
 }
@@ -115,7 +111,6 @@ struct buddy *buddy_add(struct pork_acct *acct,
 	buddy = xcalloc(1, sizeof(*buddy));
 	buddy->name = xstrdup(screen_name);
 	buddy->nname = xstrdup(nname);
-	buddy->group = group;
 	buddy->refnum = group->high_refnum++;
 	buddy->id = id;
 	pref->num_buddies++;
@@ -257,7 +252,6 @@ buddy_online(struct pork_acct *acct,
 		void *data)
 {
 	buddy_update(acct, buddy, data);
-	blist_add(acct->blist, buddy);
 }
 
 static void

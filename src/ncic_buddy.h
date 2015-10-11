@@ -25,7 +25,6 @@ struct buddy_pref {
 	dlist_t *block_list;
 	u_int16_t privacy_mode;
 	u_int32_t num_buddies;
-	//hash_t buddy_hash;
 	char **user_list;
 	int user_list_size;
 };
@@ -44,7 +43,6 @@ struct buddy {
 	char *name;
 	char *nname;
 	char *userhost;
-	struct bgroup *group;
 	u_int32_t refnum;
 	u_int32_t signon_time;
 	u_int32_t idle_time;

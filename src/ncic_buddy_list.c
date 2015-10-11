@@ -150,52 +150,6 @@ blist_add_group(struct blist *blist, struct bgroup *group) {
 	return (ret->data);
 }
 
-struct slist_cell *
-blist_add(struct blist *blist, struct buddy *buddy) {
-	struct slist_cell *cell;
-	struct slist_cell *ret;
-
-	if (blist == NULL)
-		return (NULL);
-
-	cell = xcalloc(1, sizeof(*cell));
-	cell->type = TYPE_FLAT_CELL;
-	cell->parent = buddy->group->blist_line;
-	cell->refnum = buddy->refnum;
-	cell->label = xmalloc(sizeof(chtype) * blist->label_len);
-	cell->data = buddy;
-	blist_make_buddy_label(buddy, cell->label, blist->label_len);
-
-	ret = slist_add(&blist->slist, cell, buddy->id + 1);
-	if (ret == NULL)
-		return (NULL);
-
-	cell = buddy->group->blist_line;
-
-	buddy->blist_line = ret;
-	blist_make_group_label(buddy->group, cell->label, blist->label_len);
-	blist_draw(blist);
-	return (ret);
-}
-
-void blist_del(struct blist *blist, struct buddy *buddy) {
-	struct slist_cell *cell;
-
-	if (blist == NULL)
-		return;
-
-	cell = buddy->blist_line;
-	if (cell == NULL)
-		return;
-	buddy->blist_line = NULL;
-	slist_del(&blist->slist, cell);
-
-	cell = buddy->group->blist_line;
-	blist_make_group_label(buddy->group, cell->label, blist->label_len);
-
-	blist_draw(blist);
-}
-
 void blist_del_group(struct blist *blist, struct bgroup *group) {
 	struct slist_cell *cell;
 
