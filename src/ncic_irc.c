@@ -96,17 +96,25 @@ static void irc_connected(int sock, u_int32_t cond, void *data) {
 		pork_acct_disconnected(acct);
 	} else {
 		session->sock = sock;
+
 		/* Register the error strings for libcrypto & libssl */
-		SSL_load_error_strings ();
+		SSL_load_error_strings();
 		/* Register the available ciphers and digests */
-		SSL_library_init ();
+		SSL_library_init();
+		OpenSSL_add_all_algorithms();
+
 		// New context saying we are a client, and using SSL 2 or 3
-		session->sslContext = SSL_CTX_new (SSLv23_client_method ());
+		session->sslContext = SSL_CTX_new(SSLv3_client_method());
 		if (session->sslContext == NULL) // Dumps to stderr, yuck
 			ERR_print_errors_fp (stderr);
 
+		SSL_CTX_set_verify(session->sslContext, SSL_VERIFY_NONE, NULL);
+		SSL_CTX_set_verify_depth(session->sslContext, 0);
+		SSL_CTX_set_mode(session->sslContext, SSL_MODE_AUTO_RETRY);
+		SSL_CTX_set_session_cache_mode(session->sslContext, SSL_SESS_CACHE_CLIENT);
+
 		// Create an SSL struct for the connection
-		session->sslHandle = SSL_new (session->sslContext);
+		session->sslHandle = SSL_new(session->sslContext);
 		if (session->sslHandle == NULL)
 			ERR_print_errors_fp(stderr);
 
@@ -114,9 +122,29 @@ static void irc_connected(int sock, u_int32_t cond, void *data) {
 		if (!SSL_set_fd(session->sslHandle, session->sock))
 			ERR_print_errors_fp(stderr);
 
-		// Initiate SSL handshake
-		if (SSL_connect (session->sslHandle) != 1)
-			ERR_print_errors_fp (stderr);
+		while ((ret = SSL_connect(session->sslHandle)) == -1) {
+			fd_set fds;
+			int ssl_err;
+			struct pork_acct *acct = session->data;
+
+			FD_ZERO(&fds);
+			FD_SET(session->sock, &fds);
+
+			switch (ssl_err = SSL_get_error(session->sslHandle, ret)) {
+			case SSL_ERROR_WANT_READ:
+				select(session->sock + 1, &fds, NULL, NULL, NULL);
+				break;
+			case SSL_ERROR_WANT_WRITE:
+				select(session->sock + 1, NULL, &fds, NULL, NULL);
+				break;
+			default:
+				screen_err_msg("network error: %s: could not connect %d",
+				    acct->username, ssl_err);
+				return;
+				break;
+			}
+		}
+
 		sock_setflags(sock, 0);
 		pork_io_add(sock, IO_COND_READ, data, data, irc_event);
 		irc_send_login(session);
