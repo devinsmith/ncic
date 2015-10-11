@@ -426,10 +426,6 @@ static int irc_change_nick(struct pork_acct *acct, char *nick) {
 	return (irc_send_nick(acct->data, nick));
 }
 
-static int irc_part(struct pork_acct *acct, struct chatroom *chat) {
-	return (irc_send_part(acct->data, chat->title));
-}
-
 static int irc_chan_users(struct pork_acct *acct, struct chatroom *chat) {
 	return (irc_send_names(acct->data, chat->title));
 }
@@ -877,7 +873,7 @@ int irc_proto_init(struct pork_proto *proto) {
 	proto->chat_send = irc_chan_send;
 	proto->chat_find = irc_find_chat;
 	proto->chat_name = irc_chan_get_name;
-	proto->chat_leave = irc_part;
+	proto->chat_leave = NULL;
 	proto->chat_users = irc_chan_users;
 	proto->chat_kick = irc_chan_kick;
 	proto->chat_ban = irc_chan_ban;

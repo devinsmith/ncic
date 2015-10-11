@@ -390,20 +390,6 @@ int irc_send_nick(irc_session_t *session, char *nick) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_part(irc_session_t *session, char *chan) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-
-	if (chan == NULL)
-		return (-1);
-
-	ret = snprintf(buf, sizeof(buf), "PART %s\r\n", chan);
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
-}
-
 int irc_send_quit(irc_session_t *session, char *reason) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
