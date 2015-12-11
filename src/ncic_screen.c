@@ -26,7 +26,6 @@
 #include "ncic_imsg.h"
 #include "ncic_imwindow.h"
 #include "ncic_buddy.h"
-#include "ncic_buddy_list.h"
 #include "ncic_proto.h"
 #include "ncic_acct.h"
 #include "ncic_chat.h"
@@ -254,29 +253,10 @@ void screen_resize(u_int32_t rows, u_int32_t cols) {
 	screen.rows = rows;
 	screen.cols = cols;
 
-	for (cur = screen.acct_list ; cur != NULL ; cur = cur->next) {
-		struct pork_acct *acct = cur->data;
-
-		if (acct->blist != NULL) {
-			blist_resize(acct->blist, max(1, (int) rows - STATUS_ROWS),
-				acct->blist->slist.cols, cols);
-		}
-	}
-
 	cur = screen.window_list;
 	do {
 		struct imwindow *imwindow = cur->data;
 		u_int32_t im_cols = cols;
-
-		if (imwindow->blist_visible) {
-			u_int32_t blist_cols = imwindow->owner->blist->slist.cols;
-
-			if (blist_cols >= cols) {
-				imwindow->blist_visible = 0;
-				imwindow->active_binds = &screen.binds.main;
-			} else
-				im_cols -= blist_cols;
-		}
 
 		imwindow_resize(imwindow,
 			max(1, (int) rows - STATUS_ROWS), im_cols);
@@ -290,32 +270,6 @@ void screen_resize(u_int32_t rows, u_int32_t cols) {
 		delwin(screen.status_bar);
 		status_init();
 	}
-}
-
-int screen_blist_width(struct blist *blist, u_int32_t new_width) {
-	dlist_t *cur;
-
-	if (new_width < 3 || new_width >= screen.cols)
-		return (-1);
-
-	if (blist == NULL)
-		return (-1);
-
-	cur = screen.window_list;
-	do {
-		struct imwindow *imwindow = cur->data;
-
-		if (imwindow->owner != NULL && imwindow->owner->blist == blist &&
-			imwindow->blist_visible)
-		{
-			imwindow_resize(imwindow, imwindow->swindow.rows,
-				imwindow->swindow.cols + blist->slist.cols - new_width);
-		}
-		cur = cur->next;
-	} while (cur != screen.window_list);
-
-	blist_resize(blist, blist->slist.rows, new_width, screen.cols);
-	return (0);
 }
 
 void screen_window_swap(dlist_t *new_cur) {
@@ -359,7 +313,6 @@ void screen_window_swap(dlist_t *new_cur) {
 	*/
 	redrawwin(imwindow->swindow.win);
 	imwindow->swindow.dirty = 1;
-	imwindow_blist_draw(imwindow);
 }
 
 inline int screen_goto_window(u_int32_t refnum) {
@@ -380,7 +333,6 @@ void screen_refresh(void) {
 	wclear(imwindow->swindow.win);
 	wnoutrefresh(imwindow->swindow.win);
 	swindow_redraw(&imwindow->swindow);
-	imwindow_blist_draw(imwindow);
 	status_draw(imwindow->owner);
 	imwindow_refresh(imwindow);
 	imwindow->input->dirty = 1;

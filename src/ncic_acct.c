@@ -26,7 +26,6 @@
 #include "ncic_imsg.h"
 #include "ncic_imwindow.h"
 #include "ncic_buddy.h"
-#include "ncic_buddy_list.h"
 #include "ncic_proto.h"
 #include "ncic_acct.h"
 #include "ncic_screen.h"
@@ -57,7 +56,6 @@ static void pork_acct_free(struct pork_acct *acct) {
 		acct->proto->free(acct);
 
 	if (acct->blist != NULL) {
-		blist_destroy(acct->blist);
 		free(acct->blist);
 	}
 
@@ -142,8 +140,6 @@ void pork_acct_del(dlist_t *node, char *reason) {
 			struct imwindow *win = cur->data;
 
 			if (win->owner == acct) {
-				if (win->blist_visible)
-					imwindow_blist_hide(win);
 
 				win->owner->ref_count--;
 
@@ -247,19 +243,6 @@ void pork_acct_del_all(char *reason) {
 	}
 }
 
-void pork_acct_update_blist_color(void) {
-	dlist_t *cur = screen.acct_list;
-
-	while (cur != NULL) {
-		struct pork_acct *acct = cur->data;
-
-		if (acct->blist != NULL)
-			blist_draw(acct->blist);
-
-		cur = cur->next;
-	}
-}
-
 int pork_acct_connect(const char *user, char *args, int protocol) {
 	struct pork_acct *acct;
 
@@ -289,19 +272,6 @@ int pork_acct_connect(const char *user, char *args, int protocol) {
 	}
 
 	return (0);
-}
-
-void pork_acct_update_blist_format(void) {
-	dlist_t *cur = screen.acct_list;
-
-	while (cur != NULL) {
-		struct pork_acct *acct = cur->data;
-
-		if (acct->blist != NULL)
-			blist_changed_format(acct->blist);
-
-		cur = cur->next;
-	}
 }
 
 inline void pork_acct_update(void) {
@@ -376,8 +346,6 @@ struct pork_acct *pork_acct_init(const char *user, int protocol) {
 
 	memcpy(&acct->laddr, &local_addr, sizeof(acct->laddr));
 	acct->lport = local_port;
-
-	blist_init(acct);
 
 	time(&acct->last_input);
 	return (acct);

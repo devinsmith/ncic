@@ -23,7 +23,7 @@ void screen_win_msg(struct imwindow *win,
 					char *fmt, ...) __format((printf, 6, 7));
 
 inline void screen_nocolor_msg(char *fmt, ...) __format((printf, 1, 2));
-inline void screen_err_msg(char *fmt, ...) __format((printf, 1, 2));
+void screen_err_msg(char *fmt, ...) __format((printf, 1, 2));
 inline void screen_cmd_output(char *fmt, ...) __format((printf, 1, 2));
 
 void screen_win_target_msg(	struct pork_acct *acct,

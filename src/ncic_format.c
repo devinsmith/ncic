@@ -29,7 +29,6 @@
 #include "ncic_color.h"
 #include "ncic_buddy.h"
 #include "ncic_imwindow.h"
-#include "ncic_buddy_list.h"
 #include "ncic_acct.h"
 #include "ncic_proto.h"
 #include "ncic_cstr.h"
@@ -832,121 +831,6 @@ static int format_warning(char opt, char *buf, size_t len, va_list ap) {
 	return (0);
 }
 
-static int format_blist_idle(char opt, char *buf, size_t len, va_list ap) {
-	struct buddy *buddy = va_arg(ap, struct buddy *);
-	int ret = 0;
-
-	switch (opt) {
-		case 'I':
-			ret = time_to_str(buddy->idle_time, buf, len);
-			break;
-
-		default:
-			return (-1);
-	}
-
-	if (ret < 0 || (size_t) ret >= len)
-		return (-1);
-
-	return (0);
-}
-
-static int format_blist_buddy_label(char opt, char *buf, size_t len, va_list ap)
-{
-	struct buddy *buddy = va_arg(ap, struct buddy *);
-	int ret = 0;
-
-	switch (opt) {
-		case 'B':
-		case 'b': {
-			char *status_text;
-
-			if (buddy->status == STATUS_ACTIVE)
-				status_text = opt_get_str(OPT_TEXT_BUDDY_ACTIVE);
-			else if (buddy->status == STATUS_AWAY)
-				status_text = opt_get_str(OPT_TEXT_BUDDY_AWAY);
-			else if (buddy->status == STATUS_IDLE)
-				status_text = opt_get_str(OPT_TEXT_BUDDY_IDLE);
-			else
-				status_text = "%p?%x";
-
-			ret = xstrncpy(buf, status_text, len);
-			break;
-		}
-		case 'D':
-		case 'd':
-			ret = snprintf(buf, len, "%d", buddy->id);
-			break;
-
-		case 'N':
-		case 'n':
-			ret = xstrncpy(buf, buddy->name, len);
-			break;
-
-		case 'I':
-			ret = fill_format_str(OPT_FORMAT_BLIST_IDLE, buf, len, buddy);
-			break;
-
-		case 'i':
-			if (buddy->idle_time > 0)
-				ret = fill_format_str(OPT_FORMAT_BLIST_IDLE, buf, len, buddy);
-			break;
-
-		case 'w':
-			break;
-
-		default:
-			return (-1);
-	}
-
-	if (ret < 0 || (size_t) 	ret >= len)
-		return (-1);
-
-	return (0);
-}
-
-static int format_blist_group_label(char opt, char *buf, size_t len, va_list ap)
-{
-	struct bgroup *group = va_arg(ap, struct bgroup *);
-	int ret = 0;
-
-	switch (opt) {
-		case 'E': {
-			char *expand_str;
-			struct slist_cell *cell = group->blist_line;
-
-			if (cell != NULL && cell->collapsed) {
-				expand_str =
-					opt_get_str(OPT_TEXT_BLIST_GROUP_COLLAPSED);
-			} else {
-				expand_str =
-					opt_get_str(OPT_TEXT_BLIST_GROUP_EXPANDED);
-			}
-
-			ret = xstrncpy(buf, expand_str, len);
-			break;
-		}
-
-		case 'N':
-		case 'n':
-			ret = xstrncpy(buf, group->name, len);
-			break;
-
-		case 'T':
-		case 't':
-			ret = snprintf(buf, len, "%u", group->num_members);
-			break;
-
-		default:
-			return (-1);
-	}
-
-	if (ret < 0 || (size_t) ret >= len)
-		return (-1);
-
-	return (0);
-}
-
 static int format_file_transfer(char opt, char *buf, size_t len, va_list ap) {
 	struct file_transfer *xfer = va_arg(ap, struct file_transfer *);
 	struct pork_acct *acct = xfer->acct;
@@ -1129,9 +1013,6 @@ static int (*const format_handler[])(char, char *, size_t, va_list) = {
 	format_msg_recv,			/* OPT_FORMAT_ACTION_RECV_STATUS	*/
 	format_msg_send,			/* OPT_FORMAT_ACTION_SEND			*/
 	format_msg_send,			/* OPT_FORMAT_ACTION_SEND_STATUS	*/
-	format_blist_buddy_label,	/* OPT_FORMAT_BLIST					*/
-	format_blist_group_label,	/* OPT_FORMAT_BLIST_GROUP			*/
-	format_blist_idle,			/* OPT_FORMAT_BLIST_IDLE			*/
 	format_chat_info,			/* OPT_FORMAT_CHAT_CREATE			*/
 	format_chat_info,			/* OPT_FORMAT_CHAT_IGNORE			*/
 	format_chat_info,			/* OPT_FORMAT_CHAT_INVITE			*/

@@ -52,7 +52,6 @@ static void wopt_changed_priv_input(struct imwindow *imwindow);
 static void wopt_changed_scrollbuf_len(struct imwindow *imwindow);
 static void wopt_changed_scroll_on_output(struct imwindow *imwindow);
 static void wopt_changed_scroll_on_input(struct imwindow *imwindow);
-static void wopt_changed_show_blist(struct imwindow *imwindow);
 static void wopt_changed_timestamp(struct imwindow *imwindow);
 static void wopt_changed_wordwrap(struct imwindow *imwindow);
 
@@ -122,24 +121,6 @@ struct global_pref global_pref[] = {
 		opt_set_char,
 		NULL,
 		SET_CHAR(DEFAULT_CMDCHARS),
-	},{	"COLOR_BLIST_FOCUS",
-		OPT_COLOR,
-		0,
-		opt_set_color,
-		pork_acct_update_blist_color,
-		SET_INT(DEFAULT_COLOR_BLIST_FOCUS),
-	},{	"COLOR_BLIST_NOFOCUS",
-		OPT_COLOR,
-		0,
-		opt_set_color,
-		pork_acct_update_blist_color,
-		SET_INT(DEFAULT_COLOR_BLIST_NOFOCUS),
-	},{	"COLOR_BLIST_SELECTOR",
-		OPT_COLOR,
-		0,
-		opt_set_color,
-		pork_acct_update_blist_color,
-		SET_INT(DEFAULT_COLOR_BLIST_SELECTOR),
 	},{	"CONNECT_TIMEOUT",
 		OPT_INT,
 		0,
@@ -182,24 +163,6 @@ struct global_pref global_pref[] = {
 		opt_set_format,
 		NULL,
 		SET_STR(DEFAULT_FORMAT_ACTION_SEND_STATUS),
-	},{	"FORMAT_BLIST",
-		OPT_FORMAT,
-		0,
-		opt_set_format,
-		pork_acct_update_blist_format,
-		SET_STR(DEFAULT_FORMAT_BLIST),
-	},{	"FORMAT_BLIST_GROUP",
-		OPT_FORMAT,
-		0,
-		opt_set_format,
-		pork_acct_update_blist_format,
-		SET_STR(DEFAULT_FORMAT_BLIST_GROUP),
-	},{	"FORMAT_BLIST_IDLE",
-		OPT_FORMAT,
-		0,
-		opt_set_format,
-		pork_acct_update_blist_format,
-		SET_STR(DEFAULT_FORMAT_BLIST_IDLE),
 	},{	"FORMAT_CHAT_CREATE",
 		OPT_FORMAT,
 		0,
@@ -662,12 +625,6 @@ struct global_pref global_pref[] = {
 		opt_set_bool,
 		NULL,
 		SET_BOOL(DEFAULT_SEND_REMOVES_AWAY),
-	},{	"SHOW_BLIST",
-		OPT_BOOL,
-		0,
-		opt_set_bool,
-		NULL,
-		SET_BOOL(DEFAULT_SHOW_BLIST),
 	},{	"SHOW_BUDDY_AWAY",
 		OPT_BOOL,
 		0,
@@ -686,36 +643,6 @@ struct global_pref global_pref[] = {
 		opt_set_bool,
 		NULL,
 		SET_BOOL(DEFAULT_SHOW_BUDDY_SIGNOFF),
-	},{	"TEXT_BLIST_GROUP_COLLAPSED",
-		OPT_STR,
-		0,
-		opt_set_format,
-		pork_acct_update_blist_format,
-		SET_STR(DEFAULT_TEXT_BLIST_GROUP_COLLAPSED),
-	},{	"TEXT_BLIST_GROUP_EXPANDED",
-		OPT_STR,
-		0,
-		opt_set_format,
-		pork_acct_update_blist_format,
-		SET_STR(DEFAULT_TEXT_BLIST_GROUP_EXPANDED),
-	},{	"TEXT_BUDDY_ACTIVE",
-		OPT_STR,
-		0,
-		opt_set_format,
-		pork_acct_update_blist_format,
-		SET_STR(DEFAULT_TEXT_BUDDY_ACTIVE),
-	},{	"TEXT_BUDDY_AWAY",
-		OPT_STR,
-		0,
-		opt_set_format,
-		pork_acct_update_blist_format,
-		SET_STR(DEFAULT_TEXT_BUDDY_AWAY),
-	},{	"TEXT_BUDDY_IDLE",
-		OPT_STR,
-		0,
-		opt_set_format,
-		pork_acct_update_blist_format,
-		SET_STR(DEFAULT_TEXT_BUDDY_IDLE),
 	},{	"TEXT_NO_NAME",
 		OPT_STR,
 		0,
@@ -827,10 +754,6 @@ static struct window_var window_var[] = {
 		OPT_INT,
 		wopt_set_int,
 		wopt_changed_scrollbuf_len
-	},{	"SHOW_BLIST",
-		OPT_BOOL,
-		wopt_set_bool,
-		wopt_changed_show_blist
 	},{	"TIMESTAMP",
 		OPT_BOOL,
 		wopt_set_bool,
@@ -1190,24 +1113,6 @@ static void wopt_changed_scroll_on_input(struct imwindow *imwindow) {
 	imwindow->swindow.scroll_on_input = new_val;
 }
 
-static void wopt_changed_show_blist(struct imwindow *imwindow) {
-	uint32_t new_val;
-	struct pork_acct *acct;
-
-	acct = imwindow->owner;
-	if (acct->blist == NULL)
-		return;
-
-	new_val = wopt_get_bool(imwindow->opts, WOPT_SHOW_BLIST);
-	if (new_val == imwindow->blist_visible)
-		return;
-
-	if (new_val)
-		imwindow_blist_show(imwindow);
-	else
-		imwindow_blist_hide(imwindow);
-}
-
 static void wopt_changed_timestamp(struct imwindow *imwindow) {
 	swindow_set_timestamp(&imwindow->swindow,
 		wopt_get_bool(imwindow->opts, WOPT_TIMESTAMP));
@@ -1236,7 +1141,6 @@ void wopt_init(struct imwindow *imwindow, const char *target) {
 	wopt[WOPT_SCROLL_ON_INPUT].b = opt_get_bool(OPT_SCROLL_ON_INPUT);
 	wopt[WOPT_SCROLL_ON_OUTPUT].b = opt_get_bool(OPT_SCROLL_ON_OUTPUT);
 	wopt[WOPT_SCROLLBUF_LEN].i = opt_get_int(OPT_SCROLLBUF_LEN);
-	wopt[WOPT_SHOW_BLIST].b = opt_get_bool(OPT_SHOW_BLIST);
 	wopt[WOPT_TIMESTAMP].b = opt_get_bool(OPT_TIMESTAMP);
 	wopt[WOPT_WORDWRAP].b = opt_get_bool(OPT_WORDWRAP);
 	wopt[WOPT_WORDWRAP_CHAR].c = opt_get_char(OPT_WORDWRAP_CHAR);

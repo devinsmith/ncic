@@ -27,7 +27,6 @@
 #include "ncic_set.h"
 #include "ncic_swindow.h"
 #include "ncic_imwindow.h"
-#include "ncic_buddy_list.h"
 #include "ncic_proto.h"
 #include "ncic_acct.h"
 #include "ncic_cstr.h"
@@ -86,11 +85,6 @@ struct imwindow *imwindow_new(	uint32_t rows,
 
 	imwindow->input = input;
 
-	if (wopt_get_bool(imwindow->opts, WOPT_SHOW_BLIST)) {
-		if (owner->blist != NULL)
-			imwindow_blist_show(imwindow);
-	}
-
 	return (imwindow);
 }
 
@@ -137,84 +131,18 @@ int imwindow_set_priv_input(struct imwindow *imwindow, int val) {
 	return (0);
 }
 
-inline int imwindow_blist_refresh(struct imwindow *imwindow) {
-	struct pork_acct *owner = imwindow->owner;
-
-	if (!imwindow->blist_visible)
-		return (0);
-
-	if (!owner->blist->slist.dirty)
-		return (0);
-
-	blist_draw_border(owner->blist, imwindow->input_focus);
-	blist_refresh(owner->blist);
-	return (1);
-}
-
 inline int imwindow_refresh(struct imwindow *imwindow) {
 	int was_dirty_win;
-	int was_dirty_blist;
 
 	was_dirty_win = swindow_refresh(&imwindow->swindow);
-	was_dirty_blist = imwindow_blist_refresh(imwindow);
 
-	return (was_dirty_win || was_dirty_blist);
-}
-
-void imwindow_blist_show(struct imwindow *imwindow) {
-	uint32_t new_width;
-
-	if (imwindow->owner->blist == NULL)
-		return;
-
-	if (imwindow->blist_visible)
-		return;
-
-	imwindow->blist_visible = 1;
-	imwindow->owner->blist->slist.dirty = 1;
-	new_width = imwindow->swindow.cols - imwindow->owner->blist->slist.cols;
-	imwindow_resize(imwindow, imwindow->swindow.rows, new_width);
+	return (was_dirty_win);
 }
 
 void imwindow_buffer_find(struct imwindow *imwindow, char *str, uint32_t opt) {
 	screen_win_msg(cur_window(), 1, 1, 0, MSG_TYPE_LASTLOG, "Matching lines:");
 	swindow_print_matching(&imwindow->swindow, str, opt);
 	screen_win_msg(cur_window(), 1, 1, 0, MSG_TYPE_LASTLOG, "End of matches");
-}
-
-void imwindow_blist_hide(struct imwindow *imwindow) {
-	uint32_t new_width;
-
-	if (!imwindow->blist_visible)
-		return;
-
-	imwindow->blist_visible = 0;
-	if (imwindow->owner->blist != NULL) {
-		imwindow->owner->blist->slist.dirty = 1;
-		new_width = imwindow->swindow.cols + imwindow->owner->blist->slist.cols;
-	} else
-		new_width = screen.cols;
-
-	imwindow->input_focus = BINDS_MAIN;
-	imwindow->active_binds = &screen.binds.main;
-
-	imwindow_resize(imwindow, imwindow->swindow.rows, new_width);
-}
-
-void imwindow_blist_toggle(struct imwindow *imwindow) {
-	if (!imwindow->blist_visible)
-		imwindow_blist_show(imwindow);
-	else
-		imwindow_blist_hide(imwindow);
-}
-
-void imwindow_blist_draw(struct imwindow *imwindow) {
-	struct blist *blist = imwindow->owner->blist;
-
-	if (blist == NULL || !imwindow->blist_visible)
-		return;
-
-	blist_draw(imwindow->owner->blist);
 }
 
 void imwindow_destroy(struct imwindow *imwindow) {
@@ -357,15 +285,6 @@ int imwindow_bind_acct(struct imwindow *imwindow, uint32_t refnum) {
 		imwindow->owner->ref_count--;
 		imwindow->owner = owner;
 		imwindow->owner->ref_count++;
-
-		if (imwindow->blist_visible) {
-			if (imwindow->owner->blist == NULL)
-				imwindow_blist_hide(imwindow);
-			else {
-				imwindow_blist_draw(imwindow);
-				imwindow_blist_refresh(imwindow);
-			}
-		}
 	}
 
 	return (0);

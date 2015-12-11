@@ -32,7 +32,6 @@
 #include "ncic_set.h"
 #include "ncic_imsg.h"
 #include "ncic_imwindow.h"
-#include "ncic_buddy_list.h"
 #include "ncic_proto.h"
 #include "ncic_acct.h"
 #include "ncic_cstr.h"
@@ -163,7 +162,6 @@ USER_COMMAND(cmd_input_focus_next) {
 	struct imwindow *win = cur_window();
 
 	imwindow_switch_focus(win);
-	imwindow_blist_draw(win);
 }
 
 USER_COMMAND(cmd_input_clear_to_start) {
@@ -925,209 +923,6 @@ USER_COMMAND(cmd_buddy_warn_anon) {
 }
 
 /*
-** /blist commands
-*/
-
-static struct command blist_command[] = {
-	{ "away",			cmd_blist_away			},
-	{ "collapse",		cmd_blist_collapse		},
-	{ "down",			cmd_blist_down			},
-	{ "end",			cmd_blist_end			},
-	{ "goto",			cmd_blist_goto			},
-	{ "hide",			cmd_blist_hide			},
-	{ "page_down",		cmd_blist_pgdown		},
-	{ "page_up",		cmd_blist_pgup			},
-	{ "profile",		cmd_blist_profile		},
-	{ "refresh",		cmd_blist_refresh		},
-	{ "remove",			cmd_blist_remove		},
-	{ "select",			cmd_blist_select		},
-	{ "show",			cmd_blist_show			},
-	{ "start",			cmd_blist_start			},
-	{ "toggle",			cmd_blist_toggle		},
-	{ "up",				cmd_blist_up			},
-	{ "warn",			cmd_blist_warn			},
-	{ "warn_anon",		cmd_blist_warn_anon		},
-	{ "width",			cmd_blist_width			},
-};
-
-USER_COMMAND(cmd_blist_away) {
-	struct slist_cell *cell;
-	struct buddy *buddy;
-	struct blist *blist = cur_window()->owner->blist;
-
-	cell = blist_get_cursor(blist);
-	if (cell == NULL || cell->type == TYPE_LIST_CELL)
-		return;
-
-	buddy = cell->data;
-	cmd_buddy_awaymsg(buddy->nname);
-}
-
-USER_COMMAND(cmd_blist_collapse) {
-	struct slist_cell *cell;
-	struct pork_acct *acct = cur_window()->owner;
-	struct blist *blist = acct->blist;
-
-	if (args == NULL)
-		cell = blist_get_cursor(blist);
-	else {
-		struct bgroup *gr = group_find(acct, args);
-
-		if (gr == NULL)
-			return;
-
-		cell = gr->blist_line;
-	}
-
-	if (cell == NULL || cell->type != TYPE_LIST_CELL)
-		return;
-}
-
-USER_COMMAND(cmd_blist_down) {
-	blist_cursor_down(cur_window()->owner->blist);
-}
-
-USER_COMMAND(cmd_blist_end) {
-	blist_cursor_end(cur_window()->owner->blist);
-}
-
-USER_COMMAND(cmd_blist_goto) {
-	if (args != NULL)
-		cmd_query(args);
-	else {
-		struct slist_cell *cell;
-		struct buddy *buddy;
-		struct blist *blist = cur_window()->owner->blist;
-
-		cell = blist_get_cursor(blist);
-		if (cell == NULL)
-			return;
-
-		if (cell->type != TYPE_LIST_CELL)
-			return;
-
-		buddy = cell->data;
-		cmd_query(buddy->nname);
-	}
-}
-
-USER_COMMAND(cmd_blist_hide) {
-	imwindow_blist_hide(cur_window());
-}
-
-USER_COMMAND(cmd_blist_pgdown) {
-	blist_cursor_pgdown(cur_window()->owner->blist);
-}
-
-USER_COMMAND(cmd_blist_pgup) {
-	blist_cursor_pgup(cur_window()->owner->blist);
-}
-
-USER_COMMAND(cmd_blist_profile) {
-	struct slist_cell *cell;
-	struct buddy *buddy;
-	struct blist *blist = cur_window()->owner->blist;
-
-	cell = blist_get_cursor(blist);
-	if (cell == NULL || cell->type == TYPE_LIST_CELL)
-		return;
-
-	buddy = cell->data;
-	cmd_buddy_profile(buddy->nname);
-}
-
-USER_COMMAND(cmd_blist_refresh) {
-	imwindow_blist_draw(cur_window());
-}
-
-USER_COMMAND(cmd_blist_remove) {
-	struct slist_cell *cell;
-	struct buddy *buddy;
-	struct blist *blist = cur_window()->owner->blist;
-
-	cell = blist_get_cursor(blist);
-	if (cell == NULL || cell->type == TYPE_LIST_CELL)
-		return;
-
-	buddy = cell->data;
-	cmd_buddy_remove(buddy->nname);
-}
-
-USER_COMMAND(cmd_blist_select) {
-	struct slist_cell *cell;
-	struct blist *blist = cur_window()->owner->blist;
-
-	cell = blist_get_cursor(blist);
-	if (cell == NULL)
-		return;
-
-	if (cell->type == TYPE_LIST_CELL)
-		cmd_blist_collapse(NULL);
-	else {
-		struct buddy *buddy = cell->data;
-
-		cmd_blist_goto(buddy->nname);
-	}
-}
-
-USER_COMMAND(cmd_blist_show) {
-	imwindow_blist_show(cur_window());
-}
-
-USER_COMMAND(cmd_blist_start) {
-	blist_cursor_start(cur_window()->owner->blist);
-}
-
-USER_COMMAND(cmd_blist_toggle) {
-	imwindow_blist_toggle(cur_window());
-}
-
-USER_COMMAND(cmd_blist_up) {
-	blist_cursor_up(cur_window()->owner->blist);
-}
-
-USER_COMMAND(cmd_blist_warn) {
-	struct slist_cell *cell;
-	struct buddy *buddy;
-	struct blist *blist = cur_window()->owner->blist;
-
-	cell = blist_get_cursor(blist);
-	if (cell == NULL || cell->type == TYPE_LIST_CELL)
-		return;
-
-	buddy = cell->data;
-	cmd_buddy_warn(buddy->nname);
-}
-
-USER_COMMAND(cmd_blist_warn_anon) {
-	struct slist_cell *cell;
-	struct buddy *buddy;
-	struct blist *blist = cur_window()->owner->blist;
-
-	cell = blist_get_cursor(blist);
-	if (cell == NULL || cell->type == TYPE_LIST_CELL)
-		return;
-
-	buddy = cell->data;
-	cmd_buddy_warn_anon(buddy->nname);
-}
-
-USER_COMMAND(cmd_blist_width) {
-	u_int32_t new_len;
-	struct blist *blist = cur_window()->owner->blist;
-
-	if (args == NULL)
-		return;
-
-	if (str_to_uint(args, &new_len) != 0) {
-		screen_err_msg("Error: invalid width: %s", args);
-		return;
-	}
-
-	screen_blist_width(blist, new_len);
-}
-
-/*
 ** /timer commands
 */
 
@@ -1508,7 +1303,6 @@ static struct command_set {
 	{	input_command,		array_elem(input_command),		"input "	},
 	{	scroll_command,		array_elem(scroll_command),		"scroll "	},
 	{	buddy_command,		array_elem(buddy_command),		"buddy "	},
-	{	blist_command,		array_elem(blist_command),		"blist "	},
 	{	timer_command,		array_elem(timer_command),		"timer "	},
 	{	chat_command,		array_elem(chat_command),		"chat "		},
 	{	file_command,		array_elem(file_command),		"file "		},

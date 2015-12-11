@@ -16,8 +16,8 @@
 */
 
 #define DEFAULT_ACTIVITY_TYPES				0xffffffff
-#define DEFAULT_AUTO_RECONNECT				1
-#define DEFAULT_AUTO_REJOIN					1
+#define DEFAULT_AUTO_RECONNECT				0
+#define DEFAULT_AUTO_REJOIN					0
 #define DEFAULT_AUTOSEND_AWAY				0
 #define DEFAULT_BANNER						"*** "
 #define DEFAULT_BEEP						0

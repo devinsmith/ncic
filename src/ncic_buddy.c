@@ -29,7 +29,6 @@
 #include "ncic_imsg.h"
 #include "ncic_imwindow.h"
 #include "ncic_buddy.h"
-#include "ncic_buddy_list.h"
 #include "ncic_misc.h"
 #include "ncic_set.h"
 #include "ncic_screen.h"
@@ -154,8 +153,6 @@ struct bgroup *group_add(struct pork_acct *acct, char *group_name) {
 	group->buddy_list = xcalloc(group->n_buddies, sizeof(struct buddy *));
 	memset(group->buddy_list, 0, group->n_buddies * sizeof(struct buddy *));
 
-	blist_add_group(acct->blist, group);
-
 	return (group);
 }
 
@@ -241,7 +238,6 @@ buddy_update(struct pork_acct *acct,
 		return (-1);
 
 	ret = acct->proto->buddy_update(acct, buddy, data);
-	blist_update_label(acct->blist, buddy->blist_line);
 
 	return (ret);
 }

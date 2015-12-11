@@ -257,7 +257,7 @@ inline void screen_win_msg(	struct imwindow *win,
 	va_end(ap);
 }
 
-inline void screen_err_msg(char *fmt, ...) {
+void screen_err_msg(char *fmt, ...) {
 	va_list ap;
 
 	va_start(ap, fmt);
