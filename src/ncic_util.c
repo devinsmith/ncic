@@ -218,7 +218,7 @@ void str_trim(char *str) {
 ** for details.
 */
 
-inline uint32_t string_hash(const char *str, uint32_t order) {
+uint32_t string_hash(const char *str, uint32_t order) {
 	uint32_t hash = 0;
 
 	while (*str != '\0')
@@ -227,11 +227,11 @@ inline uint32_t string_hash(const char *str, uint32_t order) {
 	return (hash & ((1 << order) - 1));
 }
 
-inline uint32_t int_hash(int num, uint32_t order) {
+uint32_t int_hash(int num, uint32_t order) {
 	return (num & ((1 << order) - 1));
 }
 
-inline int str_to_uint(const char *str, uint32_t *val) {
+int str_to_uint(const char *str, uint32_t *val) {
 	char *end;
 	uint32_t temp;
 
@@ -243,7 +243,7 @@ inline int str_to_uint(const char *str, uint32_t *val) {
 	return (0);
 }
 
-inline int str_to_int(const char *str, int *val) {
+int str_to_int(const char *str, int *val) {
 	char *end;
 	int temp;
 

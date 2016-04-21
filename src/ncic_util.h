@@ -59,8 +59,8 @@ int blank_str(const char *str);
 uint32_t string_hash(const char *str, uint32_t order);
 uint32_t int_hash(int num, uint32_t order);
 
-inline int str_to_uint(const char *str, uint32_t *val);
-inline int str_to_int(const char *str, int *val);
+int str_to_uint(const char *str, uint32_t *val);
+int str_to_int(const char *str, int *val);
 
 int file_get_size(FILE *fp, size_t *result);
 
