@@ -104,7 +104,7 @@ static void irc_connected(int sock, u_int32_t cond, void *data) {
 		OpenSSL_add_all_algorithms();
 
 		// New context saying we are a client, and using SSL 2 or 3
-		session->sslContext = SSL_CTX_new(SSLv3_client_method());
+		session->sslContext = SSL_CTX_new(TLSv1_2_client_method());
 		if (session->sslContext == NULL) // Dumps to stderr, yuck
 			ERR_print_errors_fp (stderr);
 
