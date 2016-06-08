@@ -31,9 +31,14 @@ ncic
 Building
 ========
 Under Ubuntu you will need to install ncurses-dev.
+
+```
 sudo apt-get install ncurses-dev
+```
 
 Other versions of Linux/Unix typically have ncurses installed by default.
+
+On BSD you will need to use GNU Make which is typically called gmake.
 
 After, type:
 
