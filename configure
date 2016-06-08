@@ -11,7 +11,7 @@
 # default parameters
 CC="gcc"
 PREFIX="/usr/local"
-VERSION="0.0.7"
+VERSION="0.0.8"
 
 ###############################################################################
 # Check for command line arguments
@@ -472,33 +472,6 @@ else
 fi
 rm -f _testprog*
 
-printf "checking for snprintf... "
-echo '
-
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char snprintf ();
-int
-main ()
-{
-snprintf ();
-  ;
-  return 0;
-}
-' > _testprog.c
-$CC $CFLAGS _testprog.c -o _testprog 2> /dev/null
-if [ -x _testprog ]; then
-	printf "yes\n"
-	printf "#define HAVE_SNPRINTF 1\n" >> config.h
-else
-	printf "no\n"
-fi
-rm -f _testprog*
-
 printf "checking for strsep... "
 echo '
 
@@ -798,7 +771,7 @@ include ../../config.mak
 
 .PHONY: all clean install
 
-SRCS = getopt.c inet_ntop.c ipv6_missing.c snprintf.c strsep.c vasprintf.c
+SRCS = getopt.c inet_ntop.c ipv6_missing.c strsep.c vasprintf.c
 OBJS = $(SRCS:.c=.o)
 
 STATIC_LIB = libmissing.a
