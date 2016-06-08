@@ -35,7 +35,6 @@
 #include "ncic_misc.h"
 #include "ncic_screen.h"
 #include "ncic_screen_io.h"
-#include "ncic_transfer.h"
 #include "ncic_chat.h"
 #include "ncic_format.h"
 
@@ -831,107 +830,6 @@ static int format_warning(char opt, char *buf, size_t len, va_list ap) {
 	return (0);
 }
 
-static int format_file_transfer(char opt, char *buf, size_t len, va_list ap) {
-	struct file_transfer *xfer = va_arg(ap, struct file_transfer *);
-	struct pork_acct *acct = xfer->acct;
-	int ret = 0;
-
-	switch (opt) {
-		/* Timestamp */
-		case 'T':
-			ret = fill_format_str(OPT_FORMAT_TIMESTAMP, buf, len);
-			break;
-
-		/* Starting offset */
-		case 'O':
-			ret = snprintf(buf, len, "%lld", xfer->start_offset);
-			break;
-
-		/* File transfer reference number */
-		case 'I':
-			ret = snprintf(buf, len, "%u", xfer->refnum);
-			break;
-
-		/* Actual file name */
-		case 'N':
-			ret = xstrncpy(buf, xfer->fname_local, len);
-			break;
-
-		/* Original (requested) file name */
-		case 'n':
-			ret = xstrncpy(buf, xfer->fname_orig, len);
-			break;
-
-		/* Local IP address */
-		case 'L':
-			ret = xstrncpy(buf, xfer->laddr_ip, len);
-			break;
-
-		/* Local hostname */
-		case 'l':
-			ret = xstrncpy(buf, transfer_get_local_hostname(xfer), len);
-			break;
-
-		/* Remote IP address */
-		case 'F':
-			ret = xstrncpy(buf, xfer->faddr_ip, len);
-			break;
-
-		/* Remote hostname */
-		case 'f':
-			ret = xstrncpy(buf, transfer_get_remote_hostname(xfer), len);
-			break;
-
-		/* Local port */
-		case 'P':
-			ret = snprintf(buf, len, "%d", xfer->lport);
-			break;
-
-		/* Remote port */
-		case 'p':
-			ret = snprintf(buf, len, "%d", xfer->fport);
-			break;
-
-		/* Average transfer rate */
-		case 'R':
-			ret = snprintf(buf, len, "%.04f", transfer_avg_speed(xfer));
-			break;
-
-		/* File size */
-		case 'S':
-			ret = snprintf(buf, len, "%lld", xfer->file_len - xfer->start_offset);
-			break;
-
-		/* Number of bytes sent */
-		case 's':
-			ret = snprintf(buf, len, "%lld", xfer->bytes_sent);
-			break;
-
-		/* Time elapsed since the start of the transfer in seconds */
-		case 't':
-			ret = snprintf(buf, len, "%.04f", transfer_time_elapsed(xfer));
-			break;
-
-		/* Local user */
-		case 'U':
-			ret = xstrncpy(buf, acct->username, len);
-			break;
-
-		/* Remote user */
-		case 'u':
-			ret = xstrncpy(buf, xfer->peer_username, len);
-			break;
-
-		default:
-			return (-1);
-	}
-
-	if (ret < 0 || (size_t) ret >= len)
-		return (-1);
-
-	return (0);
-}
-
 static int format_whois(char opt, char *buf, size_t len, va_list ap) {
 	char *user = va_arg(ap, char *);
 	u_int32_t warn_level = va_arg(ap, unsigned long int);
@@ -1030,17 +928,6 @@ static int (*const format_handler[])(char, char *, size_t, va_list) = {
 	format_chat_send,			/* OPT_FORMAT_CHAT_SEND_NOTICE		*/
 	format_chat_info,			/* OPT_FORMAT_CHAT_TOPIC			*/
 	format_chat_info,			/* OPT_FORMAT_CHAT_UNIGNORE			*/
-	format_file_transfer,		/* OPT_FORMAT_FILE_CANCEL_LOCAL		*/
-	format_file_transfer,		/* OPT_FORMAT_FILE_CANCEL_REMOTE	*/
-	format_file_transfer,		/* OPT_FORMAT_FILE_LOST				*/
-	format_file_transfer,		/* OPT_FORMAT_FILE_RECV_ACCEPT		*/
-	format_file_transfer,		/* OPT_FORMAT_FILE_RECV_ASK			*/
-	format_file_transfer,		/* OPT_FORMAT_FILE_RECV_COMPLETE	*/
-	format_file_transfer,		/* OPT_FORMAT_FILE_RECV_RESUME		*/
-	format_file_transfer,		/* OPT_FORMAT_FILE_SEND_ACCEPT		*/
-	format_file_transfer,		/* OPT_FORMAT_FILE_SEND_ASK			*/
-	format_file_transfer,		/* OPT_FORMAT_FILE_SEND_COMPLETE	*/
-	format_file_transfer,		/* OPT_FORMAT_FILE_SEND_RESUME		*/
 	format_msg_recv,			/* OPT_FORMAT_IM_RECV				*/
 	format_msg_recv,			/* OPT_FORMAT_IM_RECV_AUTO			*/
 	format_msg_recv,			/* OPT_FORMAT_IM_RECV_STATUS		*/

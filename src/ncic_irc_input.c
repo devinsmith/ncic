@@ -43,7 +43,6 @@
 //#include "ncic_missing.h"
 
 #include "ncic_irc.h"
-#include "ncic_irc_dcc.h"
 #include "ncic_naken.h"
 
 static int naken_process_input(irc_session_t *session, char *input, int len);

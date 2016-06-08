@@ -46,7 +46,6 @@
 #include <ncic_missing.h>
 
 #include "ncic_irc.h"
-#include "ncic_irc_dcc.h"
 #include "ncic_naken.h"
 
 #define HIGHLIGHT_BOLD			0x01
@@ -910,11 +909,5 @@ int irc_proto_init(struct pork_proto *proto) {
 	proto->set_away = irc_away;
 	proto->set_back = irc_back;
 	proto->ctcp = irc_ctcp;
-
-	proto->file_accept = irc_file_accept;
-	proto->file_recv_data = irc_recv_data;
-	proto->file_abort = irc_file_abort;
-	proto->file_send = irc_file_send;
-
 	return (0);
 }

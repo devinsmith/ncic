@@ -44,7 +44,6 @@
 #include "ncic_chat.h"
 #include "ncic_conf.h"
 #include "ncic_timer.h"
-#include "ncic_transfer.h"
 #include "ncic_msg.h"
 #include "ncic_command.h"
 #include "ncic_command_defs.h"
@@ -301,137 +300,6 @@ USER_COMMAND(cmd_scroll_start) {
 
 USER_COMMAND(cmd_scroll_up) {
 	imwindow_scroll_up(cur_window());
-}
-
-/*
-** /file commands.
-*/
-
-static struct command file_command[] = {
-	{ "abort",				cmd_file_cancel		},
-	{ "cancel",				cmd_file_cancel 	},
-	{ "get",				cmd_file_get		},
-	{ "list",				cmd_file_list		},
-	{ "resume",				cmd_file_resume		},
-	{ "send",				cmd_file_send		},
-};
-
-USER_COMMAND(cmd_file_cancel) {
-	struct pork_acct *acct = cur_window()->owner;
-	u_int32_t refnum;
-	struct file_transfer *xfer;
-	char *refnum_str;
-
-	if (args == NULL || blank_str(args))
-		return;
-
-	refnum_str = strsep(&args, " ");
-	if (refnum_str == NULL)
-		return;
-
-	if (!strcasecmp(refnum_str, "all")) {
-		transfer_abort_all(acct, TRANSFER_DIR_ANY);
-		return;
-	}
-
-	if (!strcasecmp(refnum_str, "send")) {
-		transfer_abort_all(acct, TRANSFER_DIR_SEND);
-		return;
-	}
-
-	if (!strcasecmp(refnum_str, "recv") || !strcasecmp(refnum_str, "receive")) {
-		transfer_abort_all(acct, TRANSFER_DIR_RECV);
-		return;
-	}
-
-	if (str_to_uint(args, &refnum) != 0) {
-		screen_err_msg("Invalid file transfer refnum: %s", args);
-		return;
-	}
-
-	xfer = transfer_find_refnum(acct, refnum);
-	if (xfer == NULL) {
-		screen_err_msg("Invalid file transfer refnum: %s", args);
-		return;
-	}
-
-	if (transfer_cancel_local(xfer) != 0)
-		screen_err_msg("Error canceling file transfer %s", args);
-}
-
-USER_COMMAND(cmd_file_list) {
-	struct pork_acct *acct = cur_window()->owner;
-
-	if (acct->transfer_list != NULL) {
-		dlist_t *cur = acct->transfer_list;
-
-		while (cur != NULL) {
-			struct file_transfer *xfer = cur->data;
-
-			screen_cmd_output("%u: %s %s [%s: %u/%u (%.02f%%) - %.04f KB/s]",
-				xfer->refnum,
-				xfer->peer_username, xfer->fname_local,
-				transfer_status_str(xfer),
-				(u_int32_t) xfer->bytes_sent, (u_int32_t) xfer->file_len,
-				(float) xfer->bytes_sent / xfer->file_len * 100,
-				transfer_avg_speed(xfer));
-
-			cur = cur->next;
-		}
-	}
-}
-
-USER_COMMAND(cmd_file_get) {
-	char *refnum_str;
-	u_int32_t refnum;
-	struct pork_acct *acct = cur_window()->owner;
-	struct file_transfer *xfer;
-
-	if (args == NULL || blank_str(args))
-		return;
-
-	refnum_str = strsep(&args, " ");
-	if (refnum_str == NULL)
-		return;
-
-	if (!strcasecmp(refnum_str, "all")) {
-		transfer_get_all(acct);
-		return;
-	}
-
-	if (str_to_uint(refnum_str, &refnum) != 0) {
-		screen_err_msg("Invalid file transfer refnum: %s", refnum_str);
-		return;
-	}
-
-	xfer = transfer_find_refnum(acct, refnum);
-	if (xfer == NULL) {
-		screen_err_msg("Invalid file transfer refnum: %s", refnum_str);
-		return;
-	}
-
-	if (args != NULL && blank_str(args))
-		args = NULL;
-
-	transfer_get(xfer, args);
-}
-
-USER_COMMAND(cmd_file_resume) {
-}
-
-USER_COMMAND(cmd_file_send) {
-	char *dest;
-
-	if (args == NULL)
-		return;
-
-	dest = strsep(&args, " ");
-	if (dest == NULL || args == NULL) {
-		screen_err_msg("You must specify a user and a filename");
-		return;
-	}
-
-	transfer_send(cur_window()->owner, dest, args);
 }
 
 /*
@@ -1305,7 +1173,6 @@ static struct command_set {
 	{	buddy_command,		array_elem(buddy_command),		"buddy "	},
 	{	timer_command,		array_elem(timer_command),		"timer "	},
 	{	chat_command,		array_elem(chat_command),		"chat "		},
-	{	file_command,		array_elem(file_command),		"file "		},
 	{	acct_command,		array_elem(acct_command),		"acct "		},
 };
 

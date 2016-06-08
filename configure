@@ -716,9 +716,9 @@ SRCS = ncic.c ncic_acct.c ncic_alias.c ncic_bind.c ncic_buddy.c \
        ncic_imwindow.c ncic_inet.c ncic_input.c ncic_io.c ncic_list.c \
        ncic_misc.c ncic_msg.c ncic_opt.c ncic_proto.c \
        ncic_queue.c ncic_screen.c ncic_screen_io.c ncic_set.c ncic_slist2.c \
-       ncic_status.c ncic_swindow.c ncic_timer.c ncic_transfer.c ncic_util.c
+       ncic_status.c ncic_swindow.c ncic_timer.c ncic_util.c
 
-SRCS += ncic_irc.c ncic_irc_dcc.c ncic_irc_input.c ncic_irc_output.c \
+SRCS += ncic_irc.c ncic_irc_input.c ncic_irc_output.c \
         ncic_naken.c
 
 OBJS = $(SRCS:.c=.o)

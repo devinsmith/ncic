@@ -76,14 +76,6 @@ struct pork_proto {
 	int (*chat_who)(struct pork_acct *, struct chatroom *chat);
 	int (*chat_set_topic)(struct pork_acct *, struct chatroom *chat, char *topic);
 
-	int (*file_send)(struct file_transfer *xfer);
-	int (*file_accept)(struct file_transfer *xfer);
-	int (*file_abort)(struct file_transfer *xfer);
-	int (*file_recv_data)(struct file_transfer *xfer, char *buf, size_t len);
-	int (*file_send_data)(struct file_transfer *xfer, char *buf, size_t len);
-	int (*file_recv_complete)(struct file_transfer *xfer);
-	int (*file_send_complete)(struct file_transfer *xfer);
-
 	int (*set_report_idle)(struct pork_acct *, int);
 	int (*set_idle_time)(struct pork_acct *, u_int32_t);
 	int (*set_privacy_mode)(struct pork_acct *, int);
