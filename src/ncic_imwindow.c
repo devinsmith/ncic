@@ -88,12 +88,12 @@ struct imwindow *imwindow_new(	uint32_t rows,
 	return (imwindow);
 }
 
-inline void imwindow_rename(struct imwindow *imwindow, char *new_name) {
+void imwindow_rename(struct imwindow *imwindow, char *new_name) {
 	free(imwindow->name);
 	imwindow->name = color_quote_codes(new_name);
 }
 
-inline void imwindow_resize(struct imwindow *imwindow,
+void imwindow_resize(struct imwindow *imwindow,
 							uint32_t rows,
 							uint32_t cols)
 {
@@ -131,7 +131,7 @@ int imwindow_set_priv_input(struct imwindow *imwindow, int val) {
 	return (0);
 }
 
-inline int imwindow_refresh(struct imwindow *imwindow) {
+int imwindow_refresh(struct imwindow *imwindow) {
 	int was_dirty_win;
 
 	was_dirty_win = swindow_refresh(&imwindow->swindow);
@@ -253,11 +253,11 @@ struct imwindow *imwindow_find_refnum(uint32_t refnum) {
 	return (NULL);
 }
 
-inline void imwindow_send_msg(struct imwindow *win) {
+void imwindow_send_msg(struct imwindow *win) {
 	swindow_input(&win->swindow);
 }
 
-inline void imwindow_recv_msg(struct imwindow *win) {
+void imwindow_recv_msg(struct imwindow *win) {
 	if (wopt_get_bool(win->opts, WOPT_BEEP_ON_OUTPUT))
 		beep();
 }
@@ -290,7 +290,7 @@ int imwindow_bind_acct(struct imwindow *imwindow, uint32_t refnum) {
 	return (0);
 }
 
-inline int imwindow_dump_buffer(struct imwindow *imwindow, char *file) {
+int imwindow_dump_buffer(struct imwindow *imwindow, char *file) {
 	return (swindow_dump_buffer(&imwindow->swindow, file));
 }
 
@@ -307,71 +307,71 @@ int imwindow_bind_next_acct(struct imwindow *imwindow) {
 	return (imwindow_bind_acct(imwindow, next_refnum));
 }
 
-inline void imwindow_scroll_up(struct imwindow *imwindow) {
+void imwindow_scroll_up(struct imwindow *imwindow) {
 	swindow_scroll_by(&imwindow->swindow, -1);
 }
 
-inline void imwindow_scroll_down(struct imwindow *imwindow) {
+void imwindow_scroll_down(struct imwindow *imwindow) {
 	swindow_scroll_by(&imwindow->swindow, 1);
 }
 
-inline void imwindow_scroll_by(struct imwindow *imwindow, int lines) {
+void imwindow_scroll_by(struct imwindow *imwindow, int lines) {
 	swindow_scroll_by(&imwindow->swindow, lines);
 }
 
-inline void imwindow_scroll_page_up(struct imwindow *imwindow) {
+void imwindow_scroll_page_up(struct imwindow *imwindow) {
 	swindow_scroll_by(&imwindow->swindow, -imwindow->swindow.rows);
 }
 
-inline void imwindow_scroll_page_down(struct imwindow *imwindow) {
+void imwindow_scroll_page_down(struct imwindow *imwindow) {
 	swindow_scroll_by(&imwindow->swindow, imwindow->swindow.rows);
 }
 
-inline void imwindow_scroll_start(struct imwindow *imwindow) {
+void imwindow_scroll_start(struct imwindow *imwindow) {
 	swindow_scroll_to_start(&imwindow->swindow);
 }
 
-inline void imwindow_scroll_end(struct imwindow *imwindow) {
+void imwindow_scroll_end(struct imwindow *imwindow) {
 	swindow_scroll_to_end(&imwindow->swindow);
 }
 
-inline void imwindow_clear(struct imwindow *imwindow) {
+void imwindow_clear(struct imwindow *imwindow) {
 	swindow_clear(&imwindow->swindow);
 }
 
-inline void imwindow_erase(struct imwindow *imwindow) {
+void imwindow_erase(struct imwindow *imwindow) {
 	swindow_erase(&imwindow->swindow);
 }
 
-inline int imwindow_ignore(struct imwindow *imwindow) {
+int imwindow_ignore(struct imwindow *imwindow) {
 	int ret = imwindow->ignore_activity;
 
 	imwindow->ignore_activity = 1;
 	return (ret);
 }
 
-inline int imwindow_unignore(struct imwindow *imwindow) {
+int imwindow_unignore(struct imwindow *imwindow) {
 	int ret = imwindow->ignore_activity;
 
 	imwindow->ignore_activity = 0;
 	return (ret);
 }
 
-inline int imwindow_skip(struct imwindow *imwindow) {
+int imwindow_skip(struct imwindow *imwindow) {
 	int ret = imwindow->skip;
 
 	imwindow->skip = 1;
 	return (ret);
 }
 
-inline int imwindow_unskip(struct imwindow *imwindow) {
+int imwindow_unskip(struct imwindow *imwindow) {
 	int ret = imwindow->skip;
 
 	imwindow->skip = 0;
 	return (ret);
 }
 
-inline int imwindow_add(struct imwindow *imwindow,
+int imwindow_add(struct imwindow *imwindow,
 						struct imsg *imsg,
 						uint32_t type)
 {

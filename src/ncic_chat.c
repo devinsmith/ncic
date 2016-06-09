@@ -627,7 +627,7 @@ static dlist_t *chat_find_user_node(struct pork_acct *acct,
 	return (cur);
 }
 
-inline struct chat_user *chat_find_user(struct pork_acct *acct,
+struct chat_user *chat_find_user(struct pork_acct *acct,
 										struct chatroom *chat,
 										char *user)
 {

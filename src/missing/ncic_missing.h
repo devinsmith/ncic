@@ -24,6 +24,9 @@ const char *inet_ntop(int af, const void *src, char *dst, size_t len);
 
 #ifndef EAI_NODATA
 #	define EAI_NODATA	1
+#endif
+
+#ifndef EAI_MEMORY
 #	define EAI_MEMORY	2
 #endif
 

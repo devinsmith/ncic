@@ -27,7 +27,7 @@ static struct pork_proto *proto_table[PROTO_MAX + 1];
 extern int irc_proto_init(struct pork_proto *proto);
 extern int aim_proto_init(struct pork_proto *proto);
 
-inline struct pork_proto *proto_get(int protocol) {
+struct pork_proto *proto_get(int protocol) {
 	if (protocol > PROTO_MAX || protocol < -1)
 		return (NULL);
 

@@ -147,7 +147,7 @@ int chat_got_mode(	struct pork_acct *acct,
 					char *user,
 					char *mode);
 
-inline struct chat_user *chat_find_user(struct pork_acct *acct,
+struct chat_user *chat_find_user(struct pork_acct *acct,
 										struct chatroom *chat,
 										char *user);
 #endif /* __NCIC_CHAT_H__ */

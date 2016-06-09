@@ -326,7 +326,7 @@ void swindow_resize(struct swindow *swindow,
 	swindow_redraw(swindow);
 }
 
-inline int swindow_refresh(struct swindow *swindow) {
+int swindow_refresh(struct swindow *swindow) {
 	if (swindow->visible && swindow->dirty) {
 		wnoutrefresh(swindow->win);
 		swindow->dirty = 0;

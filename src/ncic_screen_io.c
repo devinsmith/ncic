@@ -267,7 +267,7 @@ void screen_err_msg(char *fmt, ...) {
 	va_end(ap);
 }
 
-inline void screen_cmd_output(char *fmt, ...) {
+void screen_cmd_output(char *fmt, ...) {
 	va_list ap;
 
 	va_start(ap, fmt);
@@ -278,7 +278,7 @@ inline void screen_cmd_output(char *fmt, ...) {
 	va_end(ap);
 }
 
-inline void screen_nocolor_msg(char *fmt, ...) {
+void screen_nocolor_msg(char *fmt, ...) {
 	va_list ap;
 
 	va_start(ap, fmt);

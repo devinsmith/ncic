@@ -77,7 +77,7 @@ int swindow_input(struct swindow *swindow);
 void swindow_redraw(struct swindow *swindow);
 void swindow_clear(struct swindow *swindow);
 void swindow_erase(struct swindow *swindow);
-inline int swindow_refresh(struct swindow *swindow);
+int swindow_refresh(struct swindow *swindow);
 
 void swindow_resize(struct swindow *swindow,
 					uint32_t new_row,

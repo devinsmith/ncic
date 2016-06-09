@@ -1865,8 +1865,7 @@ USER_COMMAND(cmd_set) {
 	}
 }
 
-inline int run_command(char *str) {
-	//screen_err_msg("run_command: %s", str);
+int run_command(char *str) {
 	return (run_one_command(str, CMDSET_MAIN));
 }
 

@@ -194,7 +194,7 @@ int alias_resolve(hash_t *alias_hash, char *str, char **result) {
 	return (1);
 }
 
-inline int alias_init(hash_t *alias_hash) {
+int alias_init(hash_t *alias_hash) {
 	memset(alias_hash, 0, sizeof(*alias_hash));
 	return (hash_init(alias_hash, 5, alias_compare, alias_hash_remove));
 }

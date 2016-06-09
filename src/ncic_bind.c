@@ -166,7 +166,7 @@ inline int bind_init(struct binds *binds) {
 	return (0);
 }
 
-inline void bind_destroy(struct binds *binds) {
+void bind_destroy(struct binds *binds) {
 	hash_destroy(&binds->main.hash);
 	hash_destroy(&binds->blist.hash);
 }

@@ -99,57 +99,11 @@ int sockprintf(int fd, const char *fmt, ...) {
 
 #endif
 
-inline int get_peer_addr(int sock, struct sockaddr_storage *ss) {
-	socklen_t len = sizeof(*ss);
-	int ret;
-
-	ret = getpeername(sock, (struct sockaddr *) ss, &len);
-	if (ret != 0)
-		debug("getpeername: %s", strerror(errno));
-
-	return (ret);
-}
-
-inline int get_local_addr(int sock, struct sockaddr_storage *ss) {
-	socklen_t len = sizeof(*ss);
-	int ret;
-
-	ret = getsockname(sock, (struct sockaddr *) ss, &len);
-	if (ret != 0)
-		debug("getsockname: %s", strerror(errno));
-
-	return (ret);
-}
-
-/*
-** Return string IPv4 or IPv6 address.
-*/
-
-inline void get_ip(	struct sockaddr_storage *ss,
-					char *buf,
-					size_t len)
-{
-	if (inet_ntop(ss->ss_family, sin_addr(ss), buf, len) == NULL)
-		debug("inet_ntop: %s", strerror(errno));
-}
-
-/*
-** Returns the address set in the appropriate
-** sockaddr struct.
-*/
-
-inline void *sin_addr(struct sockaddr_storage *ss) {
-	if (ss->ss_family == AF_INET6)
-		return (&SIN6(ss)->sin6_addr);
-
-	return (&SIN4(ss)->sin_addr);
-}
-
 /*
 ** Returns the length of the sockaddr struct.
 */
 
-inline size_t sin_len(const struct sockaddr_storage *ss) {
+static size_t sin_len(const struct sockaddr_storage *ss) {
 	if (ss->ss_family == AF_INET6)
 		return (sizeof(struct sockaddr_in6));
 
@@ -157,21 +111,10 @@ inline size_t sin_len(const struct sockaddr_storage *ss) {
 }
 
 /*
-** Returns the port set in the sockaddr struct.
-*/
-
-inline in_port_t sin_port(const struct sockaddr_storage *ss) {
-	if (ss->ss_family == AF_INET6)
-		return (SIN6(ss)->sin6_port);
-
-	return (SIN4(ss)->sin_port);
-}
-
-/*
 ** Sets the port for the approprite socket family.
 */
 
-inline void sin_set_port(struct sockaddr_storage *ss, in_port_t port) {
+void sin_set_port(struct sockaddr_storage *ss, in_port_t port) {
 	if (ss->ss_family == AF_INET6)
 		SIN6(ss)->sin6_port = port;
 
@@ -182,7 +125,7 @@ inline void sin_set_port(struct sockaddr_storage *ss, in_port_t port) {
 ** Return the canonical hostname of the given address.
 */
 
-inline int get_hostname(struct sockaddr_storage *addr,
+int get_hostname(struct sockaddr_storage *addr,
 						char *hostbuf,
 						size_t len)
 {
@@ -275,7 +218,7 @@ out_fail:
 	return (-1);
 }
 
-inline int sock_setflags(int sock, uint32_t flags) {
+int sock_setflags(int sock, uint32_t flags) {
 	int ret;
 
 #ifdef WIN32

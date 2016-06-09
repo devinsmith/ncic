@@ -17,7 +17,7 @@ struct alias {
 	char *args;
 };
 
-inline int alias_init(hash_t *alias_hash);
+int alias_init(hash_t *alias_hash);
 struct alias *alias_find(hash_t *alias_hash, char *str);
 int alias_add(hash_t *alias_hash, char *alias, char *str);
 int alias_remove(hash_t *alias_hash, char *alias);

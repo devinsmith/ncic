@@ -65,23 +65,13 @@ ssize_t sock_write(int sock, void *buf, size_t len);
 int sockprintf(int fd, const char *fmt, ...);
 int get_port(const char *name, in_port_t *port);
 int get_addr(const char *hostname, struct sockaddr_storage *addr);
-inline int get_peer_addr(int sock, struct sockaddr_storage *ss);
-inline int get_local_addr(int sock, struct sockaddr_storage *ss);
-inline void *sin_addr(struct sockaddr_storage *ss);
-inline size_t sin_len(const struct sockaddr_storage *ss);
-inline in_port_t sin_port(const struct sockaddr_storage *ss);
-inline void sin_set_port(struct sockaddr_storage *ss, in_port_t port);
-inline int sock_setflags(int sock, u_int32_t flags);
+void sin_set_port(struct sockaddr_storage *ss, in_port_t port);
+int sock_setflags(int sock, u_int32_t flags);
 int sock_is_error(int sock);
 int sock_listen(struct sockaddr_storage *ss, in_port_t port);
 
-inline int get_hostname(struct sockaddr_storage *addr,
+int get_hostname(struct sockaddr_storage *addr,
 						char *hostbuf,
 						size_t len);
-
-inline void get_ip(	struct sockaddr_storage *ss,
-					char *buf,
-					size_t len);
-
 
 #endif /* __NCIC_INET_H__ */

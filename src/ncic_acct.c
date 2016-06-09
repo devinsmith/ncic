@@ -72,7 +72,7 @@ static void pork_acct_free(struct pork_acct *acct) {
 	free(acct);
 }
 
-inline dlist_t *pork_acct_find(u_int32_t refnum) {
+dlist_t *pork_acct_find(u_int32_t refnum) {
 	dlist_t *ret;
 
 	ret = dlist_find(screen.acct_list,
@@ -99,7 +99,7 @@ struct pork_acct *pork_acct_find_name(const char *name, int protocol) {
 	return (NULL);
 }
 
-inline struct pork_acct *pork_acct_get_data(u_int32_t refnum) {
+struct pork_acct *pork_acct_get_data(u_int32_t refnum) {
 	dlist_t *node;
 
 	node = pork_acct_find(refnum);
@@ -274,7 +274,7 @@ int pork_acct_connect(const char *user, char *args, int protocol) {
 	return (0);
 }
 
-inline void pork_acct_update(void) {
+void pork_acct_update(void) {
 	dlist_t *cur = screen.acct_list;
 
 	for (cur = screen.acct_list ; cur != NULL ; cur = cur->next) {

@@ -34,6 +34,6 @@ struct command {
 };
 
 int run_mcommand(char *str);
-inline int run_command(char *str);
+int run_command(char *str);
 
 #endif /* __NCIC_COMMAND_H__ */

@@ -33,7 +33,7 @@ struct binds {
 };
 
 int bind_init(struct binds *binds);
-inline void bind_destroy(struct binds *binds);
+void bind_destroy(struct binds *binds);
 int bind_remove(struct key_binds *bind_set, int c);
 int bind_exec(struct key_binds *bind_set, int c);
 struct binding *bind_find(struct key_binds *bind_set, int c);

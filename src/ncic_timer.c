@@ -133,7 +133,7 @@ int timer_run(dlist_t **timer_list) {
 	return (triggered);
 }
 
-inline void timer_destroy(dlist_t **timer_list) {
+void timer_destroy(dlist_t **timer_list) {
 	dlist_destroy(*timer_list, NULL, timer_destroy_cb);
 	*timer_list = NULL;
 }
