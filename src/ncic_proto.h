@@ -51,9 +51,7 @@ struct pork_proto {
 	int (*buddy_block)(struct pork_acct *, char *);
 	int (*buddy_permit)(struct pork_acct *, char *);
 	int (*buddy_unblock)(struct pork_acct *, char *);
-	int (*buddy_remove_permit)(struct pork_acct *, char *);
 	int (*buddy_add)(struct pork_acct *, struct buddy *);
-	int (*buddy_remove)(struct pork_acct *, struct buddy *);
 	int (*buddy_update)(struct pork_acct *, struct buddy *, void *);
 
 	struct chatroom *(*chat_find)(struct pork_acct *, char *);

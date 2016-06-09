@@ -622,7 +622,6 @@ static struct command buddy_command[] = {
 	{ "list_block",		cmd_buddy_list_block	},
 	{ "privacy_mode",	cmd_buddy_privacy_mode	},
 	{ "profile",		cmd_buddy_profile		},
-	{ "remove",			cmd_buddy_remove		},
 	{ "report_idle",	cmd_buddy_report_idle	},
 	{ "search",			cmd_who					},
 	{ "warn",			cmd_buddy_warn			},
@@ -719,20 +718,6 @@ USER_COMMAND(cmd_buddy_profile) {
 	}
 
 	acct->proto->get_profile(acct, args);
-}
-
-USER_COMMAND(cmd_buddy_remove) {
-	struct pork_acct *acct = cur_window()->owner;
-
-	if (args == NULL || blank_str(args))
-		return;
-
-	if (buddy_remove(acct, args, 1) != 0)
-		screen_err_msg("%s isn't on %s's buddy list", args, acct->username);
-	else {
-		screen_cmd_output("%s removed from %s's buddy list",
-			args, acct->username);
-	}
 }
 
 USER_COMMAND(cmd_buddy_report_idle) {
