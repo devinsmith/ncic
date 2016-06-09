@@ -23,10 +23,12 @@ ncic
 
    | OS              | Versions | Arch     |
    | --------------- | -------- | -------- |
-   | OpenBSD         | 4.2-4.9  | PowerPC  |
+   | OpenBSD         | 4.2-5.9  | PowerPC  |
    | OpenBSD         | 4.2-4.5  | i386     |
+   | FreeBSD         | 10.2     | amd64    |
    | MacOS X Server  | 10.4.10  | i386     |
    | Slackware Linux | 12.2     | i386     |
+   | Ubuntu          | 16.04    | amd64    |
 
 Building
 ========
