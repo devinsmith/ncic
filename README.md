@@ -32,10 +32,10 @@ ncic
 
 Building
 ========
-Under Ubuntu you will need to install ncurses-dev.
+Under Ubuntu you will need to install ncurses-dev and libssl-dev.
 
 ```
-sudo apt-get install ncurses-dev
+sudo apt-get install ncurses-dev libssl-dev
 ```
 
 Other versions of Linux/Unix typically have ncurses installed by default.
