@@ -302,7 +302,7 @@ static int irc_reconnect(struct pork_acct *acct, char *args __notused) {
 
 static int irc_join(struct pork_acct *acct, char *chan, char *args) {
 	screen_err_msg("Got here: irc_join\n");
-	return (irc_send_join(acct->data, chan, args));
+  return (0);
 }
 
 static int irc_privmsg(struct pork_acct *acct, char *dest, char *msg) {
@@ -858,17 +858,11 @@ int irc_chanmode_has_arg(irc_session_t *session, char mode) {
 	return (1);
 }
 
-static int irc_rejoin(struct pork_acct *acct, struct chatroom *chat) {
-	struct irc_chan_data *irc_data = chat->data;
-
-	return (irc_send_join(acct->data, chat->title, NULL));
-}
-
 int irc_proto_init(struct pork_proto *proto) {
 	proto->buddy_update = naken_update_buddy;
 	proto->chat_action = irc_chan_action;
 	proto->chat_join = irc_join;
-	proto->chat_rejoin = irc_rejoin;
+	proto->chat_rejoin = NULL;
 	proto->chat_send = irc_chan_send;
 	proto->chat_find = irc_find_chat;
 	proto->chat_name = irc_chan_get_name;

@@ -110,7 +110,6 @@ int irc_connect(struct pork_acct *a, const char *server, int *sock);
 
 int irc_send_raw(irc_session_t *session, char *str);
 int irc_send_pong(irc_session_t *session, char *dest);
-int irc_send_join(irc_session_t *session, char *channel, char *key);
 int irc_send_login(irc_session_t *session);
 int irc_send_privmsg(irc_session_t *session, char *dest, char *msg);
 int irc_send_mode(irc_session_t *session, char *mode_str);

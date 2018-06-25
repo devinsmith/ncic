@@ -221,18 +221,6 @@ int irc_send_invite(irc_session_t *session, char *channel, char *user) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_join(irc_session_t *session, char *channel, char *key) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-
-	ret = snprintf(buf, sizeof(buf), ".c %s\r\n", channel);
-
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
-}
-
 int irc_send_login(irc_session_t *session) {
 	char buf[IRC_OUT_BUFLEN];
 	struct pork_acct *acct = session->data;
