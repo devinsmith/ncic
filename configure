@@ -722,6 +722,7 @@ SRCS += ncic_irc.c ncic_irc_input.c ncic_irc_output.c \
         ncic_naken.c
 
 OBJS = $(SRCS:.c=.o)
+DEPS = $(SRCS:.c=.d)
 
 CC = gcc
 SYSTEM_NCICRC = $(PREFIX)/share/ncic/ncicrc
@@ -750,7 +751,7 @@ install:
 clean:
 	@(cd missing && $(MAKE) clean)
 	rm -f $(OBJS) $(EXE)
-	rm -f *.d
+	rm -f $(DEPS)
 
 pristine: clean
 	@(cd missing && $(MAKE) pristine)
@@ -760,7 +761,7 @@ pristine: clean
 	$(CC) $(INTERNAL_CFLAGS) $(CFLAGS) $(CPPFLAGS) -o $@ -c $<
 
 # Include automatically generated dependency files
--include $(wildcard *.d)
+-include $(DEPS)
 ' > src/Makefile
 
 # Build the src level Makefile
@@ -773,6 +774,7 @@ include ../../config.mak
 
 SRCS = getopt.c inet_ntop.c ipv6_missing.c strsep.c vasprintf.c
 OBJS = $(SRCS:.c=.o)
+DEPS = $(SRCS:.c=.d)
 
 STATIC_LIB = libmissing.a
 AR = ar
@@ -798,7 +800,7 @@ install:
 
 clean:
 	rm -f $(OBJS) $(STATIC_LIB)
-	rm -f *.d
+	rm -f $(DEPS)
 
 pristine: clean
 	rm -f Makefile
@@ -807,7 +809,7 @@ pristine: clean
 	$(CC) $(INTERNAL_CFLAGS) $(CFLAGS) $(CPPFLAGS) -o $@ -c $<
 
 # Include automatically generated dependency files
--include $(wildcard *.d)
+-include $(DEPS)
 ' > src/missing/Makefile
 
 echo
