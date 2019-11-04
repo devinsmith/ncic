@@ -103,7 +103,7 @@ static void irc_connected(int sock, u_int32_t cond, void *data) {
 		OpenSSL_add_all_algorithms();
 
 		// New context saying we are a client, and using SSL 2 or 3
-		session->sslContext = SSL_CTX_new(TLSv1_2_client_method());
+		session->sslContext = SSL_CTX_new(TLS_client_method());
 		if (session->sslContext == NULL) // Dumps to stderr, yuck
 			ERR_print_errors_fp (stderr);
 
@@ -406,26 +406,6 @@ static int irc_chan_get_name(	const char *str,
 		arg_buf[0] = '\0';
 
 	return (0);
-}
-
-static int irc_change_nick(struct pork_acct *acct, char *nick) {
-	irc_session_t *irc = acct->data;
-
-	if (irc->nick_len) {
-		if (strlen(nick) > irc->nick_len) {
-			screen_err_msg("Error: Nick is too long. Maximum length is %d",
-				irc->nick_len);
-
-			return (-1);
-		}
-	}
-
-	if (!acct->connected) {
-		free(acct->username);
-		acct->username = xstrdup(nick);
-	}
-
-	return (irc_send_nick(acct->data, nick));
 }
 
 static int irc_chan_users(struct pork_acct *acct, struct chatroom *chat) {
@@ -898,7 +878,7 @@ int irc_proto_init(struct pork_proto *proto) {
 	proto->update = irc_update;
 	proto->write_config = irc_write_config;
 	proto->user_compare = strcasecmp;
-	proto->change_nick = irc_change_nick;
+	proto->change_nick = NULL;
 	proto->filter_text = irc_text_filter;
 	proto->filter_text_out = irc_text_filter;
 	proto->quote = irc_quote;
