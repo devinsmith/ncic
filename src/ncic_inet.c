@@ -29,6 +29,7 @@
 #include <sys/socket.h>
 #include <netdb.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <arpa/inet.h>
 #endif
 
@@ -216,6 +217,34 @@ int get_addr(const char *hostname, struct sockaddr_storage *addr) {
 out_fail:
 	freeaddrinfo(res);
 	return (-1);
+}
+
+void sock_setkeepalive(int sockfd)
+{
+	int keep_alive = 1;
+	int keep_idle = 30;
+	int keep_cnt = 5;
+	int keep_intvl = 10;
+
+	if (setsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, &keep_alive,
+	    sizeof(keep_alive))) {
+		debug("ERROR: setsockopt(), SO_KEEPALIVE: %s", strerror(errno));
+	}
+
+	if (setsockopt(sockfd, IPPROTO_TCP, TCP_KEEPIDLE, (void *)&keep_idle,
+	    sizeof(keep_idle))) {
+		debug("ERROR: setsocketopt(), SO_KEEPIDLE: %s", strerror(errno));
+	}
+
+	if (setsockopt(sockfd, IPPROTO_TCP, TCP_KEEPCNT, (void *)&keep_cnt,
+	    sizeof(keep_cnt))) {
+		debug("ERROR: setsocketopt(), SO_KEEPCNT: %s", strerror(errno));
+	}
+
+	if (setsockopt(sockfd, IPPROTO_TCP, TCP_KEEPINTVL, (void *)&keep_intvl,
+	    sizeof(keep_intvl))) {
+		debug("ERROR: setsocketopt(), SO_KEEPINTVL: %s", strerror(errno));
+	}
 }
 
 int sock_setflags(int sock, uint32_t flags) {

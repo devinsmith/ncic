@@ -145,6 +145,9 @@ static void irc_connected(int sock, u_int32_t cond, void *data) {
 		}
 
 		sock_setflags(sock, 0);
+
+		/* enable keep alive */
+		sock_setkeepalive(sock);
 		pork_io_add(sock, IO_COND_READ, data, data, irc_event);
 		irc_send_login(session);
 	}

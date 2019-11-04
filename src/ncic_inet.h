@@ -67,6 +67,7 @@ int get_port(const char *name, in_port_t *port);
 int get_addr(const char *hostname, struct sockaddr_storage *addr);
 void sin_set_port(struct sockaddr_storage *ss, in_port_t port);
 int sock_setflags(int sock, u_int32_t flags);
+void sock_setkeepalive(int sock);
 int sock_is_error(int sock);
 int sock_listen(struct sockaddr_storage *ss, in_port_t port);
 
