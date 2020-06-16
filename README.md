@@ -49,3 +49,12 @@ After, type:
 make
 sudo make install
 ```
+
+You should then be able to simply run ncic by executing ncic. You can connect
+to a server by typing
+
+```
+/connect yourname naken.cc
+```
+
+and pressing enter.
