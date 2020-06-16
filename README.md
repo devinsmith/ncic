@@ -30,6 +30,11 @@ ncic
    | Slackware Linux | 12.2     | i386     |
    | Ubuntu          | 16.04    | amd64    |
 
+# Screenshot
+
+![Main screen](img/ncic.png)
+
+
 Building
 ========
 Under Ubuntu you will need to install ncurses-dev and libssl-dev.
