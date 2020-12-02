@@ -230,7 +230,8 @@ void sock_setkeepalive(int sockfd)
 	    sizeof(keep_alive))) {
 		debug("ERROR: setsockopt(), SO_KEEPALIVE: %s", strerror(errno));
 	}
-
+#ifdef __linux__
+	/* Linux specific socket options */
 	if (setsockopt(sockfd, IPPROTO_TCP, TCP_KEEPIDLE, (void *)&keep_idle,
 	    sizeof(keep_idle))) {
 		debug("ERROR: setsocketopt(), SO_KEEPIDLE: %s", strerror(errno));
@@ -245,6 +246,7 @@ void sock_setkeepalive(int sockfd)
 	    sizeof(keep_intvl))) {
 		debug("ERROR: setsocketopt(), SO_KEEPINTVL: %s", strerror(errno));
 	}
+#endif /* __linux__ */
 }
 
 int sock_setflags(int sock, uint32_t flags) {
