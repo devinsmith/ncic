@@ -235,12 +235,12 @@ static ssize_t irc_read_data(irc_session_t *session, char *buf, size_t len) {
 			if (errno == EINTR)
 				continue;
 
-			debug("sock err: %d:%s", sock, strerror(errno));
+			debug("ssl sock err: %p:%s", session->sslHandle, strerror(errno));
 			return (-1);
 		}
 
 		if (ret == 0) {
-			debug("sock err: %d:%s", sock, strerror(errno));
+			debug("ssl sock err: %p:%s", session->sslHandle, strerror(errno));
 			return (-1);
 		}
 
