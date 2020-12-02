@@ -288,8 +288,7 @@ int nb_connect(	struct sockaddr_storage *ss,
 
 	if (laddr != NULL) {
 		if (bind(sock, (struct sockaddr *) laddr, sin_len(laddr)) != 0) {
-			debug("bind: %s", strerror(errno));
-			goto err_out;
+			screen_err_msg("Failed to bind: %s", strerror(errno));
 		}
 	}
 
