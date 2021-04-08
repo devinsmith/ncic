@@ -14,29 +14,29 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef __NCIC_NAKEN_H__
-#define __NCIC_NAKEN_H__
+#ifndef NCIC_NAKEN_H
+#define NCIC_NAKEN_H
 
 /* Message types */
 enum {
-	MSG_NORMAL,
-	MSG_PRIVATE,
-	MSG_YELL,
-	MSG_EMOTE,
-	MSG_SYSTEM_ALERT,
-	MSG_SYSTEM_NORMAL
+  MSG_NORMAL,
+  MSG_PRIVATE,
+  MSG_YELL,
+  MSG_EMOTE,
+  MSG_SYSTEM_ALERT,
+  MSG_SYSTEM_NORMAL
 };
 
 struct naken_input {
-	int msg_type;
-	int sender;
-	char *message;
-	char *orig;
-	char *args;
+  int msg_type;
+  int sender;
+  char *message;
+  char *orig;
+  char *args;
 };
 
 int naken_send(irc_session_t *session, char *msg);
 int naken_set_back(irc_session_t *session, char *msg);
 int irc_send(irc_session_t *session, char *command, size_t len);
 
-#endif /* __NCIC_NAKEN_H__ */
+#endif /* NCIC_NAKEN_H */

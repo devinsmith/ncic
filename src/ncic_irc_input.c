@@ -218,10 +218,10 @@ naken_tokenize(irc_session_t *session, char *input)
 	}
 	*tmp = '\0';
 
-	in->sender = atoi(input + 1);
-	in->message = xstrdup(message);
+  in->sender = atoi(input + 1);
+  in->message = xstrdup(message);
 
-	return (in);
+  return (in);
 }
 
 static ssize_t irc_read_data(irc_session_t *session, char *buf, size_t len) {
@@ -255,90 +255,58 @@ static ssize_t irc_read_data(irc_session_t *session, char *buf, size_t len) {
 ** Returns -1 if the connection died, 0 otherwise.
 */
 
-int irc_input_dispatch(irc_session_t *session) {
-	int ret;
-	char *p;
-	char *cur;
-	struct pork_acct *acct = session->data;
-	int i;
-	char input[2048];
+int irc_input_dispatch(irc_session_t *session)
+{
+  int ret;
+  char *p;
+  char *cur;
+  struct pork_acct *acct = session->data;
+  int i;
+  char input[2048];
 
-	ret = irc_read_data(session,
-			&session->input_buf[session->input_offset],
-			sizeof(session->input_buf) - session->input_offset);
+  ret = irc_read_data(session,
+      &session->input_buf[session->input_offset],
+      sizeof(session->input_buf) - session->input_offset);
 
-	if (ret < 1) {
-		pork_sock_err(acct, session->sock);
-		return (-1);
-	}
+  if (ret < 1) {
+    pork_sock_err(acct, session->sock);
+    return (-1);
+  }
 
-	cur = session->input_buf;
-	p = cur;
-	i = 0;
+  cur = session->input_buf;
+  p = cur;
+  i = 0;
 
-	while (*p != '\0') {
-		if (*p == '\r') {
-			p++;
-			continue;
-		}
+  while (*p != '\0') {
+    if (*p == '\r') {
+      p++;
+      continue;
+    }
 
-		if (*p == '\n') {
-			*p++ = '\0';
-			input[i] = '\0';
-			naken_process_input(session, input, i);
-			cur = p;
-			i = 0;
-		} else {
-			input[i++] = *p;
-			p++;
-		}
-	}
-#if 0
-	while ((p = strchr(cur, '\r')) != NULL) {
-		struct naken_input *in;
-		char *q;
+    if (*p == '\n') {
+      *p++ = '\0';
+      input[i] = '\0';
+      naken_process_input(session, input, i);
+      cur = p;
+      i = 0;
+    } else {
+      input[i++] = *p;
+      p++;
+    }
+  }
 
-		*p++ = '\0';
-		q = strchr(cur, '\n');
-		if (q != NULL)
-			*q = '\0';
+  if (*cur != '\0') {
+    size_t leftover;
 
-		if (cur[0] == '@') {
-			acct->state = STATE_READY;
-			// Do more like 001
-			pork_acct_connected(acct);
-			continue;
-		}
-		screen_win_msg(cur_window(), 0, 0, 0, MSG_TYPE_CMD_OUTPUT, "%s", cur);
-#if 0
-		in = naken_tokenize(cur);
+    leftover = strlen(cur);
 
+    /* Move the '\0', too */
+    memmove(session->input_buf, cur, leftover + 1);
+    session->input_offset = leftover;
+  } else
+    session->input_offset = 0;
 
-		if (in == NULL) {
-			debug("invalid input from server: %s", cur);
-			continue;
-		}
-#endif
-		cur = p;
-#if 0
-		free(in->orig);
-		free(in);
-#endif
-	}
-#endif
-
-	if (*cur != '\0') {
-		size_t leftover;
-
-		leftover = strlen(cur);
-
-		/* Move the '\0', too */
-		memmove(session->input_buf, cur, leftover + 1);
-		session->input_offset = leftover;
-	} else
-		session->input_offset = 0;
-
-	return (0);
+  return (0);
 }
 
 #if 0

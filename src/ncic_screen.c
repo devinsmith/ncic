@@ -149,7 +149,7 @@ int screen_init(u_int32_t rows, u_int32_t cols) {
 	acct = pork_acct_init(opt_get_str(OPT_TEXT_NO_NAME), PROTO_NULL);
 	if (acct == NULL)
 		return (-1);
-	acct->refnum = -1UL;
+	acct->refnum = 0;
 
 	pork_acct_add(acct);
 	screen.null_acct = acct;

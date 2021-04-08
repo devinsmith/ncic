@@ -25,33 +25,6 @@
 typedef uint16_t in_port_t;
 #endif
 
-#ifndef HAVE_STRUCT_SOCKADDR_STORAGE
-struct sockaddr_storage {
-	struct	sockaddr __ss_sockaddr;
-	char	__ss_pad[128 - sizeof(struct sockaddr)];
-};
-#	define ss_family __ss_sockaddr.sa_family
-#endif
-
-#ifndef HAVE_STRUCT_IN6_ADDR
-struct in6_addr {
-	u_int8_t s6_addr[16];
-};
-#endif
-
-#ifndef HAVE_STRUCT_SOCKADDR_IN6
-struct sockaddr_in6 {
-	unsigned short sin6_family;
-	u_int16_t sin6_port;
-	u_int32_t sin6_flowinfo;
-	struct in6_addr sin6_addr;
-};
-#endif
-
-#ifdef HAVE___SS_FAMILY
-	#define ss_family __ss_family
-#endif
-
 #define SIN4(x) ((struct sockaddr_in *) (x))
 #define SIN6(x) ((struct sockaddr_in6 *) (x))
 #define VALID_PORT(x) ((((x) & 0xffff) == (x)) && ((x) != 0))

@@ -18,7 +18,6 @@
 #include <sys/types.h>
 
 #include "ncic.h"
-//#include "ncic_missing.h"
 #include "ncic_util.h"
 #include "ncic_list.h"
 #include "ncic_input.h"
@@ -64,7 +63,7 @@ static const struct keyval {
 };
 
 static int bind_compare(void *l, void *r) {
-	int key = POINTER_TO_INT(l);
+	int key = (intptr_t)(l);
 	struct binding *binding = r;
 
 	return (key - binding->key);
@@ -117,7 +116,7 @@ inline int bind_remove(struct key_binds *bind_set, int key) {
 	int ret;
 
 	ret = hash_remove(&bind_set->hash,
-			INT_TO_POINTER(key), int_hash(key, bind_set->hash.order));
+                    (void *)(intptr_t)(key), int_hash(key, bind_set->hash.order));
 
 	return (ret);
 }
@@ -187,7 +186,7 @@ struct binding *bind_find(struct key_binds *bind_set, int key) {
 	dlist_t *node;
 	u_int32_t hash = int_hash(key, bind_set->hash.order);
 
-	node = hash_find(&bind_set->hash, INT_TO_POINTER(key), hash);
+	node = hash_find(&bind_set->hash, (void *)(intptr_t)(key), hash);
 	if (node != NULL)
 		return (node->data);
 

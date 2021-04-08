@@ -116,13 +116,13 @@ int screen_prompt_user(char *prompt, char *buf, size_t len) {
 	return (ret);
 }
 
-static void __screen_win_msg(	struct imwindow *win,
+static void int_screen_win_msg(	struct imwindow *win,
 								u_int32_t opt,
 								u_int32_t msgtype,
 								char *fmt,
 								va_list ap)
 {
-	char *buf = NULL;
+	char buf[8192];
 	chtype *ch;
 	size_t chlen = 0;
 	int (*cstr_conv)(chtype *, size_t, ...) = plaintext_to_cstr;
@@ -151,7 +151,7 @@ static void __screen_win_msg(	struct imwindow *win,
 			chlen += strlen(banner_txt);
 	}
 
-	ret = vasprintf(&buf, fmt, ap);
+	ret = vsnprintf(buf, sizeof(buf), fmt, ap);
 	if (ret < 0) {
 		debug("unable to allocate string for %s", fmt);
 		return;
@@ -197,8 +197,6 @@ static void __screen_win_msg(	struct imwindow *win,
 
 		p = next;
 	}
-
-	free(buf);
 }
 
 void screen_print_str(struct imwindow *win, char *buf, size_t chlen, int type) {
@@ -251,7 +249,7 @@ inline void screen_win_msg(	struct imwindow *win,
 	va_list ap;
 
 	va_start(ap, fmt);
-	__screen_win_msg(win,
+  int_screen_win_msg(win,
 		(ts * MSG_OPT_TIMESTAMP) | (banner * MSG_OPT_BANNER) | (color * MSG_OPT_COLOR),
 		1, fmt, ap);
 	va_end(ap);
@@ -261,7 +259,7 @@ void screen_err_msg(char *fmt, ...) {
 	va_list ap;
 
 	va_start(ap, fmt);
-	__screen_win_msg(cur_window(),
+  int_screen_win_msg(cur_window(),
 		MSG_OPT_TIMESTAMP | MSG_OPT_BANNER | MSG_OPT_COLOR,
 		MSG_TYPE_ERROR, fmt, ap);
 	va_end(ap);
@@ -272,7 +270,7 @@ void screen_cmd_output(char *fmt, ...) {
 
 	va_start(ap, fmt);
 	if (!screen.quiet) {
-		__screen_win_msg(cur_window(), MSG_OPT_BANNER | MSG_OPT_COLOR,
+    int_screen_win_msg(cur_window(), MSG_OPT_BANNER | MSG_OPT_COLOR,
 			MSG_TYPE_CMD_OUTPUT, fmt, ap);
 	}
 	va_end(ap);
@@ -283,6 +281,6 @@ void screen_nocolor_msg(char *fmt, ...) {
 
 	va_start(ap, fmt);
 	if (!screen.quiet)
-		__screen_win_msg(cur_window(), MSG_OPT_BANNER, 1, fmt, ap);
+    int_screen_win_msg(cur_window(), MSG_OPT_BANNER, 1, fmt, ap);
 	va_end(ap);
 }

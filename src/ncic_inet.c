@@ -34,9 +34,10 @@
 #endif
 
 #include "ncic.h"
-#include <ncic_missing.h>
+//#include <ncic_missing.h>
 #include "ncic_util.h"
 #include "ncic_inet.h"
+#include "ncic_screen_io.h"
 
 /*
 ** Write to a socket, deal with interrupted and incomplete writes. Returns

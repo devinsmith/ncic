@@ -2,8 +2,10 @@ ncic
 config.h
 config.mak
 Makefile
-src/*.d
-src/*.o
-src/missing/*.d
-src/missing/*.o
-src/missing/libmissing.a
+
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+cmake_install.cmake
+
+.idea

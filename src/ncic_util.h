@@ -17,17 +17,8 @@
 #define array_elem(x) (sizeof((x)) / sizeof((x)[0]))
 
 /* Needs special care */
-#if SIZEOF_VOID_P == 8
-	#define POINTER_TO_INT(p)	((int) (long) (p))
-	#define POINTER_TO_UINT(p)	((unsigned int) (unsigned long) (p))
-	#define INT_TO_POINTER(i)	((void *) (long) (i))
-	#define UINT_TO_POINTER(u)	((void *) (unsigned long) (u))
-#else
-	#define POINTER_TO_INT(p)	((int) (p))
-	#define POINTER_TO_UINT(p)	((unsigned int) (p))
-	#define INT_TO_POINTER(i)	((void *) (i))
-	#define UINT_TO_POINTER(u)	((void *) (u))
-#endif
+#define POINTER_TO_UINT(p)	((uintptr_t) (p))
+#define UINT_TO_POINTER(u)	((void *) (uintptr_t) (u))
 
 #ifndef min
 #	define min(x,y) ((x) < (y) ? (x) : (y))

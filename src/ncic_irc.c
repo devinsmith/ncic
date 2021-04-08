@@ -43,7 +43,7 @@
 #include "ncic_imwindow.h"
 #include "ncic_screen_io.h"
 #include "ncic_chat.h"
-#include <ncic_missing.h>
+//#include <ncic_missing.h>
 
 #include "ncic_irc.h"
 #include "ncic_naken.h"
