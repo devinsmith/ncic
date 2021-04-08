@@ -38,6 +38,7 @@ ncic_conf.h          ncic_io.h        ncic_screen.h
 add_executable(${TARGET_NAME} ${SOURCES} ${HEADERS})
 target_compile_definitions(${TARGET_NAME} PRIVATE SYSTEM_NCICRC=\"${CMAKE_INSTALL_PREFIX}/share/ncic/ncicrc\")
 target_link_libraries(${TARGET_NAME} PRIVATE ${OPENSSL_LIBRARIES} ${CURSES_LIBRARIES})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 configure_file(config.h.in config.h)
 
 #if(MSVC)
