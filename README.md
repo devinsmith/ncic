@@ -29,6 +29,7 @@ ncic
    | MacOS X Server  | 10.4.10  | i386     |
    | Slackware Linux | 12.2     | i386     |
    | Ubuntu          | 16.04    | amd64    |
+   | Debian          | Buster   | amd64    |
 
 # Screenshot
 
@@ -37,7 +38,8 @@ ncic
 
 Building
 ========
-Under Ubuntu you will need to install ncurses-dev and libssl-dev.
+Under Linux, ncurses and ssl development libraries are required. On a Debian
+based distribution you can execute the following command:
 
 ```
 sudo apt-get install ncurses-dev libssl-dev
@@ -45,12 +47,13 @@ sudo apt-get install ncurses-dev libssl-dev
 
 Other versions of Linux/Unix typically have ncurses installed by default.
 
-On BSD you will need to use GNU Make which is typically called gmake.
 
 After, type:
 
 ```
-./configure
+mkdir build
+cd build
+cmake ..
 make
 sudo make install
 ```
