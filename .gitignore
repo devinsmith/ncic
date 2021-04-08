@@ -7,5 +7,6 @@ CMakeCache.txt
 CMakeFiles
 CMakeScripts
 cmake_install.cmake
+cmake-build-*
 
 .idea
