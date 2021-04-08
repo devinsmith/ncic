@@ -130,8 +130,24 @@ int pork_recv_msg(	struct pork_acct *acct,
 	return (0);
 }
 
-int
-ncic_recv_sys_alert(struct pork_acct *acct, char *msg)
+int ncic_recv_highlight_msg(struct pork_acct *acct, char *msg)
+{
+  int type;
+  char buf[4096];
+  int ret;
+
+  type = OPT_FORMAT_HIGHLIGHT;
+
+  ret = fill_format_str(type, buf, sizeof(buf), acct, msg);
+  if (ret < 1)
+    return (-1);
+
+  screen_print_str(cur_window(), buf, (size_t) ret, MSG_TYPE_PRIVMSG_RECV);
+  imwindow_recv_msg(cur_window());
+  return (0);
+}
+
+int ncic_recv_sys_alert(struct pork_acct *acct, char *msg)
 {
 	int type;
 	char buf[4096];

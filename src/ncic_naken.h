@@ -20,6 +20,7 @@
 /* Message types */
 enum {
   MSG_NORMAL,
+  MSG_MINE,
   MSG_PRIVATE,
   MSG_YELL,
   MSG_EMOTE,

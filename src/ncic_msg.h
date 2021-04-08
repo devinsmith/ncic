@@ -36,6 +36,7 @@ int pork_recv_action(	struct pork_acct *acct,
 						char *msg);
 
 int ncic_recv_sys_alert(struct pork_acct *acct, char *msg);
+int ncic_recv_highlight_msg(struct pork_acct *acct, char *msg);
 
 int pork_msg_autoreply(struct pork_acct *acct, char *dest, char *msg);
 int pork_msg_send_auto(struct pork_acct *acct, char *sender);

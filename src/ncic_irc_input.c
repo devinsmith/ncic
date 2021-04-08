@@ -133,11 +133,20 @@ static int naken_process_input(irc_session_t *session, char *input, int len)
 	if (strstr(input, ">> At the tone")) {
 		return 0;
 	}
+
+	if (acct->id <= 0) {
+
+	}
+
 	in = naken_tokenize(session, input);
 	if (input[0] == '>') {
 		ncic_recv_sys_alert(acct, in->orig);
 	} else {
-		screen_win_msg(cur_window(), 0, 0, 0, MSG_TYPE_CMD_OUTPUT, "%s", in->orig);
+	  if (in->msg_type == MSG_MINE) {
+	    ncic_recv_highlight_msg(acct, in->orig);
+	  } else {
+      screen_win_msg(cur_window(), 0, 0, 0, MSG_TYPE_CMD_OUTPUT, "%s", in->orig);
+    }
 	}
 
 	free(in->orig);
@@ -146,8 +155,7 @@ static int naken_process_input(irc_session_t *session, char *input, int len)
 	return 0;
 }
 
-static struct naken_input *
-naken_tokenize(irc_session_t *session, char *input)
+static struct naken_input *naken_tokenize(irc_session_t *session, char *input)
 {
 	struct naken_input *in = xcalloc(1, sizeof(*in));
 	char *sender;
@@ -174,6 +182,8 @@ naken_tokenize(irc_session_t *session, char *input)
 			in->args = tmp;
 			naken_handler_nick(acct, in, old_name);
 			free(old_name);
+		} else if (strstr(input, ">> You just logged on line") != NULL) {
+		  sscanf(input, "%*c%*c %*s %*s %*s %*s %*s %d", &acct->id);
 		}
 		return (in);
 	}
@@ -217,6 +227,9 @@ naken_tokenize(irc_session_t *session, char *input)
 	*tmp = '\0';
 
   in->sender = atoi(input + 1);
+  if (in->sender == acct->id && in->msg_type == MSG_NORMAL) {
+    in->msg_type = MSG_MINE;
+  }
   in->message = xstrdup(message);
 
   return (in);

@@ -18,10 +18,8 @@
 #include <sys/types.h>
 
 #include "ncic.h"
-//#include <pork_missing.h>
 #include "ncic_util.h"
 #include "ncic_list.h"
-//#include <pork_input.h>
 #include "ncic_color.h"
 
 static inline int color_get_code(char code);

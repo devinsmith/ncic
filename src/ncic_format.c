@@ -23,7 +23,6 @@
 #include <sys/types.h>
 
 #include "ncic.h"
-//#include <pork_missing.h>
 #include "ncic_util.h"
 #include "ncic_list.h"
 #include "ncic_color.h"
@@ -945,6 +944,7 @@ static int (*const format_handler[])(char, char *, size_t, va_list) = {
 	format_status_idle,			/* OPT_FORMAT_STATUS_IDLE			*/
 	format_status_timestamp,	/* OPT_FORMAT_STATUS_TIMESTAMP		*/
 	format_status_typing,		/* OPT_FORMAT_STATUS_TYPING			*/
+  format_system_alert,		/* OPT_FORMAT_HIGHLIGHT			*/
 	format_system_alert,		/* OPT_FORMAT_SYSTEM_ALERT			*/
 	format_status_timestamp,	/* OPT_FORMAT_TIMESTAMP				*/
 	format_warning,				/* OPT_FORMAT_WARN					*/

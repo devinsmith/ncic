@@ -71,6 +71,7 @@
 #define DEFAULT_FORMAT_STATUS_IDLE			"%d,w (%D,widle: $i%d,w)"
 #define DEFAULT_FORMAT_STATUS_TIMESTAMP		"[$H:$M] "
 #define DEFAULT_FORMAT_STATUS_TYPING		" (%b,w$Y%d,w)"
+#define DEFAULT_FORMAT_HIGHLIGHT      "%M$M"
 #define DEFAULT_FORMAT_SYSTEM_ALERT		"%R$M"
 #define DEFAULT_FORMAT_TIMESTAMP			"$H:$M"
 #define DEFAULT_FORMAT_WARN					"[$T] %R$N%r has been warned by %R$U%r.%x Warning level is now %W$W%%"
