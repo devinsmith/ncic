@@ -132,7 +132,7 @@ int irc_send_invite(irc_session_t *session, char *channel, char *user);
 
 char *irc_get_chanmode_arg(struct irc_chan_data *chat, char mode);
 int irc_chanmode_has_arg(irc_session_t *session, char mode);
-int irc_input_dispatch(irc_session_t *session);
+int naken_input_dispatch(irc_session_t *session);
 char *irc_text_filter(char *str);
 
 #endif /* __NCIC_IRC_H__ */

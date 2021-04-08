@@ -40,7 +40,6 @@
 #include "ncic_screen_io.h"
 #include "ncic_chat.h"
 #include "ncic_msg.h"
-//#include "ncic_missing.h"
 
 #include "ncic_irc.h"
 #include "ncic_naken.h"
@@ -50,8 +49,7 @@ static struct naken_input *naken_tokenize(irc_session_t *session, char *input);
 static int naken_handler_nick(struct pork_acct *acct, struct naken_input *in,
     char *old_name);
 
-static int
-naken_process_input(irc_session_t *session, char *input, int len)
+static int naken_process_input(irc_session_t *session, char *input, int len)
 {
 	struct pork_acct *acct = session->data;
 	struct buddy_pref *pref = acct->buddy_pref;
@@ -230,7 +228,6 @@ static ssize_t irc_read_data(irc_session_t *session, char *buf, size_t len) {
 
 	for (i = 0 ; i < 5 ; i++) {
 		ret = SSL_read(session->sslHandle, buf, len - 1);
-//		ret = read(sock, buf, len - 1);
 		if (ret == -1) {
 			if (errno == EINTR)
 				continue;
@@ -254,143 +251,55 @@ static ssize_t irc_read_data(irc_session_t *session, char *buf, size_t len) {
 /*
 ** Returns -1 if the connection died, 0 otherwise.
 */
-
-int irc_input_dispatch(irc_session_t *session)
+int naken_input_dispatch(irc_session_t *session)
 {
-  int ret;
+  ssize_t i, nbytes;
+  size_t j;
   char *p;
   char *cur;
   struct pork_acct *acct = session->data;
-  int i;
   char input[2048];
 
-  ret = irc_read_data(session,
+  nbytes = irc_read_data(session,
       &session->input_buf[session->input_offset],
       sizeof(session->input_buf) - session->input_offset);
 
-  if (ret < 1) {
+  if (nbytes < 1) {
     pork_sock_err(acct, session->sock);
     return (-1);
   }
 
   cur = session->input_buf;
   p = cur;
-  i = 0;
 
-  while (*p != '\0') {
-    if (*p == '\r') {
+  for (i = 0, j = 0; i < nbytes; i++) {
+    // Yes, the server sends null bytes.
+    if (*p == '\r' || *p == '\0') {
       p++;
       continue;
     }
 
     if (*p == '\n') {
       *p++ = '\0';
-      input[i] = '\0';
-      naken_process_input(session, input, i);
+      input[j] = '\0';
+      naken_process_input(session, input, j);
       cur = p;
-      i = 0;
+      j = 0;
     } else {
-      input[i++] = *p;
+      input[j++] = *p;
       p++;
     }
   }
 
-  if (*cur != '\0') {
-    size_t leftover;
-
-    leftover = strlen(cur);
-
+  if (j != 0) {
     /* Move the '\0', too */
-    memmove(session->input_buf, cur, leftover + 1);
-    session->input_offset = leftover;
+    memmove(session->input_buf, cur, j);
+    session->input_offset = j;
   } else
     session->input_offset = 0;
 
   return (0);
 }
-
-#if 0
-static int irc_handler_privmsg(struct pork_acct *acct, struct irc_input *in) {
-	char *p;
-	char *host;
-
-	if (in->num_tokens < 3 || in->args == NULL) {
-		debug("invalid input from server: %s", in->orig);
-		return (-1);
-	}
-
-	p = strchr(in->tokens[0], '!');
-	if (p != NULL)
-		*p++ = '\0';
-	host = p;
-
-	/* ^A */
-	if (in->args[0] == 0x01) {
-		char *dest;
-
-		p = strrchr(&in->args[1], 0x01);
-		if (p == NULL)
-			goto no_ctcp;
-		*p++ = '\0';
-
-		in->cmd = &in->args[1];
-		p = strchr(in->cmd, ' ');
-		if (p != NULL)
-			*p++ = '\0';
-		in->args = p;
-
-		if (host != NULL)
-			host[-1] = '!';
-
-		if (irc_callback_run(acct->data, in, "CTCP") == 1)
-			return (0);
-		else if (host != NULL)
-			host[-1] = '\0';
-
-		/* XXX */
-		dest = irc_text_filter(in->tokens[2]);
-		if (in->args != NULL) {
-			char *msg;
-
-			msg = irc_text_filter(in->args);
-			screen_win_msg(cur_window(), 1, 0, 1, MSG_TYPE_CHAT_MSG_RECV,
-				"%%WCTCP%%M %s %%D[%%x%s%%D]%%x from %%C%s%%D(%%c%s%%D)%%x to %%W%s",
-				in->cmd, msg, in->tokens[0], host, dest);
-
-			free(msg);
-		} else {
-			screen_win_msg(cur_window(), 1, 0, 1, MSG_TYPE_PRIVMSG_RECV,
-				"%%WCTCP%%M %s%%x from %%C%s%%D(%%c%s%%D)%%x to %%W%s",
-				in->cmd, in->tokens[0], host, dest);
-		}
-
-		free(dest);
-		return (0);
-	}
-
-no_ctcp:
-	if (!acct->proto->user_compare(acct->username, in->tokens[2]))
-		pork_recv_msg(acct, in->tokens[2], in->tokens[0], host, in->args, 0);
-	else {
-		struct chatroom *chat;
-		char *p = in->tokens[2];
-
-		/* these should be displayed in a way that lets the user know they aren't ordinary privmsgs */
-		while (*p == '@' || *p == '+' || *p == '%')
-			p++;
-
-		chat = chat_find(acct, p);
-		if (chat == NULL) {
-			debug("receviced msg for unjoined chan %s \"%s\"", p, in->orig);
-			return (-1);
-		}
-
-		chat_recv_msg(acct, chat, in->tokens[2], in->tokens[0], host, in->args);
-	}
-
-	return (0);
-}
-#endif
 
 static int
 naken_handler_nick(struct pork_acct *acct, struct naken_input *in, char *old_name)

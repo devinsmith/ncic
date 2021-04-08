@@ -63,7 +63,7 @@ static int naken_update_buddy(struct pork_acct *acct,
 
 static void irc_event(int sock, u_int32_t cond, void *data) {
 	if (cond & IO_COND_READ) {
-		if (irc_input_dispatch(data) == -1) {
+		if (naken_input_dispatch(data) == -1) {
 			irc_session_t *session = data;
 			struct pork_acct *acct = session->data;
 
