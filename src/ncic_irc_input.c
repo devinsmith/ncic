@@ -143,7 +143,7 @@ static int naken_process_input(irc_session_t *session, char *input, int len)
 		ncic_recv_sys_alert(acct, in->orig);
 	} else {
 	  if (in->msg_type == MSG_MINE) {
-	    ncic_recv_highlight_msg(acct, in->orig);
+	    ncic_recv_highlight_msg(acct, in->message);
 	  } else {
       screen_win_msg(cur_window(), 0, 0, 0, MSG_TYPE_CMD_OUTPUT, "%s", in->orig);
     }

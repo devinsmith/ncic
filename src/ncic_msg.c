@@ -132,13 +132,10 @@ int pork_recv_msg(	struct pork_acct *acct,
 
 int ncic_recv_highlight_msg(struct pork_acct *acct, char *msg)
 {
-  int type;
   char buf[4096];
   int ret;
 
-  type = OPT_FORMAT_HIGHLIGHT;
-
-  ret = fill_format_str(type, buf, sizeof(buf), acct, msg);
+  ret = fill_format_str(OPT_FORMAT_HIGHLIGHT, buf, sizeof(buf), acct, msg);
   if (ret < 1)
     return (-1);
 

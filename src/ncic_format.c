@@ -428,6 +428,43 @@ format_system_alert(char opt, char *buf, size_t len, va_list ap)
 	return (0);
 }
 
+static int format_msg_highlight(char opt, char *buf, size_t len, va_list ap) {
+  struct pork_acct *acct = va_arg(ap, struct pork_acct *);
+  char *msg = va_arg(ap, char *);
+  int ret = 0;
+
+  switch (opt) {
+    /* User name */
+    case 'n':
+    case 'N':
+      if (acct->username != NULL)
+        ret = xstrncpy(buf, acct->username, len);
+      break;
+
+    /* Message text */
+    case 'm':
+    case 'M':
+      if (msg != NULL)
+        ret = xstrncpy(buf, msg, len);
+      break;
+
+    // id number
+    case 'i':
+    case 'I':
+      ret = snprintf(buf, len, "%u", acct->id);
+      break;
+
+    default:
+      return (-1);
+  }
+
+  if (ret < 0 || (size_t) ret >= len)
+    return (-1);
+
+  return (0);
+}
+
+
 static int format_msg_send(char opt, char *buf, size_t len, va_list ap) {
 	struct pork_acct *acct = va_arg(ap, struct pork_acct *);
 	char *dest = va_arg(ap, char *);
@@ -927,6 +964,7 @@ static int (*const format_handler[])(char, char *, size_t, va_list) = {
 	format_chat_send,			/* OPT_FORMAT_CHAT_SEND_NOTICE		*/
 	format_chat_info,			/* OPT_FORMAT_CHAT_TOPIC			*/
 	format_chat_info,			/* OPT_FORMAT_CHAT_UNIGNORE			*/
+  format_msg_highlight,		/* OPT_FORMAT_HIGHLIGHT			*/
 	format_msg_recv,			/* OPT_FORMAT_IM_RECV				*/
 	format_msg_recv,			/* OPT_FORMAT_IM_RECV_AUTO			*/
 	format_msg_recv,			/* OPT_FORMAT_IM_RECV_STATUS		*/
@@ -944,7 +982,6 @@ static int (*const format_handler[])(char, char *, size_t, va_list) = {
 	format_status_idle,			/* OPT_FORMAT_STATUS_IDLE			*/
 	format_status_timestamp,	/* OPT_FORMAT_STATUS_TIMESTAMP		*/
 	format_status_typing,		/* OPT_FORMAT_STATUS_TYPING			*/
-  format_system_alert,		/* OPT_FORMAT_HIGHLIGHT			*/
 	format_system_alert,		/* OPT_FORMAT_SYSTEM_ALERT			*/
 	format_status_timestamp,	/* OPT_FORMAT_TIMESTAMP				*/
 	format_warning,				/* OPT_FORMAT_WARN					*/
