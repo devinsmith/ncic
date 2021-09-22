@@ -8,10 +8,6 @@
 ** as published by the Free Software Foundation.
 */
 
-#include "config.h"
-
-#include <unistd.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 

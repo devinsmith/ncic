@@ -9,23 +9,17 @@
 ** as published by the Free Software Foundation.
 */
 
-#include "config.h"
-
-#include <unistd.h>
 #include <ncurses.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <ctype.h>
-#include <time.h>
-#include <errno.h>
 #include <sys/time.h>
 #include <sys/types.h>
 
 #include "ncic.h"
 #include "ncic_util.h"
 #include "ncic_list.h"
-#include "ncic_color.h"
 #include "ncic_buddy.h"
 #include "ncic_imwindow.h"
 #include "ncic_acct.h"
@@ -33,7 +27,6 @@
 #include "ncic_cstr.h"
 #include "ncic_misc.h"
 #include "ncic_screen.h"
-#include "ncic_screen_io.h"
 #include "ncic_chat.h"
 #include "ncic_format.h"
 

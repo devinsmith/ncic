@@ -8,15 +8,9 @@
 ** as published by the Free Software Foundation.
 */
 
-#include "config.h"
-
 #include <unistd.h>
 #include <stdlib.h>
 #include <ncurses.h>
-#include <stdio.h>
-#include <time.h>
-#include <sys/time.h>
-#include <sys/types.h>
 
 #include "ncic.h"
 #include "ncic_util.h"
@@ -30,7 +24,6 @@
 #include "ncic_screen_io.h"
 #include "ncic_imsg.h"
 #include "ncic_imwindow.h"
-#include "ncic_color.h"
 #include "ncic_chat.h"
 
 static void chat_destroy_user_list_cb(void *param, void *data) {

@@ -8,29 +8,17 @@
 ** as published by the Free Software Foundation.
 */
 
-#include "config.h"
-
 #include <unistd.h>
 #include <ncurses.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
-#include <time.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include <errno.h>
 
 #include "ncic.h"
 #include "ncic_util.h"
 #include "ncic_list.h"
-#include "ncic_misc.h"
-#include "ncic_queue.h"
 #include "ncic_buddy.h"
-#include "ncic_color.h"
 #include "ncic_inet.h"
 #include "ncic_acct.h"
 #include "ncic_proto.h"

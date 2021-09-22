@@ -39,9 +39,6 @@ void free_str_wipe(char *str);
 
 int xstrncpy(char *dest, const char *src, size_t n);
 int xstrncat(char *dest, const char *src, size_t n);
-char *str_from_tok(char *str, uint32_t tok_num);
-void str_trim(char *str);
-char *terminate_quote(char *buf);
 
 int expand_path(char *path, char *dest, size_t len);
 
@@ -52,7 +49,5 @@ uint32_t int_hash(int num, uint32_t order);
 
 int str_to_uint(const char *str, uint32_t *val);
 int str_to_int(const char *str, int *val);
-
-int file_get_size(FILE *fp, size_t *result);
 
 #endif /* __NCIC_UTIL_H__ */

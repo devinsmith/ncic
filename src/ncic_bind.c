@@ -8,8 +8,6 @@
 ** as published by the Free Software Foundation.
 */
 
-#include "config.h"
-
 #include <unistd.h>
 #include <ncurses.h>
 #include <string.h>

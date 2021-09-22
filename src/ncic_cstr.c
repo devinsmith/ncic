@@ -8,17 +8,12 @@
 ** as published by the Free Software Foundation.
 */
 
-#include "config.h"
-
-#include <unistd.h>
 #include <ncurses.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
 #include <sys/types.h>
 
-#include "ncic.h"
-//#include <pork_missing.h>
 #include "ncic_util.h"
 #include "ncic_color.h"
 #include "ncic_set.h"

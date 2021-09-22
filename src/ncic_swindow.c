@@ -24,7 +24,6 @@
 #include <sys/uio.h>
 
 #include "ncic.h"
-//#include <pork_missing.h>
 #include "ncic_util.h"
 #include "ncic_list.h"
 #include "ncic_set.h"

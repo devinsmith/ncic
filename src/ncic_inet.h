@@ -11,6 +11,8 @@
 #ifndef __NCIC_INET_H__
 #define __NCIC_INET_H__
 
+#include <netinet/in.h>
+
 #ifdef INET6_ADDRSTRLEN
 #	define MAX_IPLEN 	INET6_ADDRSTRLEN
 #elif defined INET_ADDRSTRLEN

@@ -13,7 +13,6 @@
 
 struct pork_acct;
 struct imwindow;
-struct file_transfer;
 struct chatroom;
 struct chat_user;
 struct buddy;

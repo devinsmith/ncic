@@ -11,6 +11,8 @@
 #ifndef __NCIC_SCREEN_IO_H__
 #define __NCIC_SCREEN_IO_H__
 
+#include "ncic.h"
+
 struct imwindow;
 struct pork_acct;
 

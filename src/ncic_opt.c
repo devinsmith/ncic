@@ -10,7 +10,6 @@
 
 #include "config.h"
 
-#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,8 +23,6 @@
 #include <netinet/in.h>
 #endif
 
-#include "ncic.h"
-#include "ncic_inet.h"
 #include "ncic_opt.h"
 
 #define OPTSTRING "vH:p:h"

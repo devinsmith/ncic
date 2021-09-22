@@ -8,24 +8,15 @@
 ** as published by the Free Software Foundation.
 */
 
-#include "config.h"
-
-#include <unistd.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
 
-#include "ncic.h"
-//#include <pork_missing.h>
 #include "ncic_util.h"
-#include "ncic_list.h"
 #include "ncic_proto.h"
 
 static struct pork_proto *proto_table[PROTO_MAX + 1];
 
 extern int irc_proto_init(struct pork_proto *proto);
-extern int aim_proto_init(struct pork_proto *proto);
 
 struct pork_proto *proto_get(int protocol) {
 	if (protocol > PROTO_MAX || protocol < -1)
@@ -97,7 +88,6 @@ static int proto_init_null(struct pork_proto *proto) {
 
 int proto_init(void) {
 	proto_new(PROTO_NULL, "NULL", proto_init_null);
-//	proto_new(PROTO_AIM, "AIM", aim_proto_init);
 
 	proto_new(PROTO_IRC, "IRC", irc_proto_init);
 

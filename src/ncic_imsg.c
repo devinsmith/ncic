@@ -8,28 +8,15 @@
 ** as published by the Free Software Foundation.
 */
 
-
-#include "config.h"
-
-#include <unistd.h>
 #include <ncurses.h>
-#include <stdlib.h>
 #include <string.h>
-#include <time.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <regex.h>
-#include <sys/uio.h>
 
-#include "ncic.h"
-//#include <pork_missing.h>
 #include "ncic_util.h"
 #include "ncic_list.h"
 #include "ncic_set.h"
 #include "ncic_swindow.h"
 #include "ncic_imsg.h"
 #include "ncic_cstr.h"
-#include "ncic_misc.h"
 
 static uint32_t imsg_wordwrapped_lines(struct swindow *swindow,
 										struct imsg *imsg)

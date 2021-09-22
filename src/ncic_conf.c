@@ -8,8 +8,6 @@
 ** as published by the Free Software Foundation.
 */
 
-#include "config.h"
-
 #include <unistd.h>
 #include <ncurses.h>
 #include <stdio.h>
@@ -20,19 +18,15 @@
 #endif
 #include <errno.h>
 #include <limits.h>
-#include <time.h>
-#include <sys/time.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
 #include "ncic.h"
-//#include "ncic_missing.h"
 #include "ncic_util.h"
 #include "ncic_list.h"
 #include "ncic_buddy.h"
 #include "ncic_imwindow.h"
 #include "ncic_acct.h"
-#include "ncic_cstr.h"
 #include "ncic_misc.h"
 #include "ncic_bind.h"
 #include "ncic_alias.h"

@@ -18,15 +18,9 @@
 #include <string.h>
 #include <ctype.h>
 #include <dirent.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 
-#include "ncic.h"
-//#include "ncic_missing.h"
 #include "ncic_util.h"
-#include "ncic_list.h"
-#include "ncic_cstr.h"
-#include "ncic_color.h"
 #include "ncic_screen.h"
 #include "ncic_imsg.h"
 #include "ncic_screen_io.h"

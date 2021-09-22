@@ -8,20 +8,13 @@
 ** as published by the Free Software Foundation.
 */
 
-#include "config.h"
-
 #include <stdio.h>
-#include <unistd.h>
 #include <ncurses.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 #include <sys/time.h>
-#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
-#include <errno.h>
 
 #include "ncic.h"
 #include "ncic_util.h"
@@ -30,12 +23,9 @@
 #include "ncic_inet.h"
 #include "ncic_io.h"
 #include "ncic_acct.h"
-#include "ncic_opt.h"
 #include "ncic_imwindow.h"
 #include "ncic_screen.h"
 #include "ncic_screen_io.h"
-#include "ncic_chat.h"
-//#include "ncic_missing.h>
 
 #include "ncic_irc.h"
 

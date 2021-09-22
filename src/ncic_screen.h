@@ -50,7 +50,6 @@ void screen_destroy(void);
 int screen_renumber(struct imwindow *imwindow, u_int32_t refnum);
 void screen_add_window(struct imwindow *imwindow);
 void screen_resize(u_int32_t rows, u_int32_t cols);
-int screen_blist_width(struct blist *blist, u_int32_t new_width);
 void screen_window_swap(dlist_t *new_cur);
 int screen_goto_window(u_int32_t refnum);
 void screen_refresh(void);

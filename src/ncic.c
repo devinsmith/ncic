@@ -14,19 +14,14 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include "config.h"
-
 #include <unistd.h>
 #include <ncurses.h>
-#include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
-#include <errno.h>
 #ifndef WIN32
 #include <pwd.h>
 #include <signal.h>
-#include <sys/signal.h>
 #include <sys/ioctl.h>
 #endif
 #include <time.h>

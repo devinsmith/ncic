@@ -11,6 +11,8 @@
 #ifndef __NCIC_INPUT_H__
 #define __NCIC_INPUT_H__
 
+#include "ncic_list.h"
+
 #define INPUT_BUFFER_LEN	4096
 #define MAX_HISTORY_LEN		150
 

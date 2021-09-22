@@ -8,11 +8,7 @@
 ** as published by the Free Software Foundation.
 */
 
-#include "config.h"
-
-#include <unistd.h>
 #include <ncurses.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>

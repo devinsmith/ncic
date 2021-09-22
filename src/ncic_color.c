@@ -9,17 +9,11 @@
 ** as published by the Free Software Foundation.
 */
 
-#include "config.h"
-
-#include <unistd.h>
 #include <ncurses.h>
 #include <ctype.h>
 #include <string.h>
-#include <sys/types.h>
 
-#include "ncic.h"
 #include "ncic_util.h"
-#include "ncic_list.h"
 #include "ncic_color.h"
 
 static inline int color_get_code(char code);

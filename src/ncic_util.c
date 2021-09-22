@@ -8,20 +8,14 @@
 ** as published by the Free Software Foundation.
 */
 
-//#include <config.h>
-
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <errno.h>
 #include <pwd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 
 #include "ncic.h"
-//#include <pork_missing.h>
 #include "ncic_util.h"
 
 /*
@@ -175,43 +169,6 @@ int blank_str(const char *str) {
 }
 
 /*
-** Returns the portion of the string starting with token number "tok_num".
-** Returns NULL if there are less tokens than "tok_num" in the string.
-*/
-
-char *str_from_tok(char *str, uint32_t tok_num) {
-	char *p;
-	uint32_t i;
-
-	if (tok_num <= 1)
-		return (str);
-
-	p = str;
-	for (i = 0 ; i < tok_num - 1 && (p = strchr(p, ' ')) != NULL ; i++)
-		p++;
-
-	if (i != tok_num - 1 || p == NULL)
-		return (NULL);
-
-	return (p);
-}
-
-/*
-** Trims any trailing whitespace characters from the string.
-*/
-
-void str_trim(char *str) {
-	char *p;
-	size_t len;
-
-	len = strlen(str);
-	p = &str[len - 1];
-
-	while (*p == ' ' || *p == '\t')
-		*p-- = '\0';
-}
-
-/*
 ** Hash by Karl Nelson <kenelson@ece.ucdavis.edu>
 **
 ** See http://mail.gnome.org/archives/gtk-devel-list/2000-February/msg00057.html
@@ -255,22 +212,6 @@ int str_to_int(const char *str, int *val) {
 	return (0);
 }
 
-char *terminate_quote(char *buf) {
-	char *p = buf;
-
-	if (*p == '\"')
-		p++;
-
-	while ((p = strchr(p, '\"')) != NULL) {
-		if (p[-1] != '\\') {
-			*p++ = '\0';
-			return (p);
-		}
-		memmove(&p[-1], p, strlen(p) + 1);
-	}
-
-	return (NULL);
-}
 
 int expand_path(char *path, char *dest, size_t len) {
 #ifdef WIN32
@@ -323,16 +264,4 @@ int expand_path(char *path, char *dest, size_t len) {
 
 	return (ret);
 #endif
-}
-
-int file_get_size(FILE *fp, size_t *result) {
-	struct stat st;
-
-	if (fstat(fileno(fp), &st) != 0) {
-		debug("fstat: %s", strerror(errno));
-		return (-1);
-	}
-
-	*result = st.st_size;
-	return (0);
 }

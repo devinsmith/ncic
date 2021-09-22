@@ -8,23 +8,15 @@
 ** as published by the Free Software Foundation.
 */
 
-//#include <config.h>
-
-#include <unistd.h>
 #include <ncurses.h>
 #include <ctype.h>
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
-#include <sys/types.h>
 
-#include "ncic.h"
-//#include <pork_missing.h>
 #include "ncic_util.h"
-#include "ncic_list.h"
 #include "ncic_input.h"
 #include "ncic_misc.h"
-#include "ncic_color.h"
 
 void resize_terminal(int rows, int cols) {
 #ifdef HAVE_RESIZETERM

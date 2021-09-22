@@ -8,14 +8,9 @@
 ** as published by the Free Software Foundation.
 */
 
-#include "config.h"
-
 #include <unistd.h>
-#include <stdio.h>
 #include <stdlib.h>
 
-//#include <pork.h>
-//#include <pork_missing.h>
 #include "ncic_util.h"
 #include "ncic_list.h"
 
