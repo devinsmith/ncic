@@ -41,6 +41,8 @@ target_link_libraries(${TARGET_NAME} PRIVATE ${OPENSSL_LIBRARIES} ${CURSES_LIBRA
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 configure_file(config.h.in config.h)
 
+install(TARGETS ncic DESTINATION bin)
+
 #if(MSVC)
 #  target_compile_options(${TARGET_NAME} PRIVATE /W4 /WX)
 #else()
