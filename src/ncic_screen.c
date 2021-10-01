@@ -22,7 +22,6 @@
 #include "ncic_misc.h"
 #include "ncic_imsg.h"
 #include "ncic_imwindow.h"
-#include "ncic_buddy.h"
 #include "ncic_proto.h"
 #include "ncic_acct.h"
 #include "ncic_chat.h"
@@ -391,7 +390,7 @@ int screen_get_query_window(struct pork_acct *acct,
 		if (opt_get_bool(OPT_DUMP_MSGS_TO_STATUS))
 			win = screen.status_win;
 		else {
-			win = screen_new_window(acct, name, buddy_name(acct, name));
+			win = screen_new_window(acct, name, name);
 			new++;
 		}
 	}
@@ -413,7 +412,7 @@ int screen_make_query_window(struct pork_acct *acct,
 
 	win = imwindow_find(acct, name);
 	if (win == NULL || win->type != WIN_TYPE_PRIVMSG) {
-		win = screen_new_window(acct, name, buddy_name(acct, name));
+		win = screen_new_window(acct, name, name);
 		new++;
 	}
 

@@ -20,7 +20,6 @@
 #include "ncic.h"
 #include "ncic_util.h"
 #include "ncic_list.h"
-#include "ncic_buddy.h"
 #include "ncic_imwindow.h"
 #include "ncic_acct.h"
 #include "ncic_proto.h"
@@ -204,7 +203,7 @@ static int format_status_idle(char opt, char *buf, size_t len, va_list ap) {
 	switch (opt) {
 		/* Idle time */
 		case 'I':
-		own:
+    case 'i':
 			if (acct->idle_time == 0 && hide_if_zero)
 				return (1);
 
@@ -215,23 +214,6 @@ static int format_status_idle(char opt, char *buf, size_t len, va_list ap) {
 		** If the current window is a chat window, $i will display the
 		** idle time of the user we're talking to.
 		*/
-		case 'i': {
-			struct imwindow *win = cur_window();
-
-			if (win->type == WIN_TYPE_PRIVMSG) {
-				struct buddy *buddy;
-
-				buddy = NULL;
-				if (buddy == NULL || (buddy->idle_time == 0 && hide_if_zero))
-					return (1);
-
-				ret = time_to_str(buddy->idle_time, buf, len);
-				break;
-			}
-
-			goto own;
-		}
-
 		default:
 			return (-1);
 	}
@@ -479,7 +461,7 @@ static int format_msg_send(char opt, char *buf, size_t len, va_list ap) {
 		/* Screen name / alias  of the receiver */
 		case 'R':
 			if (dest != NULL)
-				ret = xstrncpy(buf, buddy_name(acct, dest), len);
+				ret = xstrncpy(buf, dest, len);
 			break;
 
 		case 'r':
@@ -543,13 +525,13 @@ static int format_msg_recv(char opt, char *buf, size_t len, va_list ap) {
 		/* Screen name / alias of sender */
 		case 'N':
 			if (sender != NULL)
-				ret = xstrncpy(buf, buddy_name(acct, sender), len);
+				ret = xstrncpy(buf, sender, len);
 			break;
 
 		/* Screen name / alias  of the receiver */
 		case 'R':
 			if (dest != NULL)
-				ret = xstrncpy(buf, buddy_name(acct, dest), len);
+				ret = xstrncpy(buf, dest, len);
 			break;
 
 		case 'r':
@@ -674,7 +656,7 @@ static int format_chat_recv(char opt, char *buf, size_t len, va_list ap) {
 		/* Message source */
 		case 'N':
 			if (src != NULL)
-				ret = xstrncpy(buf, buddy_name(acct, src), len);
+				ret = xstrncpy(buf, src, len);
 			break;
 
 		case 'n':
@@ -750,7 +732,7 @@ static int format_chat_info(char opt, char *buf, size_t len, va_list ap) {
 		/* Screen name of user who the action originated from */
 		case 'n':
 		case 'N':
-			ret = xstrncpy(buf, buddy_name(acct, src), len);
+			ret = xstrncpy(buf, src, len);
 			break;
 
 		/* Destination, if applicable */

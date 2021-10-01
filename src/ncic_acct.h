@@ -16,9 +16,8 @@
 #include <arpa/inet.h>
 
 #include "ncic_inet.h"
+#include "ncic_list.h"
 
-struct buddy_pref;
-struct blist;
 struct pork_proto;
 
 /* Account states */

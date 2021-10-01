@@ -20,7 +20,6 @@
 #include "ncic_list.h"
 #include "ncic_imsg.h"
 #include "ncic_imwindow.h"
-#include "ncic_buddy.h"
 #include "ncic_proto.h"
 #include "ncic_acct.h"
 #include "ncic_screen.h"

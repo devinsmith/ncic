@@ -21,7 +21,6 @@
 #include "ncic_acct.h"
 #include "ncic_proto.h"
 #include "ncic_misc.h"
-#include "ncic_buddy.h"
 #include "ncic_set.h"
 #include "ncic_format.h"
 #include "ncic_imsg.h"

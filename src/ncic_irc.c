@@ -28,7 +28,6 @@
 #include "ncic_util.h"
 #include "ncic_list.h"
 #include "ncic_queue.h"
-#include "ncic_buddy.h"
 #include "ncic_inet.h"
 #include "ncic_acct.h"
 #include "ncic_proto.h"

@@ -19,7 +19,6 @@
 #include "ncic.h"
 #include "ncic_util.h"
 #include "ncic_list.h"
-#include "ncic_buddy.h"
 #include "ncic_set.h"
 #include "ncic_imsg.h"
 #include "ncic_imwindow.h"

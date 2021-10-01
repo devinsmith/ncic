@@ -10,7 +10,7 @@ find_package(Curses REQUIRED)
 SET(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 
 # C and C++ sources are freely mixed.
-set(SOURCES ncic.c ncic_acct.c ncic_alias.c ncic_bind.c ncic_buddy.c
+set(SOURCES ncic.c ncic_acct.c ncic_alias.c ncic_bind.c
        ncic_chat.c ncic_color.c ncic_command.c ncic_conf.c
        ncic_cstr.c ncic_format.c ncic_help.c ncic_imsg.c
        ncic_imwindow.c ncic_inet.c ncic_input.c ncic_io.c ncic_list.c
@@ -25,7 +25,7 @@ set(HEADERS
   ncic_acct.h          ncic_cstr.h      ncic_irc.h     ncic_screen_io.h
 ncic_alias.h         ncic_format.h    ncic_list.h    ncic_set_defaults.h
 ncic_bind.h          ncic.h           ncic_misc.h    ncic_set.h
-ncic_buddy.h         ncic_help.h      ncic_msg.h     ncic_slist2.h
+ncic_help.h      ncic_msg.h     ncic_slist2.h
 ncic_chat.h          ncic_imsg.h      ncic_naken.h   ncic_status.h
 ncic_color.h         ncic_imwindow.h  ncic_opt.h     ncic_swindow.h
 ncic_command_defs.h  ncic_inet.h      ncic_proto.h   ncic_timer.h
