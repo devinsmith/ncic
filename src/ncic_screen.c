@@ -148,7 +148,6 @@ int screen_init(u_int32_t rows, u_int32_t cols) {
 		return (-1);
 	acct->refnum = 0;
 
-	pork_acct_add(acct);
 	screen.null_acct = acct;
 
 	pork_io_add(STDIN_FILENO, IO_COND_READ, &screen, &screen,

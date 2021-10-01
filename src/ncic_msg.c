@@ -460,6 +460,10 @@ int pork_recv_notice(	struct pork_acct *acct,
 }
 
 int pork_signoff(struct pork_acct *acct, char *msg) {
+  if (acct == NULL) {
+    return 0;
+  }
+
 	if (acct->proto->signoff != NULL) {
 		ncic_recv_sys_alert(acct, ">> You have been disconnected");
 		return (acct->proto->signoff(acct, msg));

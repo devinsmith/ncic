@@ -17,7 +17,6 @@
 
 #include "ncic.h"
 #include "ncic_util.h"
-#include "ncic_list.h"
 #include "ncic_buddy.h"
 #include "ncic_inet.h"
 #include "ncic_acct.h"
@@ -40,20 +39,17 @@ static int naken_handler_nick(struct pork_acct *acct, struct naken_input *in,
 static int naken_process_input(irc_session_t *session, char *input, int len)
 {
 	struct pork_acct *acct = session->data;
-	struct buddy_pref *pref = acct->buddy_pref;
 	struct naken_input *in;
 	char *tmp;
 	int number;
 
 	if (input[0] == '@') {
 		struct chatroom *chat;
-		struct bgroup *group;
 
 		acct->state = STATE_READY;
 		pork_acct_connected(acct);
 
 		chat = chat_new(acct, "main", "main", screen.status_win);
-		group = group_add(acct, "User List");
 		return 0;
 	}
 
@@ -62,6 +58,7 @@ static int naken_process_input(irc_session_t *session, char *input, int len)
 		return 0;
 	}
 
+  // Best to use ngnc's solution at some point (for tab completion)
 	if (input[0] == '+' && input[1] == '[') {
 		int name_len;
 
@@ -75,33 +72,6 @@ static int naken_process_input(irc_session_t *session, char *input, int len)
 
 		number = atoi(input + 2);
 
-		if ((number + 1) > pref->user_list_size) {
-			int i;
-			int grow_by;
-
-			grow_by = ((number + 1) - pref->user_list_size) + 1;
-			pref->user_list = xrealloc(pref->user_list,
-			    (pref->user_list_size + grow_by) * sizeof(char *));
-			/* Set all the new cells created to NULL */
-			for (i = pref->user_list_size; i < pref->user_list_size + grow_by; i++) {
-				/* Set the cell to NULL */
-				pref->user_list[i] = NULL;
-			}
-			pref->user_list_size += grow_by;
-		}
-
-		name_len = strlen(tmp + 1);
-		if (pref->user_list[number] != NULL) {
-			/* This shouldn't happen, if it does naken chat
-			 * server is fucked. */
-			free(pref->user_list[number]);
-		}
-		pref->user_list[number] = xmalloc(name_len + 1);
-		strncpy(pref->user_list[number], tmp + 1, name_len);
-		pref->user_list[number][name_len] = '\0';
-
-		buddy_add(acct, pref->user_list[number], number);
-
 		return 0;
 	}
 
@@ -112,10 +82,6 @@ static int naken_process_input(irc_session_t *session, char *input, int len)
 
 		number = atoi(input + 2);
 
-		buddy_remove(acct, pref->user_list[number], number);
-
-		free(pref->user_list[number]);
-		pref->user_list[number] = NULL;
 		return 0;
 	}
 	if (strstr(input, ">> At the tone")) {

@@ -63,11 +63,7 @@ struct pork_acct {
 	u_int32_t ref_count;
 	u_int32_t refnum;
 
-	struct buddy_pref *buddy_pref;
-	struct blist *blist;
-
 	dlist_t *chat_list;
-	dlist_t *transfer_list;
 	hash_t autoreply;
 
 	char *fport;
@@ -80,22 +76,17 @@ struct pork_acct {
 	void *data;
 };
 
-int pork_acct_add(struct pork_acct *acct);
 int pork_acct_del_refnum(u_int32_t refnum, char *reason);
-void pork_acct_del(dlist_t *node, char *reason);
+void pork_acct_del(struct pork_acct *acct, char *reason);
 void pork_acct_del_all(char *reason);
-dlist_t *pork_acct_find(u_int32_t refnum);
+struct pork_acct *pork_acct_find(u_int32_t refnum);
 struct pork_acct *pork_acct_get_data(u_int32_t refnum);
 void pork_acct_update(void);
 int pork_acct_disconnected(struct pork_acct *acct);
-void pork_acct_update_blist_format(void);
-void pork_acct_update_blist_color(void);
-void pork_acct_print_list(void);
 void pork_acct_reconnect_all(void);
 void pork_acct_connected(struct pork_acct *acct);
 int pork_acct_connect(const char *user, char *args, int protocol);
 int pork_acct_next_refnum(u_int32_t cur_refnum, u_int32_t *next);
-struct pork_acct *pork_acct_find_name(const char *name, int protocol);
 struct pork_acct *pork_acct_init(const char *user, int protocol);
 int pork_acct_save(struct pork_acct *acct);
 

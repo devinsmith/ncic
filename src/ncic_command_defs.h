@@ -51,7 +51,6 @@ USER_COMMAND(cmd_unbind);
 USER_COMMAND(cmd_unalias);
 USER_COMMAND(cmd_whowas);
 
-USER_COMMAND(cmd_acct_list);
 USER_COMMAND(cmd_acct_save);
 USER_COMMAND(cmd_acct_set);
 
@@ -115,45 +114,6 @@ USER_COMMAND(cmd_history_clear);
 USER_COMMAND(cmd_history_list);
 USER_COMMAND(cmd_history_next);
 USER_COMMAND(cmd_history_prev);
-
-USER_COMMAND(cmd_buddy);
-USER_COMMAND(cmd_buddy_awaymsg);
-USER_COMMAND(cmd_buddy_block);
-USER_COMMAND(cmd_buddy_clear_permit);
-USER_COMMAND(cmd_buddy_list);
-USER_COMMAND(cmd_buddy_list_block);
-USER_COMMAND(cmd_buddy_list_permit);
-USER_COMMAND(cmd_buddy_permit);
-USER_COMMAND(cmd_buddy_privacy_mode);
-USER_COMMAND(cmd_buddy_profile);
-USER_COMMAND(cmd_buddy_report_idle);
-USER_COMMAND(cmd_buddy_seen);
-USER_COMMAND(cmd_buddy_unblock);
-USER_COMMAND(cmd_buddy_warn);
-USER_COMMAND(cmd_buddy_warn_anon);
-
-USER_COMMAND(cmd_blist);
-USER_COMMAND(cmd_blist_away);
-USER_COMMAND(cmd_blist_collapse);
-USER_COMMAND(cmd_blist_down);
-USER_COMMAND(cmd_blist_end);
-USER_COMMAND(cmd_blist_goto);
-USER_COMMAND(cmd_blist_hide);
-USER_COMMAND(cmd_blist_pgdown);
-USER_COMMAND(cmd_blist_pgup);
-USER_COMMAND(cmd_blist_profile);
-USER_COMMAND(cmd_blist_refresh);
-USER_COMMAND(cmd_blist_remove);
-USER_COMMAND(cmd_blist_remove_block);
-USER_COMMAND(cmd_blist_remove_permit);
-USER_COMMAND(cmd_blist_select);
-USER_COMMAND(cmd_blist_show);
-USER_COMMAND(cmd_blist_start);
-USER_COMMAND(cmd_blist_toggle);
-USER_COMMAND(cmd_blist_up);
-USER_COMMAND(cmd_blist_warn);
-USER_COMMAND(cmd_blist_warn_anon);
-USER_COMMAND(cmd_blist_width);
 
 USER_COMMAND(cmd_timer);
 USER_COMMAND(cmd_timer_add);

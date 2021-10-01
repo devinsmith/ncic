@@ -63,8 +63,6 @@ static struct command command[] = {
 	{ "auto",		cmd_auto			},
 	{ "away",		cmd_away			},
 	{ "bind",		cmd_bind			},
-	{ "blist",		cmd_blist			},
-	{ "buddy",		cmd_buddy			},
 	{ "chat",		cmd_chat			},
 	{ "connect",	cmd_connect			},
 	{ "ctcp",		cmd_ctcp			},
@@ -603,16 +601,6 @@ USER_COMMAND(cmd_history_prev) {
 ** /buddy commands
 */
 
-static struct command buddy_command[] = {
-	{ "awaymsg",		cmd_buddy_awaymsg		},
-	{ "list",			cmd_buddy_list			},
-	{ "list_block",		cmd_buddy_list_block	},
-	{ "privacy_mode",	cmd_buddy_privacy_mode	},
-	{ "profile",		cmd_buddy_profile		},
-	{ "report_idle",	cmd_buddy_report_idle	},
-	{ "warn",			cmd_buddy_warn			},
-	{ "warn_anon",		cmd_buddy_warn_anon		},
-};
 
 USER_COMMAND(cmd_buddy_awaymsg) {
 	struct imwindow *win = cur_window();
@@ -645,49 +633,7 @@ USER_COMMAND(cmd_buddy_privacy_mode) {
 	screen_cmd_output("Privacy mode for %s is %d", acct->username, mode);
 }
 
-USER_COMMAND(cmd_buddy_list) {
-	struct imwindow *win = cur_window();
-	struct pork_acct *acct = win->owner;
-	struct buddy_pref *pref = acct->buddy_pref;
-	struct bgroup *gr;
-	int i;
 
-	gr = pref->group;
-	if (gr != NULL) {
-		screen_win_msg(win, 0, 1, 1, MSG_TYPE_CMD_OUTPUT,
-			"%s's buddy list: ", acct->username);
-	}
-
-	screen_win_msg(win, 0, 0, 1, MSG_TYPE_CMD_OUTPUT, "+ %s (%u)",
-		gr->name, gr->num_members);
-
-	for (i = 0; i < pref->user_list_size; i++) {
-		if (pref->user_list[i] != NULL) {
-			screen_win_msg(win, 0, 0, 1, MSG_TYPE_CMD_OUTPUT,
-			    " %%Go [%d]%%x %s", i, pref->user_list[i]);
-		}
-	}
-
-}
-
-USER_COMMAND(cmd_buddy_list_block) {
-	struct pork_acct *acct = cur_window()->owner;
-	struct buddy_pref *pref = acct->buddy_pref;
-	dlist_t *cur;
-
-	cur = pref->block_list;
-	if (cur == NULL) {
-		screen_cmd_output("%s's blocked users list is empty", acct->username);
-		return;
-	}
-
-	screen_cmd_output("%s's blocked users list:", acct->username);
-
-	while (cur != NULL) {
-		screen_cmd_output(" - %s", (char *) cur->data);
-		cur = cur->next;
-	}
-}
 
 USER_COMMAND(cmd_buddy_profile) {
 	struct imwindow *win = cur_window();
@@ -853,14 +799,9 @@ USER_COMMAND(cmd_timer_purge) {
 */
 
 static struct command acct_command[] = {
-	{ "list",	cmd_acct_list		},
 	{ "save",	cmd_acct_save		},
 	{ "set",	cmd_acct_set		},
 };
-
-USER_COMMAND(cmd_acct_list) {
-	pork_acct_print_list();
-}
 
 USER_COMMAND(cmd_acct_save) {
 	pork_acct_save(cur_window()->owner);
@@ -1121,7 +1062,6 @@ static struct command_set {
 	{	history_command,	array_elem(history_command),	"history "	},
 	{	input_command,		array_elem(input_command),		"input "	},
 	{	scroll_command,		array_elem(scroll_command),		"scroll "	},
-	{	buddy_command,		array_elem(buddy_command),		"buddy "	},
 	{	timer_command,		array_elem(timer_command),		"timer "	},
 	{	chat_command,		array_elem(chat_command),		"chat "		},
 	{	acct_command,		array_elem(acct_command),		"acct "		},
@@ -1325,19 +1265,18 @@ USER_COMMAND(cmd_disconnect) {
 			args = NULL;
 	}
 
-	node = pork_acct_find(dest);
-	if (node == NULL) {
+	acct = pork_acct_find(dest);
+	if (acct == NULL) {
 		screen_err_msg("Account refnum %u is not logged in", dest);
 		return;
 	}
 
-	acct = node->data;
 	if (!acct->can_connect) {
 		screen_err_msg("You cannot sign %s off", acct->username);
 		return;
 	}
 
-	pork_acct_del(node, args);
+	pork_acct_del(acct, args);
 
 	if (screen.status_win->owner == screen.null_acct)
 		imwindow_bind_next_acct(screen.status_win);
@@ -1724,16 +1663,6 @@ USER_COMMAND(cmd_buddy) {
 		run_one_command(args, CMDSET_BUDDY);
 	else
 		run_one_command("list", CMDSET_BUDDY);
-}
-
-USER_COMMAND(cmd_blist) {
-	struct pork_acct *acct = cur_window()->owner;
-
-	if (!acct->connected || acct->blist == NULL)
-		return;
-
-	if (args != NULL)
-		run_one_command(args, CMDSET_BLIST);
 }
 
 USER_COMMAND(cmd_input) {

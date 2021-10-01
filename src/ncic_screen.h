@@ -31,9 +31,8 @@ struct screen {
 	dlist_t *cur_window;
 	dlist_t *window_list;
 	dlist_t *timer_list;
-	dlist_t *transfer_list;
 	struct imwindow *status_win;
-	dlist_t *acct_list;
+  struct pork_acct *acct;
 	WINDOW *status_bar;
 	u_int32_t quiet:1;
 	struct pork_acct *null_acct;
