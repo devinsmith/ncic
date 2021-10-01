@@ -10,25 +10,13 @@
 
 #include "config.h"
 
-#include <unistd.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 #include <errno.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#ifdef WIN32
-#define _WIN32_WINNT 0x0501
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#else
-#include <sys/socket.h>
-#include <netinet/in.h>
-#endif
 
 #include "ncic.h"
-//#include "ncic_missing.h"
 #include "ncic_util.h"
 #include "ncic_list.h"
 #include "ncic_io.h"

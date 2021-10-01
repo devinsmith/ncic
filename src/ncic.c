@@ -19,11 +19,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
-#ifndef WIN32
 #include <pwd.h>
 #include <signal.h>
 #include <sys/ioctl.h>
-#endif
 #include <time.h>
 #include <sys/time.h>
 
@@ -90,8 +88,6 @@ static inline void binding_run(struct binding *binding) {
 		run_mcommand(binding->binding);
 }
 
-#ifndef WIN32
-/* No resize support under Windows yet. */
 static void
 resize_display(void) {
 	struct winsize size;
@@ -104,9 +100,7 @@ resize_display(void) {
 	screen_resize(size.ws_row, size.ws_col);
 	screen_refresh();
 }
-#endif
 
-#ifndef WIN32
 static void sigwinch_handler(int sig __notused) {
 	pork_io_add_cond(&screen, IO_COND_ALWAYS);
 }
@@ -114,7 +108,6 @@ static void sigwinch_handler(int sig __notused) {
 static void generic_signal_handler(int sig) {
 	pork_exit(sig, NULL, "Caught signal %d. Exiting\n", sig);
 }
-#endif
 
 void
 keyboard_input(int fd, uint32_t cond, void *data)
@@ -129,9 +122,7 @@ keyboard_input(int fd, uint32_t cond, void *data)
 	*/
 	if (cond == IO_COND_ALWAYS) {
 		pork_io_del_cond(&screen, IO_COND_ALWAYS);
-#ifndef WIN32
 		resize_display();
-#endif
 		return;
 	}
 
@@ -154,18 +145,13 @@ keyboard_input(int fd, uint32_t cond, void *data)
 int
 main(int argc, char *argv[])
 {
-#ifndef WIN32
 	struct passwd *pw;
-#endif
 	char buf[PATH_MAX];
 	struct imwindow *imwindow;
 	int ret;
 	time_t timer_last_run;
 	time_t status_last_update = 0;
 
-#ifdef WIN32
-	snprintf(buf, sizeof(buf), "ncic");
-#else
 	pw = getpwuid(getuid());
 	if (pw == NULL) {
 		fprintf(stderr, "Fatal: Can't get your user info.\n");
@@ -173,7 +159,6 @@ main(int argc, char *argv[])
 	}
 
 	snprintf(buf, sizeof(buf), "%s/.ncic", pw->pw_dir);
-#endif
 	opt_set(OPT_NCIC_DIR, buf);
 
 	if (get_options(argc, argv) != 0) {
@@ -193,13 +178,11 @@ main(int argc, char *argv[])
 	if (screen_init(LINES, COLS) == -1)
 		pork_exit(-1, NULL, "Fatal: Error initializing the terminal.\n");
 
-#ifndef WIN32
 	signal(SIGWINCH, sigwinch_handler);
 	signal(SIGTERM, generic_signal_handler);
 	signal(SIGQUIT, generic_signal_handler);
 	signal(SIGHUP, generic_signal_handler);
 	signal(SIGPIPE, SIG_IGN);
-#endif
 
 	wmove(screen.status_bar, STATUS_ROWS - 1, 0);
 	imwindow = cur_window();

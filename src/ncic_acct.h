@@ -11,15 +11,9 @@
 #ifndef __NCIC_ACCT_H__
 #define __NCIC_ACCT_H__
 
-#ifdef WIN32
-#define _WIN32_WINNT 0x0501
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#else
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#endif
 
 #include "ncic_inet.h"
 

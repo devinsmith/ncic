@@ -23,10 +23,6 @@
 
 #define MAX_HOSTLEN		256
 
-#ifdef WIN32 /* hack for Windows */
-typedef uint16_t in_port_t;
-#endif
-
 #define SIN4(x) ((struct sockaddr_in *) (x))
 #define SIN6(x) ((struct sockaddr_in6 *) (x))
 #define VALID_PORT(x) ((((x) & 0xffff) == (x)) && ((x) != 0))

@@ -17,24 +17,14 @@
 #include <errno.h>
 #include <stdarg.h>
 #include <sys/types.h>
-#ifdef WIN32
-#define _WIN32_WINNT 0x0501
-#define O_NONBLOCK 1
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#define EINPROGRESS WSAEINPROGRESS
-#define ENOTSOCK WSAENOTSOCK
-#else
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
-#endif
 
 #include "ncic.h"
-//#include <ncic_missing.h>
 #include "ncic_util.h"
 #include "ncic_inet.h"
 #include "ncic_screen_io.h"
@@ -253,20 +243,7 @@ void sock_setkeepalive(int sockfd)
 int sock_setflags(int sock, uint32_t flags) {
 	int ret;
 
-#ifdef WIN32
-	u_long on;
-
-	if (flags > 0) {
-		on = 1;
-		ret = ioctlsocket(sock, FIONBIO, &on);
-	} else {
-		on = 0;
-		ret = ioctlsocket(sock, FIONBIO, &on);
-	}
-	if (ret != 0) ret = -1;
-#else
 	ret = fcntl(sock, F_SETFL, flags);
-#endif
 	if (ret == -1)
 		debug("fnctl: %s", strerror(errno));
 
@@ -406,13 +383,11 @@ int sock_listen(struct sockaddr_storage *ss, in_port_t listen_port) {
 		goto done;
 	}
 
-#ifndef WIN32
 	if (fcntl(sock, F_SETFL, O_NONBLOCK) == -1) {
 		debug("fcntl: %s", strerror(errno));
 		close(sock);
 		sock = -1;
 	}
-#endif
 
 done:
 	free(cur->ai_addr);

@@ -214,9 +214,6 @@ int str_to_int(const char *str, int *val) {
 
 
 int expand_path(char *path, char *dest, size_t len) {
-#ifdef WIN32
-	return (0);
-#else
 	int ret;
 
 	if (*path == '~') {
@@ -263,5 +260,4 @@ int expand_path(char *path, char *dest, size_t len) {
 		ret = xstrncpy(dest, path, len);
 
 	return (ret);
-#endif
 }

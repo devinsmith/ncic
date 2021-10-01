@@ -427,8 +427,7 @@ int swindow_add(struct swindow *swindow, struct imsg *imsg, uint32_t msgtype) {
 	}
 
 	if (swindow->logged && (swindow->log_type & msgtype)) {
-#ifndef WIN32
-		struct iovec wvec[2];
+    struct iovec wvec[2];
 		char *plaintext;
 
 		plaintext = cstr_to_plaintext(imsg->text, imsg->len);
@@ -443,7 +442,6 @@ int swindow_add(struct swindow *swindow, struct imsg *imsg, uint32_t msgtype) {
 		}
 
 		free(plaintext);
-#endif
 	}
 
 	swindow->scrollbuf = dlist_add_head(swindow->scrollbuf, imsg);
@@ -784,8 +782,7 @@ inline void swindow_set_wordwrap(struct swindow *swindow, uint32_t value) {
 */
 
 int swindow_dump_buffer(struct swindow *swindow, char *file) {
-#ifndef WIN32
-	int fd;
+  int fd;
 	dlist_t *cur;
 	struct iovec wvec[2];
 
@@ -814,7 +811,6 @@ int swindow_dump_buffer(struct swindow *swindow, char *file) {
 	}
 
 	close(fd);
-#endif
 	return (0);
 }
 

@@ -13,9 +13,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifndef WIN32
 #include <pwd.h>
-#endif
 #include <errno.h>
 #include <limits.h>
 #include <sys/stat.h>
@@ -39,11 +37,7 @@ static int pork_mkdir(const char *path) {
 	struct stat st;
 
 	if (stat(path, &st) != 0) {
-#ifdef WIN32
-		if (mkdir(path) != 0) {
-#else
 		if (mkdir(path, 0700) != 0) {
-#endif
 			screen_err_msg("Error: mkdir %s: %s", path, strerror(errno));
 			return (-1);
 		}
@@ -220,9 +214,7 @@ static int save_acct_conf(struct pork_acct *acct, char *filename) {
 	if (opt_get_bool(OPT_SAVE_PASSWD) && acct->passwd != NULL)
 		fprintf(fp, "password: %s\n", acct->passwd);
 
-#ifndef WIN32
 	fchmod(fileno(fp), 0600);
-#endif
 	fclose(fp);
 
 	if (rename(fn, filename) != 0) {
@@ -262,24 +254,19 @@ int read_global_config(void) {
 	char *pork_dir;
 	char buf[PATH_MAX];
 
-	if (read_conf(SYSTEM_NCICRC) != 0)
-		screen_err_msg("Error reading the system-wide ncicrc file from %s", SYSTEM_NCICRC);
+	if (read_conf(SYSTEM_NCICRC) != 0) {
+    screen_err_msg("Error reading the system-wide ncicrc file from %s", SYSTEM_NCICRC);
+  }
 
-#ifndef WIN32
-	pw = getpwuid(getuid());
+  pw = getpwuid(getuid());
 	if (pw == NULL) {
 		debug("getpwuid: %s", strerror(errno));
 		return (-1);
 	}
-#endif
 
 	pork_dir = opt_get_str(OPT_NCIC_DIR);
 	if (pork_dir == NULL) {
-#ifdef WIN32
-		snprintf(buf, sizeof(buf), "ncic");
-#else
 		snprintf(buf, sizeof(buf), "%s/.ncic", pw->pw_dir);
-#endif
 		opt_set(OPT_NCIC_DIR, buf);
 
 		pork_dir = opt_get_str(OPT_NCIC_DIR);

@@ -19,16 +19,9 @@
 #include <time.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#ifdef WIN32
-#define _WIN32_WINNT 0x0501
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#define EINPROGRESS WSAEINPROGRESS
-#else
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#endif
 #include <errno.h>
 
 #include "ncic.h"
@@ -43,7 +36,6 @@
 #include "ncic_imwindow.h"
 #include "ncic_screen_io.h"
 #include "ncic_chat.h"
-//#include <ncic_missing.h>
 
 #include "ncic_irc.h"
 #include "ncic_naken.h"
