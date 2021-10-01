@@ -88,7 +88,6 @@ static struct command command[] = {
 	{ "profile",	cmd_profile,		},
 	{ "query",		cmd_query			},
 	{ "quit",		cmd_quit			},
-	{ "quote",		cmd_quote			},
 	{ "refresh",	cmd_refresh			},
 	{ "save",		cmd_save			},
 	{ "scroll",		cmd_scroll			},
@@ -96,7 +95,6 @@ static struct command command[] = {
 	{ "timer",		cmd_timer			},
 	{ "unalias",	cmd_unalias			},
 	{ "unbind",		cmd_unbind			},
-	{ "who",		cmd_who				},
 	{ "whowas",		cmd_whowas			},
 	{ "win",		cmd_win				},
 };
@@ -612,7 +610,6 @@ static struct command buddy_command[] = {
 	{ "privacy_mode",	cmd_buddy_privacy_mode	},
 	{ "profile",		cmd_buddy_profile		},
 	{ "report_idle",	cmd_buddy_report_idle	},
-	{ "search",			cmd_who					},
 	{ "warn",			cmd_buddy_warn			},
 	{ "warn_anon",		cmd_buddy_warn_anon		},
 };
@@ -887,7 +884,6 @@ static struct command chat_command[] = {
 	{ "send",				cmd_chat_send			},
 	{ "topic",				cmd_chat_topic			},
 	{ "unignore",			cmd_chat_unignore		},
-	{ "who",				cmd_chat_who			},
 };
 
 USER_COMMAND(cmd_chat_ban) {
@@ -1113,25 +1109,6 @@ USER_COMMAND(cmd_chat_unignore) {
 	}
 
 	chat_unignore(acct, chat_name, user_name);
-}
-
-USER_COMMAND(cmd_chat_who) {
-	struct imwindow *imwindow = cur_window();
-	struct pork_acct *acct = imwindow->owner;
-
-	if (args == NULL || blank_str(args)) {
-		struct chatroom *chat;
-
-		if (imwindow->type != WIN_TYPE_CHAT) {
-			screen_err_msg("You must specify a chat room if the current window is not a chat window");
-			return;
-		}
-
-		chat = imwindow->data;
-		args = chat->title;
-	}
-
-	chat_who(acct, args);
 }
 
 static struct command_set {
@@ -1579,15 +1556,6 @@ USER_COMMAND(cmd_quit) {
 	pork_exit(0, args, NULL);
 }
 
-USER_COMMAND(cmd_quote) {
-	if (args != NULL) {
-		struct pork_acct *acct = cur_window()->owner;
-
-		if (acct->proto->quote != NULL)
-			acct->proto->quote(acct, args);
-	}
-}
-
 USER_COMMAND(cmd_refresh) {
 	screen_refresh();
 }
@@ -1693,22 +1661,6 @@ USER_COMMAND(cmd_notice) {
 		chat_send_notice(acct, chat, target, args);
 	else
 		pork_notice_send(acct, target, args);
-}
-
-USER_COMMAND(cmd_who) {
-	struct imwindow *win = cur_window();
-	struct pork_acct *acct = win->owner;
-
-	if (acct->proto->who != NULL && args != NULL)
-		acct->proto->who(acct, args);
-
-	if (args == NULL && win->type == WIN_TYPE_CHAT) {
-		if (win->data != NULL) {
-			struct chatroom *chat = win->data;
-
-			chat_who(acct, chat->title);
-		}
-	}
 }
 
 USER_COMMAND(cmd_whowas) {

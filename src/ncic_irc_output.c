@@ -309,21 +309,6 @@ int irc_send_names(irc_session_t *session, char *chan) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_who(irc_session_t *session, char *dest) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-
-	if (dest != NULL)
-		ret = snprintf(buf, sizeof(buf), "WHO :%s\r\n", dest);
-	else
-		ret = snprintf(buf, sizeof(buf), "WHO\r\n");
-
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
-}
-
 int irc_send_whois(irc_session_t *session, char *dest) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;

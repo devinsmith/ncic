@@ -45,10 +45,7 @@ static int pork_acct_find_helper(void *l, void *r) {
 
 static void pork_acct_free(struct pork_acct *acct) {
 	/* XXX - really? */
-	if (acct->proto->write_config != NULL)
-		acct->proto->write_config(acct);
-
-	if (acct->proto->free != NULL)
+  if (acct->proto->free != NULL)
 		acct->proto->free(acct);
 
 	if (acct->blist != NULL) {
@@ -330,12 +327,6 @@ struct pork_acct *pork_acct_init(const char *user, int protocol) {
 
 	if (acct->proto->init != NULL && acct->proto->init(acct) == -1)
 		goto out_fail2;
-
-	if (acct->proto->read_config != NULL &&
-		acct->proto->read_config(acct) == -1)
-	{
-		goto out_fail2;
-	}
 
 	acct->can_connect = 1;
 	acct->refnum = pork_acct_get_new_refnum();

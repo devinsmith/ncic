@@ -280,32 +280,6 @@ int chat_user_is_ignored(	struct pork_acct *acct,
 	return (chat_user->ignore);
 }
 
-int chat_users(struct pork_acct *acct, char *chat_name) {
-	struct chatroom *chat;
-
-	if (acct->proto->chat_users == NULL)
-		return (-1);
-
-	chat = chat_find(acct, chat_name);
-	if (chat == NULL)
-		return (-1);
-
-	return (acct->proto->chat_users(acct, chat));
-}
-
-int chat_who(struct pork_acct *acct, char *chat_name) {
-	struct chatroom *chat;
-
-	if (acct->proto->chat_who == NULL)
-		return (-1);
-
-	chat = chat_find(acct, chat_name);
-	if (chat == NULL)
-		return (-1);
-
-	return (acct->proto->chat_who(acct, chat));
-}
-
 int chat_join(struct pork_acct *acct, char *args) {
 	struct imwindow *imwindow = NULL;
 	char buf[512];

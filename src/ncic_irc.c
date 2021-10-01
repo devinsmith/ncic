@@ -44,15 +44,6 @@
 #define HIGHLIGHT_UNDERLINE		0x02
 #define HIGHLIGHT_INVERSE		0x04
 
-static int naken_update_buddy(struct pork_acct *acct,
-		struct buddy *buddy,
-		void *data)
-{
-	buddy->status = STATUS_ACTIVE;
-
-	return (0);
-}
-
 static void irc_event(int sock, u_int32_t cond, void *data) {
 	if (cond & IO_COND_READ) {
 		if (naken_input_dispatch(data) == -1) {
@@ -217,14 +208,6 @@ static int irc_update(struct pork_acct *acct) {
 		session->last_update = time_now;
 	}
 
-	return (0);
-}
-
-static int irc_read_config(struct pork_acct *acct) {
-	return (0);
-}
-
-static int irc_write_config(struct pork_acct *acct) {
 	return (0);
 }
 
@@ -400,10 +383,6 @@ static int irc_chan_get_name(	const char *str,
 	return (0);
 }
 
-static int irc_chan_users(struct pork_acct *acct, struct chatroom *chat) {
-	return (irc_send_names(acct->data, chat->title));
-}
-
 static int irc_chan_kick(	struct pork_acct *acct,
 							struct chatroom *chat,
 							char *user,
@@ -444,16 +423,8 @@ static int irc_chan_notice(	struct pork_acct *acct,
 	return (irc_send_notice(acct->data, target, msg));
 }
 
-static int irc_chan_who(struct pork_acct *acct, struct chatroom *chat) {
-	return (irc_send_who(acct->data, chat->title));
-}
-
 static int irc_notice(struct pork_acct *acct, char *dest, char *msg) {
 	return (irc_send_notice(acct->data, dest, msg));
-}
-
-static int irc_who(struct pork_acct *acct, char *str) {
-	return (irc_send_who(acct->data, str));
 }
 
 static int irc_ping(struct pork_acct *acct, char *str) {
@@ -465,17 +436,6 @@ static int irc_quit(struct pork_acct *acct, char *reason) {
 		return (irc_send_quit(acct->data, reason));
 
 	return (-1);
-}
-
-static int irc_is_chat(struct pork_acct *acct, char *str) {
-	irc_session_t *irc = acct->data;
-
-	if (irc->chantypes != NULL)
-		return (irc_is_chan_type(irc, *str));
-	else if (*str == '#' || *str == '&')
-		return (1);
-
-	return (0);
 }
 
 static int irc_quote(struct pork_acct *acct, char *str) {
@@ -807,34 +767,7 @@ int irc_chan_free(struct pork_acct *acct, void *data) {
 	return (0);
 }
 
-int irc_chanmode_has_arg(irc_session_t *session, char mode) {
-	char *p;
-
-	if (session->chanmodes == NULL) {
-		switch (mode) {
-			case 'k':
-			case 'l':
-			case 'e':
-			case 'b':
-			case 'o':
-			case 'h':
-			case 'v':
-			case 'I':
-				return (1);
-		}
-
-		return (0);
-	}
-
-	p = strchr(session->chanmodes, mode);
-	if (p == NULL || p[1] != ',')
-		return (0);
-
-	return (1);
-}
-
 int irc_proto_init(struct pork_proto *proto) {
-	proto->buddy_update = naken_update_buddy;
 	proto->chat_action = irc_chan_action;
 	proto->chat_join = irc_join;
 	proto->chat_rejoin = NULL;
@@ -842,12 +775,10 @@ int irc_proto_init(struct pork_proto *proto) {
 	proto->chat_find = irc_find_chat;
 	proto->chat_name = irc_chan_get_name;
 	proto->chat_leave = NULL;
-	proto->chat_users = irc_chan_users;
 	proto->chat_kick = irc_chan_kick;
 	proto->chat_ban = irc_chan_ban;
 	proto->chat_free = irc_chan_free;
 	proto->chat_send_notice = irc_chan_notice;
-	proto->chat_who = irc_chan_who;
 	proto->chat_set_topic = irc_topic;
 	proto->chat_invite = irc_invite;
 
@@ -859,22 +790,17 @@ int irc_proto_init(struct pork_proto *proto) {
 	proto->free = irc_free;
 	proto->mode = irc_mode;
 	proto->init = irc_init;
-	proto->who = irc_who;
 	proto->ping = irc_ping;
 	proto->whowas = irc_whowas;
 	proto->send_notice = irc_notice;
 	proto->signoff = irc_quit;
 	proto->normalize = xstrncpy;
-	proto->read_config = irc_read_config;
 	proto->send_msg = irc_privmsg;
 	proto->update = irc_update;
-	proto->write_config = irc_write_config;
 	proto->user_compare = strcasecmp;
 	proto->change_nick = NULL;
 	proto->filter_text = irc_text_filter;
 	proto->filter_text_out = irc_text_filter;
-	proto->quote = irc_quote;
-	proto->is_chat = irc_is_chat;
 	proto->set_away = irc_away;
 	proto->set_back = irc_back;
 	proto->ctcp = irc_ctcp;

@@ -43,14 +43,12 @@ USER_COMMAND(cmd_ping);
 USER_COMMAND(cmd_profile);
 USER_COMMAND(cmd_query);
 USER_COMMAND(cmd_quit);
-USER_COMMAND(cmd_quote);
 USER_COMMAND(cmd_refresh);
 USER_COMMAND(cmd_save);
 USER_COMMAND(cmd_send);
 USER_COMMAND(cmd_set);
 USER_COMMAND(cmd_unbind);
 USER_COMMAND(cmd_unalias);
-USER_COMMAND(cmd_who);
 USER_COMMAND(cmd_whowas);
 
 USER_COMMAND(cmd_acct_list);
@@ -175,7 +173,6 @@ USER_COMMAND(cmd_chat_list);
 USER_COMMAND(cmd_chat_send);
 USER_COMMAND(cmd_chat_topic);
 USER_COMMAND(cmd_chat_unignore);
-USER_COMMAND(cmd_chat_who);
 
 USER_COMMAND(cmd_protocol);
 
