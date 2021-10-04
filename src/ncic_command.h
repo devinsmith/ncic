@@ -13,21 +13,6 @@
 
 #define USER_COMMAND(x)	void x (char *args __notused)
 
-enum {
-	CMDSET_MAIN,
-	CMDSET_WIN,
-	CMDSET_HISTORY,
-	CMDSET_INPUT,
-	CMDSET_SCROLL,
-	CMDSET_BUDDY,
-	CMDSET_BLIST,
-	CMDSET_TIMER,
-	CMDSET_CHAT,
-	CMDSET_FILE,
-	CMDSET_ACCT,
-	CMDSET_PROTO,
-};
-
 struct command {
 	char *name;
 	void (*cmd)(char *);

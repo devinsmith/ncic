@@ -46,6 +46,21 @@ static int cmd_compare(const void *l, const void *r);
 static void print_timer(void *data, void *nothing);
 static int run_one_command(char *str, u_int32_t set);
 
+enum {
+  CMDSET_MAIN,
+  CMDSET_WIN,
+  CMDSET_HISTORY,
+  CMDSET_INPUT,
+  CMDSET_SCROLL,
+  CMDSET_BUDDY,
+  CMDSET_BLIST,
+  CMDSET_TIMER,
+  CMDSET_CHAT,
+  CMDSET_FILE,
+  CMDSET_ACCT,
+  CMDSET_PROTO,
+};
+
 /*
 ** Note that the "struct command" arrays are arranged in alphabetical
 ** order. They have to be like that.
