@@ -458,7 +458,7 @@ int pork_recv_notice(	struct pork_acct *acct,
 	return (0);
 }
 
-int pork_signoff(struct pork_acct *acct, char *msg) {
+int pork_signoff(struct pork_acct *acct, const char *msg) {
   if (acct == NULL) {
     return 0;
   }

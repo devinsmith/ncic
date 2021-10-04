@@ -54,7 +54,7 @@ int pork_send_warn_anon(struct pork_acct *acct, char *user);
 int pork_change_nick(struct pork_acct *acct, char *nick);
 int pork_notice_send(struct pork_acct *acct, char *dest, char *msg);
 int pork_action_send(struct pork_acct *acct, char *dest, char *msg);
-int pork_signoff(struct pork_acct *acct, char *msg);
+int pork_signoff(struct pork_acct *acct, const char *msg);
 
 #ifdef __cplusplus
 }

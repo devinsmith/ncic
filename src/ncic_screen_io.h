@@ -26,10 +26,10 @@ void screen_win_msg(struct imwindow *win,
 					int banner,
 					int color,
 					int type,
-					char *fmt, ...) __format((printf, 6, 7));
+					const char *fmt, ...) __format((printf, 6, 7));
 
 void screen_nocolor_msg(char *fmt, ...) __format((printf, 1, 2));
-void screen_err_msg(char *fmt, ...) __format((printf, 1, 2));
+void screen_err_msg(const char *fmt, ...) __format((printf, 1, 2));
 void screen_cmd_output(char *fmt, ...) __format((printf, 1, 2));
 
 void screen_win_target_msg(	struct pork_acct *acct,

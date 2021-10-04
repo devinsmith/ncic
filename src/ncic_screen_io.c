@@ -114,7 +114,7 @@ int screen_prompt_user(char *prompt, char *buf, size_t len) {
 static void int_screen_win_msg(	struct imwindow *win,
 								u_int32_t opt,
 								u_int32_t msgtype,
-								char *fmt,
+								const char *fmt,
 								va_list ap)
 {
 	char buf[8192];
@@ -238,7 +238,7 @@ inline void screen_win_msg(	struct imwindow *win,
 							int banner,
 							int color,
 							int type,
-							char *fmt,
+							const char *fmt,
 							...)
 {
 	va_list ap;
@@ -250,7 +250,7 @@ inline void screen_win_msg(	struct imwindow *win,
 	va_end(ap);
 }
 
-void screen_err_msg(char *fmt, ...) {
+void screen_err_msg(const char *fmt, ...) {
 	va_list ap;
 
 	va_start(ap, fmt);

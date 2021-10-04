@@ -46,7 +46,7 @@ struct pork_proto {
 	int (*connect_abort)(struct pork_acct *acct);
 	int (*reconnect)(struct pork_acct *, char *);
 	int (*disconnected)(struct pork_acct *);
-	int (*signoff)(struct pork_acct *acct, char *reason);
+	int (*signoff)(struct pork_acct *acct, const char *reason);
 
 	struct chatroom *(*chat_find)(struct pork_acct *, char *);
 	int (*chat_free)(struct pork_acct *, void *chat_data);
