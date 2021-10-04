@@ -36,7 +36,7 @@ struct pork_proto *proto_get_name(const char *name) {
 	return (NULL);
 }
 
-int proto_new(	int protocol,
+static int proto_new(	int protocol,
 				const char *name,
 				int (*init_func)(struct pork_proto *))
 {

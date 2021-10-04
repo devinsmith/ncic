@@ -89,7 +89,6 @@ struct pork_proto {
 
 int proto_init(void);
 int proto_get_num(const char *name);
-int proto_new(int proto, const char *name, int (*init)(struct pork_proto *));
 void proto_destroy(void);
 struct pork_proto *proto_get(int protocol);
 struct pork_proto *proto_get_name(const char *name);
