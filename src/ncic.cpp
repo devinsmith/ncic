@@ -16,14 +16,12 @@
 
 #include <unistd.h>
 #include <ncurses.h>
-#include <stdlib.h>
-#include <string.h>
-#include <limits.h>
+#include <cstdlib>
+#include <climits>
 #include <pwd.h>
-#include <signal.h>
+#include <csignal>
 #include <sys/ioctl.h>
-#include <time.h>
-#include <sys/time.h>
+#include <ctime>
 
 #ifdef HAVE_TERMIOS_H
 #	include <termios.h>
