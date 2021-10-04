@@ -11,6 +11,10 @@
 #ifndef __NCIC_CHAT_H__
 #define __NCIC_CHAT_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define CHAT_STATUS_OP		0x01
 #define CHAT_STATUS_HALFOP	0x02
 #define CHAT_STATUS_VOICE	0x04
@@ -150,4 +154,8 @@ int chat_got_mode(	struct pork_acct *acct,
 struct chat_user *chat_find_user(struct pork_acct *acct,
 										struct chatroom *chat,
 										char *user);
+
+#ifdef __cplusplus
+}
+#endif
 #endif /* __NCIC_CHAT_H__ */

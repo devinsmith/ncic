@@ -14,6 +14,10 @@
 #include <sys/types.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef struct dlist {
 	struct dlist *next;
 	struct dlist *prev;
@@ -50,5 +54,9 @@ void hash_clear(hash_t *hash);
 void hash_destroy(hash_t *hash);
 int hash_exists(hash_t *hash, void *data, uint32_t cur_hash);
 void hash_iterate(hash_t *hash, void (*func)(void *, void *), void *data);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __NCIC_LIST_H__ */

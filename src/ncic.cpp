@@ -32,8 +32,6 @@
 #endif
 
 #include "ncic.h"
-#include "ncic_util.h"
-#include "ncic_list.h"
 #include "ncic_set.h"
 #include "ncic_imsg.h"
 #include "ncic_imwindow.h"
@@ -52,9 +50,6 @@
 #include "ncic_timer.h"
 #include "ncic_io.h"
 #include "ncic_proto.h"
-#include "ncic_screen.h"
-#include "ncic_queue.h"
-#include "ncic_inet.h"
 
 struct screen screen;
 

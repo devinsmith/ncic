@@ -22,14 +22,15 @@
 extern "C" {
 #endif
 
-struct pork_proto;
-
 /* Account states */
 enum {
-	STATE_DISCONNECTED,
-	STATE_CONNECTING,
-	STATE_READY
+  STATE_DISCONNECTED,
+  STATE_CONNECTING,
+  STATE_READY
 };
+
+struct pork_proto;
+
 
 struct pork_acct {
 	char *username;

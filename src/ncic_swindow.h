@@ -11,6 +11,8 @@
 #ifndef __NCIC_SWINDOW_H__
 #define __NCIC_SWINDOW_H__
 
+#include "ncic_list.h"
+
 #define SWINDOW_FIND_ICASE		0x01
 #define SWINDOW_FIND_BASIC		0x02
 

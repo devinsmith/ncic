@@ -30,13 +30,15 @@
 extern struct sockaddr_storage local_addr;
 extern in_port_t local_port;
 
+
+
 /*
 ** Free everything that needs freeing.
 */
 
 static void pork_acct_free(struct pork_acct *acct) {
 	/* XXX - really? */
-  if (acct->proto->free != NULL)
+  if (acct->proto->free != nullptr)
 		acct->proto->free(acct);
 
 	hash_destroy(&acct->autoreply);
@@ -62,7 +64,7 @@ int pork_acct_del_refnum(u_int32_t refnum, char *reason) {
 	struct pork_acct *acct;
 
 	acct = pork_acct_find(refnum);
-	if (acct == NULL)
+	if (acct == nullptr)
 		return (-1);
 
 	pork_acct_del(acct, reason);
@@ -72,22 +74,22 @@ int pork_acct_del_refnum(u_int32_t refnum, char *reason) {
 void pork_acct_del(struct pork_acct *acct, const char *reason) {
 	dlist_t *cur;
 
-  if (acct != NULL) {
+  if (acct != nullptr) {
     pork_signoff(acct, reason);
     chat_leave_all(acct);
   }
 
 	cur = screen.window_list;
-	if (cur != NULL) {
+	if (cur != nullptr) {
 		do {
-			struct imwindow *win = cur->data;
+			struct imwindow *win = (imwindow *)cur->data;
 
 			if (win->owner == acct) {
 
 				win->owner->ref_count--;
 
 				if (win->owner == screen.null_acct)
-					win->owner = NULL;
+					win->owner = nullptr;
 				else {
 					win->owner = screen.null_acct;
 					win->owner->ref_count++;
@@ -99,16 +101,16 @@ void pork_acct_del(struct pork_acct *acct, const char *reason) {
 	}
 
 	/* This must always be the case. */
-	if (acct != NULL) {
+	if (acct != nullptr) {
 		pork_acct_free(acct);
 	}
 }
 
 int pork_acct_next_refnum(u_int32_t cur_refnum, u_int32_t *next) {
-	struct pork_acct *acct = NULL;
+	struct pork_acct *acct = nullptr;
 
 	acct = pork_acct_find(cur_refnum);
-	if (acct == NULL) {
+	if (acct == nullptr) {
 		debug("current refnum %u doesn't exist", cur_refnum);
 		return (-1);
 	}
@@ -124,25 +126,25 @@ void pork_acct_del_all(const char *reason) {
 int pork_acct_connect(const char *user, char *args, int protocol) {
   struct pork_acct *acct;
 
-  if (user == NULL)
+  if (user == nullptr)
     return (-1);
 
-  if (screen.acct != NULL) {
+  if (screen.acct != nullptr) {
     screen_err_msg("%s is already connected", user);
     return (-1);
   }
 
   acct = pork_acct_init(user, protocol);
-  if (acct == NULL) {
+  if (acct == nullptr) {
     screen_err_msg("Failed to initialize account for %s", user);
     return (-1);
   }
 
   screen.acct = acct;
 
-  if (!acct->can_connect || acct->proto->connect == NULL) {
+  if (!acct->can_connect || acct->proto->connect == nullptr) {
     screen_err_msg("You must specify a screen name before connecting");
-    pork_acct_del_refnum(acct->refnum, NULL);
+    pork_acct_del_refnum(acct->refnum, nullptr);
     return (-1);
   }
 
@@ -150,7 +152,7 @@ int pork_acct_connect(const char *user, char *args, int protocol) {
 
   if (acct->proto->connect(acct, args) == -1) {
     screen_err_msg("Unable to login as %s", acct->username);
-    pork_acct_del_refnum(acct->refnum, NULL);
+    pork_acct_del_refnum(acct->refnum, nullptr);
     return (-1);
   }
 
@@ -159,17 +161,17 @@ int pork_acct_connect(const char *user, char *args, int protocol) {
 
 void pork_acct_update(void) {
   struct pork_acct *acct = screen.acct;
-  time_t time_now = time(NULL);
+  time_t time_now = time(nullptr);
 
-  if (acct == NULL)
+  if (acct == nullptr)
     return;
 
-  if (acct->proto->update != NULL) {
+  if (acct->proto->update != nullptr) {
     if (acct->proto->update(acct) == -1)
       return;
   }
 
-  if (acct->proto->set_idle_time != NULL && acct->report_idle &&
+  if (acct->proto->set_idle_time != nullptr && acct->report_idle &&
     !acct->marked_idle && opt_get_bool(OPT_REPORT_IDLE))
   {
     time_t time_diff = time_now - acct->last_input;
@@ -184,11 +186,11 @@ void pork_acct_update(void) {
   }
 }
 
-static inline u_int32_t pork_acct_get_new_refnum(void) {
+static inline u_int32_t pork_acct_get_new_refnum() {
 	u_int32_t i;
 
 	for (i = 0 ; i < 0xffffffff ; i++) {
-		if (pork_acct_find(i) == NULL)
+		if (pork_acct_find(i) == nullptr)
 			return (i);
 	}
 
@@ -202,7 +204,7 @@ static inline u_int32_t pork_acct_get_new_refnum(void) {
 struct pork_acct *pork_acct_init(const char *user, int protocol) {
 	struct pork_acct *acct;
 
-	acct = xcalloc(1, sizeof(*acct));
+	acct = (pork_acct *)xcalloc(1, sizeof(*acct));
 	acct->username = xstrdup(user);
 	acct->state = STATE_DISCONNECTED;
 
@@ -211,7 +213,7 @@ struct pork_acct *pork_acct_init(const char *user, int protocol) {
 	if (protocol < 0)
 		return (acct);
 
-	if (acct->proto->init != NULL && acct->proto->init(acct) == -1)
+	if (acct->proto->init != nullptr && acct->proto->init(acct) == -1)
 		goto out_fail2;
 
 	acct->can_connect = 1;
@@ -226,7 +228,7 @@ struct pork_acct *pork_acct_init(const char *user, int protocol) {
 out_fail2:
 	free(acct->username);
 	free(acct);
-	return (NULL);
+	return (nullptr);
 }
 
 void pork_acct_connected(struct pork_acct *acct) {
@@ -242,7 +244,7 @@ void pork_acct_connected(struct pork_acct *acct) {
 }
 
 static int pork_acct_reconnect(struct pork_acct *acct) {
-	if (acct->proto->reconnect == NULL || acct->connected ||
+	if (acct->proto->reconnect == nullptr || acct->connected ||
 		!acct->disconnected || acct->reconnecting)
 	{
 		debug("%p %u %u %u", acct->proto->reconnect, acct->connected,
@@ -256,7 +258,7 @@ static int pork_acct_reconnect(struct pork_acct *acct) {
 	screen_err_msg("Automatically reconnecting account %s (attempt %u)",
 		acct->username, acct->reconnect_tries);
 
-	return (acct->proto->reconnect(acct, NULL));
+	return (acct->proto->reconnect(acct, nullptr));
 }
 
 static int pork_acct_connect_fail(struct pork_acct *acct) {
@@ -276,18 +278,18 @@ static int pork_acct_connect_fail(struct pork_acct *acct) {
 		screen_err_msg("Failed to reconnect %s after %u tries. Giving up.",
 			acct->username, max_reconnect_tries);
 
-		pork_acct_del_refnum(acct->refnum, NULL);
+		pork_acct_del_refnum(acct->refnum, nullptr);
 		return (-1);
 	}
 
-	acct->reconnect_next_try = time(NULL) +
+	acct->reconnect_next_try = time(nullptr) +
 		min(acct->reconnect_tries * connect_interval, connect_interval_max);
 	return (0);
 }
 
 int pork_acct_disconnected(struct pork_acct *acct) {
 	if (!acct->successful_connect || !opt_get_bool(OPT_AUTO_RECONNECT)) {
-		pork_acct_del_refnum(acct->refnum, NULL);
+		pork_acct_del_refnum(acct->refnum, nullptr);
 		return (0);
 	}
 
@@ -301,19 +303,19 @@ int pork_acct_disconnected(struct pork_acct *acct) {
 	acct->reconnecting = 0;
 	acct->reconnect_tries = 0;
 	acct->disconnected = 1;
-	acct->reconnect_next_try = time(NULL);
+	acct->reconnect_next_try = time(nullptr);
 
-	if (acct->proto->disconnected != NULL)
+	if (acct->proto->disconnected != nullptr)
 		acct->proto->disconnected(acct);
 
 	return (pork_acct_reconnect(acct));
 }
 
 void pork_acct_reconnect_all(void) {
-	time_t now = time(NULL);
+	time_t now = time(nullptr);
 	int timeout = opt_get_int(OPT_CONNECT_TIMEOUT);
 
-	if (screen.acct != NULL) {
+	if (screen.acct != nullptr) {
 		struct pork_acct *acct = screen.acct;
 
 		if (acct->disconnected && !acct->reconnecting &&

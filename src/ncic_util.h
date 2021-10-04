@@ -14,6 +14,10 @@
 #include <sys/types.h>
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define array_elem(x) (sizeof((x)) / sizeof((x)[0]))
 
 /* Needs special care */
@@ -49,5 +53,9 @@ uint32_t int_hash(int num, uint32_t order);
 
 int str_to_uint(const char *str, uint32_t *val);
 int str_to_int(const char *str, int *val);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __NCIC_UTIL_H__ */
