@@ -13,6 +13,10 @@
 
 #include "ncic.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct imwindow;
 struct pork_acct;
 
@@ -68,6 +72,10 @@ void screen_doupdate(void);
 		} \
 	} while (0)
 
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* __NCIC_SCREEN_IO_H__ */

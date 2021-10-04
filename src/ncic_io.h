@@ -11,6 +11,10 @@
 #ifndef __NCIC_IO_H__
 #define __NCIC_IO_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define IO_COND_READ		0x01
 #define IO_COND_WRITE		0x02
 #define IO_COND_EXCEPTION	0x04
@@ -40,6 +44,10 @@ int pork_io_add(int fd,
 				void *data,
 				void *key,
 				void (*callback)(int fd, u_int32_t condition, void *data));
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __NCIC_IO_H__ */
 

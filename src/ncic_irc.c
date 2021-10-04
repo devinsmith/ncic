@@ -430,7 +430,7 @@ static int irc_ping(struct pork_acct *acct, char *str) {
 	return (irc_send_ping(acct->data, str));
 }
 
-static int irc_quit(struct pork_acct *acct, char *reason) {
+static int irc_quit(struct pork_acct *acct, const char *reason) {
 	if (acct->connected)
 		return (irc_send_quit(acct->data, reason));
 

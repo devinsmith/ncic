@@ -339,7 +339,7 @@ int irc_send_whowas(irc_session_t *session, char *dest) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_quit(irc_session_t *session, char *reason) {
+int irc_send_quit(irc_session_t *session, const char *reason) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 

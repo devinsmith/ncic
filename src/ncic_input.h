@@ -13,6 +13,10 @@
 
 #include "ncic_list.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define INPUT_BUFFER_LEN	4096
 #define MAX_HISTORY_LEN		150
 
@@ -67,5 +71,9 @@ int input_set_buf(struct input *input, char *str);
 int input_set_prompt(struct input *input, char *prompt);
 char *input_get_buf_str(struct input *input);
 uint32_t input_get_cursor_pos(struct input *input);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __NCIC_INPUT_H__ */

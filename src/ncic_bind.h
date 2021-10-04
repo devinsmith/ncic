@@ -11,6 +11,10 @@
 #ifndef __NCIC_BIND_H__
 #define __NCIC_BIND_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum {
 	BINDS_MAIN,
 	BINDS_BUDDY
@@ -44,5 +48,9 @@ void bind_set_handlers(	struct key_binds *bind_set,
 
 int bind_get_keycode(char *keystr);
 void bind_get_keyname(int key, char *result, size_t len);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __NCIC_BIND_H__ */

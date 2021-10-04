@@ -11,7 +11,15 @@
 #ifndef __NCIC_OPT_H__
 #define __NCIC_OPT_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int get_options(int argc, char *const argv[]);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __NCIC_OPT_H__ */
 

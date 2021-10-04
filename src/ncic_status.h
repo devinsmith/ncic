@@ -11,11 +11,19 @@
 #ifndef __NCIC_STATUS_H__
 #define __NCIC_STATUS_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define STATUS_ROWS 2
 
 struct pork_acct;
 
 int status_init(void);
 void status_draw(struct pork_acct *acct);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __NCIC_STATUS_H__ */

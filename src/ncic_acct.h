@@ -18,6 +18,10 @@
 #include "ncic_inet.h"
 #include "ncic_list.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct pork_proto;
 
 /* Account states */
@@ -88,5 +92,9 @@ int pork_acct_connect(const char *user, char *args, int protocol);
 int pork_acct_next_refnum(u_int32_t cur_refnum, u_int32_t *next);
 struct pork_acct *pork_acct_init(const char *user, int protocol);
 int pork_acct_save(struct pork_acct *acct);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __NCIC_ACCT_H__ */

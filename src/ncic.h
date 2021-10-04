@@ -11,12 +11,20 @@
 #ifndef __NCIC_H__
 #define __NCIC_H__
 
-#ifdef HAVE___ATTRIBUTE__
-	#define __notused	__attribute__((unused))
-	#define __format(x) __attribute__((format x ))
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#ifdef __GNUC__
+#define __format(x) __attribute__((format x ))
 #else
-	#define __notused
-	#define __format(x)
+#define __format(x)
+#endif
+
+#ifdef HAVE___ATTRIBUTE__
+#define __notused	__attribute__((unused))
+#else
+#define __notused
 #endif
 
 #ifdef ENABLE_DEBUGGING
@@ -27,7 +35,13 @@
 
 #include <sys/types.h>
 #include <stdint.h>
-void pork_exit(int status, char *msg, char *fmt, ...) __format((printf, 3, 4));
+
+void pork_exit(int status, const char *msg, const char *fmt, ...) __format((printf, 3, 4));
 void keyboard_input(int fd, uint32_t condition, void *data);
 
+#ifdef __cplusplus
+}
+#endif
+
 #endif /* __NCIC_H__ */
+

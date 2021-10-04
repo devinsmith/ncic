@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2009 Devin Smith <devin@devinsmith.net>
+ * Copyright (c) 2007-2021 Devin Smith <devin@devinsmith.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -89,12 +89,12 @@ static inline void binding_run(struct binding *binding) {
 }
 
 static void
-resize_display(void) {
+resize_display() {
 	struct winsize size;
 
 	if (ioctl(1, TIOCGWINSZ, &size) != 0) {
 		debug("ioctl: %s", strerror(errno));
-		pork_exit(-1, NULL, "Fatal error getting screen size\n");
+		pork_exit(-1, nullptr, "Fatal error getting screen size\n");
 	}
 
 	screen_resize(size.ws_row, size.ws_col);
@@ -106,7 +106,7 @@ static void sigwinch_handler(int sig __notused) {
 }
 
 static void generic_signal_handler(int sig) {
-	pork_exit(sig, NULL, "Caught signal %d. Exiting\n", sig);
+	pork_exit(sig, nullptr, "Caught signal %d. Exiting\n", sig);
 }
 
 void
@@ -134,7 +134,7 @@ keyboard_input(int fd, uint32_t cond, void *data)
 	bind_exec(imwindow->active_binds, key);
 
 	if (acct->connected && acct->marked_idle && opt_get_bool(OPT_REPORT_IDLE)) {
-		if (acct->proto->set_idle_time != NULL)
+		if (acct->proto->set_idle_time != nullptr)
 			acct->proto->set_idle_time(acct, 0);
 		acct->marked_idle = 0;
 		screen_win_msg(cur_window(), 1, 1, 0,
@@ -153,7 +153,7 @@ main(int argc, char *argv[])
 	time_t status_last_update = 0;
 
 	pw = getpwuid(getuid());
-	if (pw == NULL) {
+	if (pw == nullptr) {
 		fprintf(stderr, "Fatal: Can't get your user info.\n");
 		exit(-1);
 	}
@@ -176,7 +176,7 @@ main(int argc, char *argv[])
 	pork_io_init();
 
 	if (screen_init(LINES, COLS) == -1)
-		pork_exit(-1, NULL, "Fatal: Error initializing the terminal.\n");
+		pork_exit(-1, nullptr, "Fatal: Error initializing the terminal.\n");
 
 	signal(SIGWINCH, sigwinch_handler);
 	signal(SIGTERM, generic_signal_handler);
@@ -189,7 +189,7 @@ main(int argc, char *argv[])
 
 	bind_init(&screen.binds);
 	bind_set_handlers(&screen.binds.main, binding_run, binding_insert);
-	bind_set_handlers(&screen.binds.blist, binding_run, NULL);
+	bind_set_handlers(&screen.binds.blist, binding_run, nullptr);
 
 	alias_init(&screen.alias_hash);
 
@@ -252,7 +252,7 @@ main(int argc, char *argv[])
 ** is given, print it to the screen.
 */
 
-void pork_exit(int status, char *msg, char *fmt, ...) {
+void pork_exit(int status, const char *msg, const char *fmt, ...) {
 	pork_acct_del_all(msg);
 	screen_destroy();
 	pork_io_destroy();
@@ -263,7 +263,7 @@ void pork_exit(int status, char *msg, char *fmt, ...) {
 	delwin(stdscr);
 	endwin();
 
-	if (fmt != NULL) {
+	if (fmt != nullptr) {
 		va_list ap;
 
 		va_start(ap, fmt);

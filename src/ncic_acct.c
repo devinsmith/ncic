@@ -69,7 +69,7 @@ int pork_acct_del_refnum(u_int32_t refnum, char *reason) {
 	return (0);
 }
 
-void pork_acct_del(struct pork_acct *acct, char *reason) {
+void pork_acct_del(struct pork_acct *acct, const char *reason) {
 	dlist_t *cur;
 
   if (acct != NULL) {
@@ -117,7 +117,7 @@ int pork_acct_next_refnum(u_int32_t cur_refnum, u_int32_t *next) {
 	return (0);
 }
 
-void pork_acct_del_all(char *reason) {
+void pork_acct_del_all(const char *reason) {
 		pork_acct_del(screen.acct, reason);
 }
 

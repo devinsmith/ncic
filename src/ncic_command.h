@@ -11,6 +11,10 @@
 #ifndef __NCIC_COMMAND_H__
 #define __NCIC_COMMAND_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define USER_COMMAND(x)	void x (char *args __notused)
 
 struct command {
@@ -20,5 +24,9 @@ struct command {
 
 int run_mcommand(char *str);
 int run_command(char *str);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __NCIC_COMMAND_H__ */

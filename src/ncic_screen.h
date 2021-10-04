@@ -11,6 +11,10 @@
 #ifndef __NCIC_SCREEN_H__
 #define __NCIC_SCREEN_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern struct screen screen;
 
 enum {
@@ -59,5 +63,9 @@ int screen_close_window(struct imwindow *imwindow);
 void screen_cycle_fwd(void);
 void screen_cycle_bak(void);
 void screen_doupdate(void);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __NCIC_SCREEN_H__ */

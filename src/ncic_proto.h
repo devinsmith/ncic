@@ -11,6 +11,10 @@
 #ifndef __NCIC_PROTO_H__
 #define __NCIC_PROTO_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct pork_acct;
 struct imwindow;
 struct chatroom;
@@ -92,5 +96,9 @@ int proto_get_num(const char *name);
 void proto_destroy(void);
 struct pork_proto *proto_get(int protocol);
 struct pork_proto *proto_get_name(const char *name);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __NCIC_PROTO_H__ */

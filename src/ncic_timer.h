@@ -11,6 +11,10 @@
 #ifndef __NCIC_TIMER_H__
 #define __NCIC_TIMER_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct timer_entry {
 	char *command;
 	u_int32_t refnum;
@@ -27,5 +31,9 @@ u_int32_t timer_add(dlist_t **timer_list,
 					char *command,
 					time_t interval,
 					u_int32_t count);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __NCIC_TIMER_H__ */

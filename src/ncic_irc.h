@@ -18,6 +18,7 @@
 #define DEFAULT_IRC_PORT	"6666"
 #define DEFAULT_SECURE_PORT	"6667"
 
+#include "ncic_acct.h"
 #include "ncic_queue.h"
 
 #define IRC_CHAN_OP			0x01
@@ -121,7 +122,7 @@ int irc_send_whois(irc_session_t *session, char *dest);
 int irc_send_whowas(irc_session_t *session, char *dest);
 int irc_send_kick(irc_session_t *session, char *chan, char *nick, char *reason);
 int irc_send_ping(irc_session_t *session, char *str);
-int irc_send_quit(irc_session_t *session, char *reason);
+int irc_send_quit(irc_session_t *session, const char *reason);
 int irc_send_topic(irc_session_t *session, char *chan, char *topic);
 int irc_send_notice(irc_session_t *session, char *dest, char *msg);
 int irc_kick(irc_session_t *session, char *chan, char *user, char *msg);

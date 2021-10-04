@@ -12,9 +12,17 @@
 #ifndef __NCIC_COLOR_H__
 #define __NCIC_COLOR_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void color_init(void);
 int color_parse_code(const char *code, attr_t *attr);
 int color_get_str(attr_t attr, char *buf, size_t len);
 char *color_quote_codes(const char *str);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __NCIC_COLOR_H__ */
