@@ -11,12 +11,20 @@
 #ifndef __NCIC_HELP_H__
 #define __NCIC_HELP_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define HELP_TABSTOP			4
 #define HELP_SECTION_STYLE		"%W"
 #define HELP_HEADER_STYLE		"%W"
 #define HELP_HEADER_STYLE_END	"%x"
 
-int pork_help_print(char *section, char *command);
+int pork_help_print(const char *section, char *command);
 int pork_help_get_cmds(char *section, char *buf, size_t len);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __NCIC_HELP_H__ */

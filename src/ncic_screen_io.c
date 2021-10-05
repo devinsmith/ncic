@@ -271,7 +271,7 @@ void screen_cmd_output(const char *fmt, ...) {
 	va_end(ap);
 }
 
-void screen_nocolor_msg(char *fmt, ...) {
+void screen_nocolor_msg(const char *fmt, ...) {
 	va_list ap;
 
 	va_start(ap, fmt);

@@ -59,7 +59,7 @@ struct chatroom *chat_new(	struct pork_acct *acct,
 
 int chat_send_msg(	struct pork_acct *acct,
 					struct chatroom *chat,
-					char *target,
+					const char *target,
 					char *msg)
 {
 	if (acct->proto->chat_send == nullptr || msg == nullptr)

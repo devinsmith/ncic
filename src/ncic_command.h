@@ -18,7 +18,7 @@ extern "C" {
 #define USER_COMMAND(x)	void x (char *args __notused)
 
 struct command {
-	char *name;
+	const char *name;
 	void (*cmd)(char *);
 };
 

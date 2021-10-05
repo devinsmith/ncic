@@ -49,7 +49,7 @@ struct chatroom *chat_new(	struct pork_acct *acct,
 							char *chat_title_full,
 							struct imwindow *win);
 
-int chat_send_msg(struct pork_acct *acct, struct chatroom *chat, char *target, char *msg);
+int chat_send_msg(struct pork_acct *acct, struct chatroom *chat, const char *target, char *msg);
 int chat_send_notice(struct pork_acct *acct, struct chatroom *chat, char *target, char *msg);
 int chat_ignore(struct pork_acct *acct, char *chat_name, char *user);
 int chat_unignore(struct pork_acct *acct, char *chat_name, char *user);

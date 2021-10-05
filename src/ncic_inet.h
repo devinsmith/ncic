@@ -13,6 +13,10 @@
 
 #include <netinet/in.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef INET6_ADDRSTRLEN
 #	define MAX_IPLEN 	INET6_ADDRSTRLEN
 #elif defined INET_ADDRSTRLEN
@@ -45,5 +49,9 @@ int sock_listen(struct sockaddr_storage *ss, in_port_t port);
 int get_hostname(struct sockaddr_storage *addr,
 						char *hostbuf,
 						size_t len);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __NCIC_INET_H__ */

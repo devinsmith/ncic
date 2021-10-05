@@ -99,7 +99,7 @@ inline void input_insert(struct input *input, int c) {
 ** Insert the string "str" at the cursor position.
 */
 
-inline void input_insert_str(struct input *input, char *str) {
+inline void input_insert_str(struct input *input, const char *str) {
 	u_int32_t cur = input->cur - input->prompt_len;
 	size_t len = strlen(str);
 

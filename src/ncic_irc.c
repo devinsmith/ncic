@@ -303,7 +303,7 @@ static int irc_ctcp(struct pork_acct *acct, char *dest, char *msg) {
 
 static int irc_chan_send(struct pork_acct *acct,
 			struct chatroom *chat,
-			char *target,
+			const char *target,
 			char *msg)
 {
 	return (naken_send(acct->data, msg));

@@ -28,7 +28,7 @@ void screen_win_msg(struct imwindow *win,
 					int type,
 					const char *fmt, ...) __format((printf, 6, 7));
 
-void screen_nocolor_msg(char *fmt, ...) __format((printf, 1, 2));
+void screen_nocolor_msg(const char *fmt, ...) __format((printf, 1, 2));
 void screen_err_msg(const char *fmt, ...) __format((printf, 1, 2));
 void screen_cmd_output(const char *fmt, ...) __format((printf, 1, 2));
 

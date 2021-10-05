@@ -94,7 +94,7 @@ out_fail:
 	return (-1);
 }
 
-int pork_help_print(char *section, char *command) {
+int pork_help_print(const char *section, char *command) {
 	FILE *fp;
 	char buf[8192];
 	int ret;
