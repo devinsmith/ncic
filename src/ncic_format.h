@@ -11,9 +11,17 @@
 #ifndef __NCIC_FORMAT_H__
 #define __NCIC_FORMAT_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define FORMAT_VARIABLE '$'
 
 int fill_format_str(int type, char *buf, size_t len, ...);
 void format_apply_justification(char *buf, chtype *ch, size_t len);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __NCIC_FORMAT_H__ */

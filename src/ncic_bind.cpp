@@ -10,9 +10,9 @@
 
 #include <unistd.h>
 #include <ncurses.h>
-#include <string.h>
-#include <stdlib.h>
-#include <ctype.h>
+#include <cstring>
+#include <cstdlib>
+#include <cctype>
 #include <sys/types.h>
 
 #include "ncic.h"
@@ -26,7 +26,7 @@
 */
 
 static const struct keyval {
-	char *name;
+	const char *name;
 	int key;
 } keyval[] = {
 	{ "BACKSPACE",			KEY_BACKSPACE	},
@@ -62,20 +62,20 @@ static const struct keyval {
 
 static int bind_compare(void *l, void *r) {
 	int key = (intptr_t)(l);
-	struct binding *binding = r;
+	struct binding *binding = static_cast<struct binding *>(r);
 
 	return (key - binding->key);
 }
 
 static int key_compare(const void *l, const void *r) {
-	const char *str = l;
-	const struct keyval *kv = r;
+	const char *str = static_cast<const char *>(l);
+	const struct keyval *kv = static_cast<const struct keyval *>(r);
 
 	return (strcasecmp(str, kv->name));
 }
 
 static void bind_hash_remove(void *param __notused, void *data) {
-	struct binding *binding = data;
+	struct binding *binding = static_cast<struct binding *>(data);
 
 	free(binding->binding);
 	free(binding);
@@ -95,11 +95,11 @@ int bind_exec(struct key_binds *bind_set, int key) {
 	struct binding *binding;
 
 	binding = bind_find(bind_set, key);
-	if (binding == NULL) {
-		if (bind_set->failure != NULL)
+	if (binding == nullptr) {
+		if (bind_set->failure != nullptr)
 			bind_set->failure(key);
 	} else {
-		if (bind_set->success != NULL)
+		if (bind_set->success != nullptr)
 			bind_set->success(binding);
 	}
 
@@ -123,9 +123,9 @@ inline int bind_remove(struct key_binds *bind_set, int key) {
 ** Execute the command "command" when key "key" is pressed.
 */
 
-void bind_add(struct key_binds *bind_set, int key, char *command) {
+void bind_add(struct key_binds *bind_set, int key, const char *command) {
 	u_int32_t hash = int_hash(key, bind_set->hash.order);
-	struct binding *binding = xmalloc(sizeof(*binding));
+	struct binding *binding = (struct binding *)xmalloc(sizeof(*binding));
 
 	bind_remove(bind_set, key);
 
@@ -150,7 +150,7 @@ static void bind_add_default(struct binds *binds) {
 ** Initialize the bind hash.
 */
 
-inline int bind_init(struct binds *binds) {
+int bind_init(struct binds *binds) {
 	memset(binds, 0, sizeof(*binds));
 
 	if (hash_init(&binds->main.hash, 5, bind_compare, bind_hash_remove) != 0)
@@ -168,7 +168,7 @@ void bind_destroy(struct binds *binds) {
 	hash_destroy(&binds->blist.hash);
 }
 
-inline void bind_set_handlers(	struct key_binds *bind_set,
+void bind_set_handlers(	struct key_binds *bind_set,
 								void (*success)(struct binding *binding),
 								void (*failure)(int key))
 {
@@ -185,10 +185,10 @@ struct binding *bind_find(struct key_binds *bind_set, int key) {
 	u_int32_t hash = int_hash(key, bind_set->hash.order);
 
 	node = hash_find(&bind_set->hash, (void *)(intptr_t)(key), hash);
-	if (node != NULL)
-		return (node->data);
+	if (node != nullptr)
+		return (struct binding *)(node->data);
 
-	return (NULL);
+	return (nullptr);
 }
 
 /*
@@ -204,10 +204,10 @@ int bind_get_keycode(char *keystr) {
 	struct keyval *kv;
 	int key;
 
-	kv = bsearch(keystr, keyval, array_elem(keyval), sizeof(struct keyval),
-			key_compare);
+	kv = (struct keyval *)bsearch(keystr, keyval, array_elem(keyval),
+          sizeof(struct keyval), key_compare);
 
-	if (kv != NULL)
+	if (kv != nullptr)
 		return (kv->key);
 
 	if (!strncasecmp(keystr, "0x", 2)) {
@@ -235,7 +235,7 @@ int bind_get_keycode(char *keystr) {
 				return (-1);
 
 			p = strchr(meta_str, '-');
-			if (p == NULL)
+			if (p == nullptr)
 				return (-1);
 			*p++ = '\0';
 
@@ -246,10 +246,10 @@ int bind_get_keycode(char *keystr) {
 		} else
 			return (-1);
 
-		kv = bsearch(keystr, keyval, array_elem(keyval), sizeof(struct keyval),
-				key_compare);
+		kv = (struct keyval *)bsearch(keystr, keyval, array_elem(keyval),
+            sizeof(struct keyval), key_compare);
 
-		if (kv != NULL)
+		if (kv != nullptr)
 			return (META_KEY(kv->key, meta_num));
 
 		if (keystr[0] == '^' && keystr[1] != '\0' && keystr[2] == '\0')

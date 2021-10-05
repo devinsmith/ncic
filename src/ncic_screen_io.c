@@ -260,7 +260,7 @@ void screen_err_msg(const char *fmt, ...) {
 	va_end(ap);
 }
 
-void screen_cmd_output(char *fmt, ...) {
+void screen_cmd_output(const char *fmt, ...) {
 	va_list ap;
 
 	va_start(ap, fmt);

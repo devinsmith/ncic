@@ -41,7 +41,7 @@ void bind_destroy(struct binds *binds);
 int bind_remove(struct key_binds *bind_set, int c);
 int bind_exec(struct key_binds *bind_set, int c);
 struct binding *bind_find(struct key_binds *bind_set, int c);
-void bind_add(struct key_binds *bind_set, int c, char *command);
+void bind_add(struct key_binds *bind_set, int c, const char *command);
 void bind_set_handlers(	struct key_binds *bind_set,
 						void (*success)(struct binding *binding),
 						void (*failure)(int key));
