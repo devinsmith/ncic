@@ -9,9 +9,9 @@
 */
 
 #include <ncurses.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
+#include <cstdio>
+#include <cctype>
+#include <cstring>
 #include <sys/types.h>
 
 #include "ncic_util.h"
@@ -36,7 +36,7 @@
 ** by "ch"
 */
 
-inline size_t cstrlen(chtype *ch) {
+size_t cstrlen(chtype *ch) {
 	size_t i = 0;
 
 	while (*ch++ != 0)
@@ -52,8 +52,8 @@ inline size_t cstrlen(chtype *ch) {
 ** that comprise it.
 */
 
-char *cstr_to_plaintext(chtype *cstr, size_t len) {
-	char *str = xmalloc(len + 1);
+char *cstr_to_plaintext(const chtype *cstr, size_t len) {
+	char *str = (char *)xmalloc(len + 1);
 	size_t i;
 
 	for (i = 0 ; i < len && cstr[i] != 0 ; i++)
@@ -82,7 +82,7 @@ int plaintext_to_cstr(chtype *ch, size_t len, ...) {
 
 	len--;
 
-	while ((str = va_arg(ap, char *)) != NULL) {
+	while ((str = va_arg(ap, char *)) != nullptr) {
 		u_int32_t spos = 0;
 		attr_t color_attr = 0;
 
@@ -135,7 +135,7 @@ int plaintext_to_cstr_nocolor(chtype *ch, size_t len, ...) {
 
 	va_start(ap, len);
 
-	while ((str = va_arg(ap, char *)) != NULL) {
+	while ((str = va_arg(ap, char *)) != nullptr) {
 		for (; i < len && *str != '\0' ; i++) {
 			if (*str == '\t') {
 				size_t pad = PORK_TABSTOP - i % PORK_TABSTOP;
@@ -157,25 +157,6 @@ int plaintext_to_cstr_nocolor(chtype *ch, size_t len, ...) {
 	return (i);
 }
 
-/*
-** Duplicate a chtype * string of length "len".
-*/
-
-chtype *cstrndup(chtype *ch, size_t len) {
-	size_t i;
-	chtype *result;
-
-	if (len < 1)
-		return (NULL);
-
-	result = xmalloc((len + 1) * sizeof(chtype));
-
-	for (i = 0 ; i < len ; i++)
-		result[i] = ch[i];
-
-	result[i] = 0;
-	return (result);
-}
 
 /*
 ** Write the cstring pointed to by "ch"
@@ -211,7 +192,7 @@ inline size_t wputstr(WINDOW *win, chtype *ch) {
 ** to the screen at the position (x, y).
 */
 
-inline size_t mvwputstr(WINDOW *win, int y, int x, chtype *ch) {
+size_t mvwputstr(WINDOW *win, int y, int x, chtype *ch) {
 	wmove(win, y, x);
 
 	return (wputstr(win, ch));
@@ -222,7 +203,7 @@ inline size_t mvwputstr(WINDOW *win, int y, int x, chtype *ch) {
 ** to the screen at the current cursor position.
 */
 
-inline size_t wputnstr(WINDOW *win, chtype *ch, size_t n) {
+size_t wputnstr(WINDOW *win, chtype *ch, size_t n) {
 	size_t i;
 	u_int32_t beeps = 0;
 	u_int32_t beeps_max = opt_get_int(OPT_BEEP_MAX);
@@ -244,7 +225,7 @@ inline size_t wputnstr(WINDOW *win, chtype *ch, size_t n) {
 	return (i);
 }
 
-inline size_t wputncstr(WINDOW *win, char *str, size_t n) {
+size_t wputncstr(WINDOW *win, char *str, size_t n) {
 	size_t i;
 
 	for (i = 0 ; i < n && *str != '\0' ; i++) {
@@ -264,7 +245,7 @@ inline size_t wputncstr(WINDOW *win, char *str, size_t n) {
 ** to the screen at position (x, y).
 */
 
-inline size_t mvwputnstr(WINDOW *win, int y, int x, chtype *ch, size_t n) {
+size_t mvwputnstr(WINDOW *win, int y, int x, chtype *ch, size_t n) {
 	wmove(win, y, x);
 
 	return (wputnstr(win, ch, n));

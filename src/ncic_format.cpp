@@ -10,11 +10,10 @@
 */
 
 #include <ncurses.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-#include <ctype.h>
-#include <sys/time.h>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+#include <cctype>
 #include <sys/types.h>
 
 #include "ncic.h"
@@ -38,10 +37,10 @@ static int format_status_timestamp(	char opt,
 	struct tm *tm;
 	int ret = 0;
 
-	cur_time = time(NULL);
+	cur_time = time(nullptr);
 	tm = localtime(&cur_time);
 
-	if (tm == NULL) {
+	if (tm == nullptr) {
 		debug("localtime: %s", strerror(errno));
 		return (-1);
 	}
@@ -110,7 +109,7 @@ static int format_status_activity(	char opt,
 			size_t n = 0;
 
 			do {
-				struct imwindow *imwindow = cur->data;
+				struct imwindow *imwindow = (struct imwindow *)cur->data;
 
 				if (imwindow->swindow.activity &&
 					!imwindow->ignore_activity &&
@@ -249,14 +248,14 @@ static int format_status(char opt, char *buf, size_t len, va_list ap) {
 		/* Remote server */
 		case 'S':
 		case 's':
-			if (acct->server != NULL)
+			if (acct->server != nullptr)
 				ret = xstrncpy(buf, acct->server, len);
 			break;
 
 		/* Remote port */
 		case 'P':
 		case 'p':
-			if (acct->fport != NULL)
+			if (acct->fport != nullptr)
 				ret = xstrncpy(buf, acct->fport, len);
 			break;
 
@@ -270,7 +269,7 @@ static int format_status(char opt, char *buf, size_t len, va_list ap) {
 		case 'c':
 		case 'C':
 			if (imwindow->type == WIN_TYPE_CHAT &&
-				(imwindow->data == NULL || !acct->connected))
+				(imwindow->data == nullptr || !acct->connected))
 			{
 				ret = xstrncpy(buf, opt_get_str(OPT_TEXT_NO_ROOM), len);
 			}
@@ -279,15 +278,15 @@ static int format_status(char opt, char *buf, size_t len, va_list ap) {
 		/* Chat mode, if applicable; M includes arguments, m doesn't. */
 		case 'M':
 		case 'm':
-			if (imwindow->type == WIN_TYPE_CHAT && imwindow->data != NULL) {
-				struct chatroom *chat = imwindow->data;
+			if (imwindow->type == WIN_TYPE_CHAT && imwindow->data != nullptr) {
+				struct chatroom *chat = (struct chatroom *)imwindow->data;
 
 				ret = xstrncpy(buf, chat->mode, len);
 				if (opt == 'm') {
 					char *p;
 
 					p = strchr(buf, ' ');
-					if (p != NULL)
+					if (p != nullptr)
 						*p = '\0';
 				}
 			}
@@ -295,12 +294,12 @@ static int format_status(char opt, char *buf, size_t len, va_list ap) {
 
 		/* Chat status, if applicable */
 		case '@':
-			if (imwindow->type == WIN_TYPE_CHAT && imwindow->data != NULL) {
-				struct chatroom *chat = imwindow->data;
+			if (imwindow->type == WIN_TYPE_CHAT && imwindow->data != nullptr) {
+				struct chatroom *chat = (struct chatroom *)imwindow->data;
 				struct chat_user *user;
 
 				user = chat_find_user(acct, chat, acct->username);
-				if (user == NULL)
+				if (user == nullptr)
 					break;
 
 				if (user->status & CHAT_STATUS_OP)
@@ -390,7 +389,7 @@ format_system_alert(char opt, char *buf, size_t len, va_list ap)
 	switch (opt) {
 	case 'M':
 	case 'm':
-		if (msg != NULL)
+		if (msg != nullptr)
 			ret = xstrncpy(buf, msg, len);
 		break;
 	default:
@@ -412,14 +411,14 @@ static int format_msg_highlight(char opt, char *buf, size_t len, va_list ap) {
     /* User name */
     case 'n':
     case 'N':
-      if (acct->username != NULL)
+      if (acct->username != nullptr)
         ret = xstrncpy(buf, acct->username, len);
       break;
 
     /* Message text */
     case 'm':
     case 'M':
-      if (msg != NULL)
+      if (msg != nullptr)
         ret = xstrncpy(buf, msg, len);
       break;
 
@@ -460,18 +459,18 @@ static int format_msg_send(char opt, char *buf, size_t len, va_list ap) {
 
 		/* Screen name / alias  of the receiver */
 		case 'R':
-			if (dest != NULL)
+			if (dest != nullptr)
 				ret = xstrncpy(buf, dest, len);
 			break;
 
 		case 'r':
-			if (dest != NULL)
+			if (dest != nullptr)
 				ret = xstrncpy(buf, dest, len);
 			break;
 
 		/* Message text */
 		case 'M':
-			if (msg != NULL) {
+			if (msg != nullptr) {
 				msg = acct->proto->filter_text(msg);
 				ret = xstrncpy(buf, msg, len);
 				free(msg);
@@ -479,12 +478,12 @@ static int format_msg_send(char opt, char *buf, size_t len, va_list ap) {
 			break;
 
 		case 'm':
-			if (msg != NULL)
+			if (msg != nullptr)
 				ret = xstrncpy(buf, msg, len);
 			break;
 
 		case 'H':
-			if (acct->userhost != NULL) {
+			if (acct->userhost != nullptr) {
 				char *host = acct->proto->filter_text(acct->userhost);
 				ret = xstrncpy(buf, host, len);
 				free(host);
@@ -518,31 +517,31 @@ static int format_msg_recv(char opt, char *buf, size_t len, va_list ap) {
 
 		/* Screen name of sender */
 		case 'n':
-			if (sender != NULL)
+			if (sender != nullptr)
 				ret = xstrncpy(buf, sender, len);
 			break;
 
 		/* Screen name / alias of sender */
 		case 'N':
-			if (sender != NULL)
+			if (sender != nullptr)
 				ret = xstrncpy(buf, sender, len);
 			break;
 
 		/* Screen name / alias  of the receiver */
 		case 'R':
-			if (dest != NULL)
+			if (dest != nullptr)
 				ret = xstrncpy(buf, dest, len);
 			break;
 
 		case 'r':
-			if (dest != NULL)
+			if (dest != nullptr)
 				ret = xstrncpy(buf, dest, len);
 			break;
 
 		/* Message text */
 		case 'm':
 		case 'M':
-			if (msg != NULL) {
+			if (msg != nullptr) {
 				msg = acct->proto->filter_text(msg);
 				ret = xstrncpy(buf, msg, len);
 				free(msg);
@@ -550,7 +549,7 @@ static int format_msg_recv(char opt, char *buf, size_t len, va_list ap) {
 			break;
 
 		case 'H':
-			if (acct->userhost != NULL) {
+			if (acct->userhost != nullptr) {
 				char *host = acct->proto->filter_text(acct->userhost);
 				ret = xstrncpy(buf, host, len);
 				free(host);
@@ -558,7 +557,7 @@ static int format_msg_recv(char opt, char *buf, size_t len, va_list ap) {
 			break;
 
 		case 'h':
-			if (sender_userhost != NULL) {
+			if (sender_userhost != nullptr) {
 				char *host = acct->proto->filter_text(sender_userhost);
 				ret = xstrncpy(buf, host, len);
 				free(host);
@@ -597,12 +596,12 @@ static int format_chat_send(char opt, char *buf, size_t len, va_list ap) {
 
 		/* Message destination */
 		case 'C':
-			if (chat != NULL)
+			if (chat != nullptr)
 				ret = xstrncpy(buf, chat->title_quoted, len);
 			break;
 
 		case 'c':
-			if (dest != NULL) {
+			if (dest != nullptr) {
 				dest = acct->proto->filter_text(dest);
 				ret = xstrncpy(buf, dest, len);
 				free(dest);
@@ -612,7 +611,7 @@ static int format_chat_send(char opt, char *buf, size_t len, va_list ap) {
 		/* Message text */
 		case 'm':
 		case 'M':
-			if (msg != NULL) {
+			if (msg != nullptr) {
 				msg = acct->proto->filter_text(msg);
 				ret = xstrncpy(buf, msg, len);
 				free(msg);
@@ -620,7 +619,7 @@ static int format_chat_send(char opt, char *buf, size_t len, va_list ap) {
 			break;
 
 		case 'H':
-			if (acct->userhost != NULL) {
+			if (acct->userhost != nullptr) {
 				char *host = acct->proto->filter_text(acct->userhost);
 				ret = xstrncpy(buf, host, len);
 				free(host);
@@ -655,18 +654,18 @@ static int format_chat_recv(char opt, char *buf, size_t len, va_list ap) {
 
 		/* Message source */
 		case 'N':
-			if (src != NULL)
+			if (src != nullptr)
 				ret = xstrncpy(buf, src, len);
 			break;
 
 		case 'n':
-			if (src != NULL)
+			if (src != nullptr)
 				ret = xstrncpy(buf, src, len);
 			break;
 
 		/* Message destination */
 		case 'C':
-			if (chat != NULL)
+			if (chat != nullptr)
 				ret = xstrncpy(buf, chat->title_quoted, len);
 			break;
 
@@ -681,7 +680,7 @@ static int format_chat_recv(char opt, char *buf, size_t len, va_list ap) {
 		/* Message text */
 		case 'M':
 		case 'm':
-			if (msg != NULL) {
+			if (msg != nullptr) {
 				msg = acct->proto->filter_text(msg);
 				ret = xstrncpy(buf, msg, len);
 				free(msg);
@@ -689,7 +688,7 @@ static int format_chat_recv(char opt, char *buf, size_t len, va_list ap) {
 			break;
 
 		case 'H':
-			if (acct->userhost != NULL) {
+			if (acct->userhost != nullptr) {
 				char *host = acct->proto->filter_text(acct->userhost);
 				ret = xstrncpy(buf, host, len);
 				free(host);
@@ -697,7 +696,7 @@ static int format_chat_recv(char opt, char *buf, size_t len, va_list ap) {
 			break;
 
 		case 'h':
-			if (src_uhost != NULL) {
+			if (src_uhost != nullptr) {
 				src_uhost = acct->proto->filter_text(src_uhost);
 				ret = xstrncpy(buf, src_uhost, len);
 				free(src_uhost);
@@ -738,7 +737,7 @@ static int format_chat_info(char opt, char *buf, size_t len, va_list ap) {
 		/* Destination, if applicable */
 		case 'D':
 		case 'd':
-			if (dst != NULL) {
+			if (dst != nullptr) {
 				dst = acct->proto->filter_text(dst);
 				ret = xstrncpy(buf, dst, len);
 				free(dst);
@@ -754,16 +753,16 @@ static int format_chat_info(char opt, char *buf, size_t len, va_list ap) {
 		/* Chat name (full, quoted) */
 		case 'U':
 		case 'u':
-			if (chat != NULL)
+			if (chat != nullptr)
 				ret = xstrncpy(buf, chat->title_full_quoted, len);
 
 		/* Source's userhost (if available) */
 		case 'H':
-			if (acct != NULL && chat != NULL && src != NULL) {
+			if (acct != nullptr && chat != nullptr && src != nullptr) {
 				struct chat_user *chat_user;
 
 				chat_user = chat_find_user(acct, chat, src);
-				if (chat_user != NULL && chat_user->host != NULL) {
+				if (chat_user != nullptr && chat_user->host != nullptr) {
 					char *host = acct->proto->filter_text(chat_user->host);
 					ret = xstrncpy(buf, host, len);
 					free(host);
@@ -773,11 +772,11 @@ static int format_chat_info(char opt, char *buf, size_t len, va_list ap) {
 
 		/* Dest's userhost (if available) */
 		case 'h':
-			if (acct != NULL && chat != NULL && dst != NULL) {
+			if (acct != nullptr && chat != nullptr && dst != nullptr) {
 				struct chat_user *chat_user;
 
 				chat_user = chat_find_user(acct, chat, dst);
-				if (chat_user != NULL && chat_user->host != NULL) {
+				if (chat_user != nullptr && chat_user->host != nullptr) {
 					char *host = acct->proto->filter_text(chat_user->host);
 					ret = xstrncpy(buf, host, len);
 					free(host);
@@ -787,7 +786,7 @@ static int format_chat_info(char opt, char *buf, size_t len, va_list ap) {
 
 		case 'm':
 		case 'M':
-			if (msg != NULL) {
+			if (msg != nullptr) {
 				msg = acct->proto->filter_text(msg);
 				ret = xstrncpy(buf, msg, len);
 				free(msg);
@@ -889,9 +888,9 @@ static int format_whois(char opt, char *buf, size_t len, va_list ap) {
 		/* Profile or away message */
 		case 'P':
 		case 'A':
-			if (info != NULL) {
+			if (info != nullptr) {
 				char *p = strchr(info, '\n');
-				if (p != NULL)
+				if (p != nullptr)
 					ret = snprintf(buf, len, "\n%s", info);
 				else
 					ret = xstrncpy(buf, info, len);
@@ -981,7 +980,7 @@ int fill_format_str(int type, char *buf, size_t len, ...) {
 	int (*handler)(char, char *, size_t, va_list);
 
 	format = opt_get_str(type);
-	if (format == NULL) {
+	if (format == nullptr) {
 		debug("unknown format str: %d", type);
 		return (-1);
 	}
@@ -1044,12 +1043,12 @@ int fill_format_str(int type, char *buf, size_t len, ...) {
 
 void format_apply_justification(char *buf, chtype *ch, size_t len) {
 	char *p = buf;
-	char *left = NULL;
-	char *right = NULL;
+	char *left = nullptr;
+	char *right = nullptr;
 	size_t len_left;
 	chtype fill_char;
 
-	while ((p = strchr(p, '$')) != NULL) {
+	while ((p = strchr(p, '$')) != nullptr) {
 		if (p[1] == '>') {
 			left = buf;
 
@@ -1067,7 +1066,7 @@ void format_apply_justification(char *buf, chtype *ch, size_t len) {
 	/*
 	** If there's right-justified text, paste it on.
 	*/
-	if (right != NULL) {
+	if (right != nullptr) {
 		chtype ch_right[len];
 		size_t len_right;
 		size_t diff;

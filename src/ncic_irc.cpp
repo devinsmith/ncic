@@ -12,17 +12,17 @@
 
 #include <unistd.h>
 #include <ncurses.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <time.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <cctype>
+#include <ctime>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <errno.h>
+#include <cerrno>
 
 #include "ncic.h"
 #include "ncic_util.h"
@@ -45,9 +45,9 @@
 
 static void irc_event(int sock, u_int32_t cond, void *data) {
 	if (cond & IO_COND_READ) {
-		if (naken_input_dispatch(data) == -1) {
-			irc_session_t *session = data;
-			struct pork_acct *acct = session->data;
+    irc_session_t *session = static_cast<irc_session_t *>(data);
+		if (naken_input_dispatch(session) == -1) {
+			struct pork_acct *acct = static_cast<struct pork_acct *>(session->data);
 
 			pork_sock_err(acct, sock);
 			pork_io_del(data);

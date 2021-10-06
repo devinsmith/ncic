@@ -12,11 +12,9 @@
 
 #include <unistd.h>
 #include <ncurses.h>
-#include <stdio.h>
-#include <limits.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
+#include <cstdio>
+#include <cstring>
+#include <cctype>
 #include <dirent.h>
 #include <sys/stat.h>
 
@@ -38,7 +36,7 @@ static int pork_help_is_section(char *string) {
 	return (1);
 }
 
-int pork_help_get_cmds(char *section, char *buf, size_t len) {
+int pork_help_get_cmds(const char *section, char *buf, size_t len) {
 	DIR *dir;
 	struct dirent *de;
 	char path[4096];
@@ -46,7 +44,7 @@ int pork_help_get_cmds(char *section, char *buf, size_t len) {
 	int i = 0;
 	int ret;
 
-	if (section == NULL)
+	if (section == nullptr)
 		section = "main";
 
 	ret = snprintf(path, sizeof(path), "%s/%s", NCIC_HELP_PATH, section);
@@ -54,16 +52,16 @@ int pork_help_get_cmds(char *section, char *buf, size_t len) {
 		return (-1);
 
 	dir = opendir(path);
-	if (dir == NULL)
+	if (dir == nullptr)
 		return (-1);
 
-	if (getcwd(cwd, sizeof(cwd)) == NULL)
+	if (getcwd(cwd, sizeof(cwd)) == nullptr)
 		goto out_fail;
 
 	if (chdir(path) != 0)
 		goto out_fail;
 
-	while (len > 0 && (de = readdir(dir)) != NULL) {
+	while (len > 0 && (de = readdir(dir)) != nullptr) {
 		struct stat st;
 
 		ret = stat(de->d_name, &st);
@@ -99,10 +97,10 @@ int pork_help_print(const char *section, char *command) {
 	char buf[8192];
 	int ret;
 
-	if (command == NULL)
+	if (command == nullptr)
 		return (-1);
 
-	if (section == NULL)
+	if (section == nullptr)
 		section = "main";
 
 	ret = snprintf(buf, sizeof(buf), "%s/%s/%s", NCIC_HELP_PATH, section, command);
@@ -110,10 +108,10 @@ int pork_help_print(const char *section, char *command) {
 		return (-1);
 
 	fp = fopen(buf, "r");
-	if (fp == NULL)
+	if (fp == nullptr)
 		return (-1);
 
-	while (fgets(buf, sizeof(buf), fp) != NULL) {
+	while (fgets(buf, sizeof(buf), fp) != nullptr) {
 		char *p;
 		char outbuf[8192];
 		size_t len = sizeof(outbuf) - 1;
@@ -122,7 +120,7 @@ int pork_help_print(const char *section, char *command) {
 		*out = '\0';
 
 		p = strchr(buf, '\n');
-		if (p == NULL)
+		if (p == nullptr)
 			goto out_fail;
 		*p = '\0';
 

@@ -9,7 +9,7 @@
 */
 
 #include <ncurses.h>
-#include <string.h>
+#include <cstring>
 
 #include "ncic_util.h"
 #include "ncic_list.h"
@@ -93,7 +93,7 @@ uint32_t imsg_lines(struct swindow *swindow, struct imsg *imsg) {
 struct imsg *imsg_new(struct swindow *swindow, chtype *msg, size_t len) {
 	struct imsg *imsg;
 
-	imsg = xmalloc(sizeof(*imsg));
+	imsg = (struct imsg *)xmalloc(sizeof(*imsg));
 	imsg->text = msg;
 	imsg->serial = swindow->serial++;
 	imsg->len = len;
@@ -113,13 +113,13 @@ struct imsg *imsg_copy(struct swindow *swindow, struct imsg *imsg) {
 	** relative to the overhead of the reference counting.
 	*/
 
-	new_imsg = xmalloc(sizeof(*new_imsg));
+	new_imsg = (struct imsg *)xmalloc(sizeof(*new_imsg));
 	new_imsg->len = imsg->len;
 	new_imsg->lines = imsg->lines;
 	new_imsg->serial = swindow->serial++;
 
 	msg_size = (imsg->len + 1) * sizeof(imsg->text[0]);
-	new_imsg->text = xmalloc(msg_size);
+	new_imsg->text = (chtype *)xmalloc(msg_size);
 	memcpy(new_imsg->text, imsg->text, msg_size);
 
 	return (new_imsg);

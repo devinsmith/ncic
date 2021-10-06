@@ -10,9 +10,9 @@
 
 #include "config.h"
 
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
+#include <cstdlib>
+#include <cstring>
+#include <cerrno>
 #include <sys/time.h>
 #include <sys/types.h>
 
@@ -27,7 +27,7 @@ static dlist_t *io_list;
 static int pork_io_find_cb(void *l, void *r) {
 	struct io_source *io = (struct io_source *) r;
 
-	return (!(l == io->key));
+	return l != io->key;
 }
 
 static void pork_io_destroy_cb(void *param __notused, void *data) {
@@ -35,18 +35,18 @@ static void pork_io_destroy_cb(void *param __notused, void *data) {
 }
 
 static void pork_io_remove(dlist_t *node) {
-	pork_io_destroy_cb(NULL, node->data);
+	pork_io_destroy_cb(nullptr, node->data);
 	io_list = dlist_remove(io_list, node);
 }
 
 int pork_io_init(void) {
-	io_list = NULL;
+	io_list = nullptr;
 	return (0);
 }
 
 void pork_io_destroy(void) {
-	dlist_destroy(io_list, NULL, pork_io_destroy_cb);
-	io_list = NULL;
+	dlist_destroy(io_list, nullptr, pork_io_destroy_cb);
+	io_list = nullptr;
 }
 
 int pork_io_add(int fd,
@@ -64,10 +64,10 @@ int pork_io_add(int fd,
 	*/
 
 	node = dlist_find(io_list, key, pork_io_find_cb);
-	if (node != NULL)
+	if (node != nullptr)
 		pork_io_remove(node);
 
-	io = xcalloc(1, sizeof(*io));
+	io = (io_source *)xcalloc(1, sizeof(*io));
 	io->fd = fd;
 	io->cond = cond;
 	io->data = data;
@@ -83,12 +83,12 @@ int pork_io_del(void *key) {
 	struct io_source *io;
 
 	node = dlist_find(io_list, key, pork_io_find_cb);
-	if (node == NULL)
+	if (node == nullptr)
 		return (-1);
 
-	io = node->data;
+	io = (io_source *) node->data;
 	io->fd = -2;
-	io->callback = NULL;
+	io->callback = nullptr;
 	return (0);
 }
 
@@ -96,7 +96,7 @@ int pork_io_dead(void *key) {
 	dlist_t *node;
 
 	node = dlist_find(io_list, key, pork_io_find_cb);
-	if (node == NULL)
+	if (node == nullptr)
 		return (-1);
 
 	((struct io_source *) node->data)->fd = -1;
@@ -107,7 +107,7 @@ int pork_io_set_cond(void *key, u_int32_t new_cond) {
 	dlist_t *node;
 
 	node = dlist_find(io_list, key, pork_io_find_cb);
-	if (node == NULL)
+	if (node == nullptr)
 		return (-1);
 
 	((struct io_source *) node->data)->cond = new_cond;
@@ -118,7 +118,7 @@ int pork_io_add_cond(void *key, u_int32_t new_cond) {
 	dlist_t *node;
 
 	node = dlist_find(io_list, key, pork_io_find_cb);
-	if (node == NULL)
+	if (node == nullptr)
 		return (-1);
 
 	((struct io_source *) node->data)->cond |= new_cond;
@@ -129,7 +129,7 @@ int pork_io_del_cond(void *key, u_int32_t new_cond) {
 	dlist_t *node;
 
 	node = dlist_find(io_list, key, pork_io_find_cb);
-	if (node == NULL)
+	if (node == nullptr)
 		return (-1);
 
 	((struct io_source *) node->data)->cond &= ~new_cond;
@@ -140,13 +140,13 @@ static int pork_io_find_dead_fds(dlist_t *io_list) {
 	dlist_t *cur = io_list;
 	int bad_fd = 0;
 
-	while (cur != NULL) {
-		struct io_source *io = cur->data;
+	while (cur != nullptr) {
+		struct io_source *io = (struct io_source *)cur->data;
 		dlist_t *next = cur->next;
 
 		if (io->fd < 0 || sock_is_error(io->fd)) {
 			debug("fd %d is dead", io->fd);
-			if (io->callback != NULL)
+			if (io->callback != nullptr)
 				io->callback(io->fd, IO_COND_DEAD, io->data);
 
 			pork_io_remove(cur);
@@ -173,12 +173,12 @@ int pork_io_run(void) {
 	FD_ZERO(&xfds);
 
 	cur = io_list;
-	while (cur != NULL) {
-		struct io_source *io = cur->data;
+	while (cur != nullptr) {
+		struct io_source *io = (struct io_source *)cur->data;
 		dlist_t *next = cur->next;
 
 		if (io->fd >= 0) {
-			if (io->cond & IO_COND_ALWAYS && io->callback != NULL)
+			if (io->cond & IO_COND_ALWAYS && io->callback != nullptr)
 				io->callback(io->fd, IO_COND_ALWAYS, io->data);
 
 			if (io->cond & IO_COND_READ)
@@ -193,7 +193,7 @@ int pork_io_run(void) {
 			if (io->fd > max_fd)
 				max_fd = io->fd;
 		} else {
-			if (io->callback != NULL)
+			if (io->callback != nullptr)
 				io->callback(io->fd, IO_COND_DEAD, io->data);
 
 			pork_io_remove(cur);
@@ -218,8 +218,8 @@ int pork_io_run(void) {
 	}
 
 	cur = io_list;
-	while (cur != NULL) {
-		struct io_source *io = cur->data;
+	while (cur != nullptr) {
+		struct io_source *io = (struct io_source *)cur->data;
 		dlist_t *next = cur->next;
 
 		if (io->fd >= 0) {
@@ -234,7 +234,7 @@ int pork_io_run(void) {
 			if ((io->cond & IO_COND_EXCEPTION) && FD_ISSET(io->fd, &xfds))
 				cond |= IO_COND_EXCEPTION;
 
-			if (cond != 0 && io->callback != NULL)
+			if (cond != 0 && io->callback != nullptr)
 				io->callback(io->fd, cond, io->data);
 		}
 

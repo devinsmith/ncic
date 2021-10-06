@@ -15,14 +15,13 @@
 
 #include <unistd.h>
 #include <ncurses.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <cctype>
 #include <sys/types.h>
 
 #include "ncic.h"
-//#include <pork_missing.h>
 #include "ncic_util.h"
 #include "ncic_list.h"
 #include "ncic_set.h"
@@ -35,7 +34,7 @@ static inline void input_free(void *param __notused, void *data);
 ** Deletes the character at the cursor position.
 */
 
-inline void input_delete(struct input *input) {
+void input_delete(struct input *input) {
 	u_int32_t cur = input->cur - input->prompt_len;
 
 	if (input->input_buf[cur] == '\0')
@@ -56,7 +55,7 @@ inline void input_delete(struct input *input) {
 ** Deletes the character before the cursor.
 */
 
-inline void input_bkspace(struct input *input) {
+void input_bkspace(struct input *input) {
 	u_int32_t cur = input->cur - input->prompt_len;
 
 	if (cur == 0)
@@ -77,7 +76,7 @@ inline void input_bkspace(struct input *input) {
 ** Add the character "c" at the cursor position.
 */
 
-inline void input_insert(struct input *input, int c) {
+void input_insert(struct input *input, int c) {
 	u_int32_t cur = input->cur - input->prompt_len;
 
 	if (input->len >= sizeof(input->input_buf) - 1) {
@@ -99,7 +98,7 @@ inline void input_insert(struct input *input, int c) {
 ** Insert the string "str" at the cursor position.
 */
 
-inline void input_insert_str(struct input *input, const char *str) {
+void input_insert_str(struct input *input, const char *str) {
 	u_int32_t cur = input->cur - input->prompt_len;
 	size_t len = strlen(str);
 
@@ -120,7 +119,7 @@ inline void input_insert_str(struct input *input, const char *str) {
 ** Clear the input line.
 */
 
-inline void input_clear_line(struct input *input) {
+void input_clear_line(struct input *input) {
 	input->input_buf[0] = '\0';
 	input->cur = input->prompt_len;
 	input->begin_completion = input->cur;
@@ -132,7 +131,7 @@ inline void input_clear_line(struct input *input) {
 ** Clear from the cursor position the start of the line.
 */
 
-inline void input_clear_to_start(struct input *input) {
+void input_clear_to_start(struct input *input) {
 	u_int32_t cur = input->cur - input->prompt_len;
 	u_int32_t new_len = input->len - cur;
 
@@ -147,7 +146,7 @@ inline void input_clear_to_start(struct input *input) {
 ** Clear from the cursor position to the end of the line.
 */
 
-inline void input_clear_to_end(struct input *input) {
+void input_clear_to_end(struct input *input) {
 	u_int32_t cur = input->cur - input->prompt_len;
 
 	input->len = cur;
@@ -160,7 +159,7 @@ inline void input_clear_to_end(struct input *input) {
 ** Move to the start of the line.
 */
 
-inline void input_home(struct input *input) {
+void input_home(struct input *input) {
 	input->cur = input->prompt_len;
 	input->begin_completion = input->cur;
 	input->dirty = 1;
@@ -170,7 +169,7 @@ inline void input_home(struct input *input) {
 ** Move to the end of the line.
 */
 
-inline void input_end(struct input *input) {
+void input_end(struct input *input) {
 	input->cur = input->len + input->prompt_len;
 	input->begin_completion = input->cur;
 	input->dirty = 1;
@@ -180,7 +179,7 @@ inline void input_end(struct input *input) {
 ** Move the cursor left.
 */
 
-inline void input_move_left(struct input *input) {
+void input_move_left(struct input *input) {
 	if (input->cur > input->prompt_len) {
 		input->cur--;
 		input->dirty = 1;
@@ -193,7 +192,7 @@ inline void input_move_left(struct input *input) {
 ** Move the cursor right.
 */
 
-inline void input_move_right(struct input *input) {
+void input_move_right(struct input *input) {
 	if (input->cur < input->len + input->prompt_len) {
 		input->cur++;
 		input->dirty = 1;
@@ -317,7 +316,7 @@ void input_clear_next_word(struct input *input) {
 void input_history_prune(struct input *input) {
 	dlist_t *cur = input->history_end;
 
-	while (input->history_len > input->max_history_len && cur != NULL) {
+	while (input->history_len > input->max_history_len && cur != nullptr) {
 		dlist_t *prev = cur->prev;
 
 		free(cur->data);
@@ -335,10 +334,10 @@ void input_history_prune(struct input *input) {
 
 void input_history_add(struct input *input) {
 	input->history = dlist_add_head(input->history, xstrdup(input->input_buf));
-	input->history_cur = NULL;
+	input->history_cur = nullptr;
 	input->history_len++;
 
-	if (input->history_end == NULL)
+	if (input->history_end == nullptr)
 		input->history_end = input->history;
 
 	if (input->history_len > input->max_history_len)
@@ -351,17 +350,17 @@ void input_history_add(struct input *input) {
 */
 
 void input_history_prev(struct input *input) {
-	if (input->history == NULL)
+	if (input->history == nullptr)
 		return;
 
-	if (input->history_cur == NULL) {
+	if (input->history_cur == nullptr) {
 		dlist_t *cur = input->history;
 
 		if (input->len != 0)
 			input_history_add(input);
 
 		input->history_cur = cur;
-	} else if (input->history_cur->next != NULL)
+	} else if (input->history_cur->next != nullptr)
 		input->history_cur = input->history_cur->next;
 	else
 		return;
@@ -381,7 +380,7 @@ void input_history_prev(struct input *input) {
 */
 
 void input_history_next(struct input *input) {
-	if (input->history_cur == NULL)
+	if (input->history_cur == nullptr)
 		return;
 
 	input->dirty = 1;
@@ -391,8 +390,8 @@ void input_history_next(struct input *input) {
 	** of the history list, clear the line.
 	*/
 
-	if (input->history_cur->prev == NULL) {
-		input->history_cur = NULL;
+	if (input->history_cur->prev == nullptr) {
+		input->history_cur = nullptr;
 		input->input_buf[0] = '\0';
 		input->cur = input->prompt_len;
 		input->begin_completion = input->cur;
@@ -415,11 +414,11 @@ void input_history_next(struct input *input) {
 ** Clear the input history list.
 */
 
-inline void input_history_clear(struct input *input) {
-	dlist_destroy(input->history, NULL, input_free);
-	input->history = NULL;
-	input->history_end = NULL;
-	input->history_cur = NULL;
+void input_history_clear(struct input *input) {
+	dlist_destroy(input->history, nullptr, input_free);
+	input->history = nullptr;
+	input->history_end = nullptr;
+	input->history_cur = nullptr;
 	input->history_len = 0;
 
 	input->input_buf[0] = '\0';
@@ -443,7 +442,7 @@ void input_init(struct input *input, u_int32_t width) {
 	input->dirty = 1;
 
 	prompt = opt_get_str(OPT_PROMPT);
-	if (prompt != NULL)
+	if (prompt != nullptr)
 		input_set_prompt(input, prompt);
 }
 
@@ -451,12 +450,12 @@ static inline void input_free(void *param __notused, void *data) {
 	free(data);
 }
 
-inline void input_destroy(struct input *input) {
+void input_destroy(struct input *input) {
 	free(input->prompt);
-	dlist_destroy(input->history, NULL, input_free);
+	dlist_destroy(input->history, nullptr, input_free);
 }
 
-inline void input_resize(struct input *input, u_int32_t width) {
+void input_resize(struct input *input, u_int32_t width) {
 	input->width = width;
 	input->dirty = 1;
 }
@@ -465,7 +464,7 @@ char *input_partial(struct input *input) {
 	u_int32_t offset;
 
 	if (input->prompt_len >= input->width)
-		return (NULL);
+		return (nullptr);
 
 	if (input->cur >= input->width)
 		offset = (input->cur / input->width) * input->width - input->prompt_len;
@@ -479,7 +478,7 @@ char *input_partial(struct input *input) {
 ** Returns the x position of the cursor.
 */
 
-inline u_int32_t input_get_cursor_pos(struct input *input) {
+u_int32_t input_get_cursor_pos(struct input *input) {
 	return (input->cur % input->width);
 }
 
@@ -490,19 +489,19 @@ inline u_int32_t input_get_cursor_pos(struct input *input) {
 int input_set_prompt(struct input *input, char *prompt) {
 	u_int32_t cur;
 
-	if (prompt != NULL && strlen(prompt) >= input->width)
+	if (prompt != nullptr && strlen(prompt) >= input->width)
 		return (-1);
 
 	cur = input->cur - input->prompt_len;
 	free(input->prompt);
 
-	if (prompt == NULL) {
-		input->prompt = NULL;
+	if (prompt == nullptr) {
+		input->prompt = nullptr;
 		input->prompt_len = 0;
 	} else {
 		size_t tmp_len = strlen(prompt) + 1;
 
-		input->prompt = xmalloc(sizeof(chtype) * tmp_len);
+		input->prompt = (chtype *)xmalloc(sizeof(chtype) * tmp_len);
 		plaintext_to_cstr(input->prompt, tmp_len, prompt, NULL);
 		input->prompt_len = cstrlen(input->prompt);
 	}
@@ -518,7 +517,7 @@ int input_set_prompt(struct input *input, char *prompt) {
 ** Fetches the contents of the input buffer as a C string.
 */
 
-inline char *input_get_buf_str(struct input *input) {
+char *input_get_buf_str(struct input *input) {
 	return (input->input_buf);
 }
 
@@ -529,7 +528,7 @@ inline char *input_get_buf_str(struct input *input) {
 int input_set_buf(struct input *input, char *str) {
 	size_t len = strlen(str);
 
-	if (str == NULL || len >= sizeof(input->input_buf) - 1)
+	if (str == nullptr || len >= sizeof(input->input_buf) - 1)
 		return (-1);
 
 	if (xstrncpy(input->input_buf, str, sizeof(input->input_buf)) == -1) {

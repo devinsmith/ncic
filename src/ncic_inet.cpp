@@ -11,11 +11,11 @@
 #include "config.h"
 
 #include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <stdarg.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <cerrno>
+#include <cstdarg>
 #include <sys/types.h>
 #include <fcntl.h>
 #include <sys/socket.h>
@@ -124,7 +124,7 @@ int get_hostname(struct sockaddr_storage *addr,
 	int ret;
 
 	ret = getnameinfo((struct sockaddr *) addr, sizeof(struct sockaddr_storage),
-					hostbuf, len, NULL, 0, 0);
+					hostbuf, len, nullptr, 0, 0);
 
 	if (ret != 0)
 		debug("getnameinfo: %s", strerror(errno));
@@ -140,7 +140,7 @@ int get_port(const char *name, in_port_t *port) {
 	struct servent *servent;
 
 	servent = getservbyname(name, "tcp");
-	if (servent != NULL)
+	if (servent != nullptr)
 		*port = ntohs(servent->s_port);
 	else {
 		char *end;
@@ -169,12 +169,12 @@ int get_port(const char *name, in_port_t *port) {
 */
 
 int get_addr(const char *hostname, struct sockaddr_storage *addr) {
-	struct addrinfo *res = NULL;
+	struct addrinfo *res = nullptr;
 	size_t len;
 	int ret;
 
 	if ((ret = getaddrinfo(hostname, NULL, NULL, &res)) != 0) {
-		if (res != NULL)
+		if (res != nullptr)
 			freeaddrinfo(res);
 
 		debug("getaddrinfo: %s: %s", hostname, gai_strerror(ret));
@@ -264,7 +264,7 @@ int nb_connect(	struct sockaddr_storage *ss,
 		return (-1);
 	}
 
-	if (laddr != NULL) {
+	if (laddr != nullptr) {
 		if (bind(sock, (struct sockaddr *) laddr, sin_len(laddr)) != 0) {
 			screen_err_msg("Failed to bind: %s", strerror(errno));
 		}
@@ -317,80 +317,3 @@ int sock_is_error(int sock) {
 	return (error);
 }
 
-/*
-** Listen to the specified port (passed in host byte order) on the address
-** specified by ss.
-*/
-
-int sock_listen(struct sockaddr_storage *ss, in_port_t listen_port) {
-	int sock;
-	struct addrinfo *cur;
-	const int one = 1;
-
-	if (ss == NULL)
-		return (-1);
-
-	cur = xcalloc(1, sizeof(*cur));
-	cur->ai_family = ss->ss_family;
-
-	switch (cur->ai_family) {
-		case AF_INET6:
-			cur->ai_addrlen = sizeof(struct sockaddr_in6);
-			break;
-
-		case AF_INET:
-			cur->ai_addrlen = sizeof(struct sockaddr_in);
-			break;
-
-		default:
-			debug("unknown family: %d", cur->ai_family);
-			free(cur);
-			return (-1);
-	}
-
-	cur->ai_addr = xmalloc(cur->ai_addrlen);
-	memcpy(cur->ai_addr, ss, cur->ai_addrlen);
-
-	if (cur->ai_family == AF_INET)
-		SIN4(cur->ai_addr)->sin_port = htons(listen_port);
-	else
-		SIN6(cur->ai_addr)->sin6_port = htons(listen_port);
-
-	sock = socket(cur->ai_family, SOCK_STREAM, 0);
-	if (sock == -1) {
-		debug("socket: %s", strerror(errno));
-		goto done;
-	}
-
-	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one)) != 0) {
-		debug("setsockopt: %s", strerror(errno));
-		close(sock);
-		sock = -1;
-		goto done;
-	}
-
-	if (bind(sock, cur->ai_addr, cur->ai_addrlen) != 0) {
-		debug("bind: %s", strerror(errno));
-		close(sock);
-		sock = -1;
-		goto done;
-	}
-
-	if (listen(sock, SOMAXCONN) != 0) {
-		debug("listen: %s", strerror(errno));
-		close(sock);
-		sock = -1;
-		goto done;
-	}
-
-	if (fcntl(sock, F_SETFL, O_NONBLOCK) == -1) {
-		debug("fcntl: %s", strerror(errno));
-		close(sock);
-		sock = -1;
-	}
-
-done:
-	free(cur->ai_addr);
-	free(cur);
-	return (sock);
-}
