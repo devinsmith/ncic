@@ -833,7 +833,6 @@ static struct command chat_command[] = {
 	{ "ignore",				cmd_chat_ignore			},
 	{ "invite",				cmd_chat_invite			},
 	{ "join",				cmd_chat_join			},
-	{ "kick",				cmd_chat_kick			},
 	{ "leave",				cmd_chat_leave			},
 	{ "list",				cmd_chat_list			},
 	{ "send",				cmd_chat_send			},
@@ -927,33 +926,6 @@ USER_COMMAND(cmd_chat_invite) {
 USER_COMMAND(cmd_chat_join) {
 	screen_err_msg("cmd_chat_join");
 	chat_join(cur_window()->owner, args);
-}
-
-USER_COMMAND(cmd_chat_kick) {
-	struct imwindow *win = cur_window();
-	struct pork_acct *acct = win->owner;
-	struct chatroom *chat;
-	char *arg1;
-	char *arg2;
-
-	if (args == nullptr)
-		return;
-
-	arg1 = strsep(&args, " ");
-
-	chat = chat_find(acct, arg1);
-	if (chat == nullptr) {
-		if (win->type == WIN_TYPE_CHAT && win->data != nullptr)
-			chat_kick(acct, (chatroom *)win->data, arg1, args);
-		else
-			screen_err_msg("%s is not a member of %s", acct->username, arg1);
-
-		return;
-	}
-
-	arg2 = strsep(&args, " ");
-	if (arg2 != nullptr)
-		chat_kick(acct, chat, arg2, args);
 }
 
 USER_COMMAND(cmd_chat_leave) {

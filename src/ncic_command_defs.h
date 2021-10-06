@@ -127,7 +127,6 @@ USER_COMMAND(cmd_chat_ban);
 USER_COMMAND(cmd_chat_ignore);
 USER_COMMAND(cmd_chat_invite);
 USER_COMMAND(cmd_chat_join);
-USER_COMMAND(cmd_chat_kick);
 USER_COMMAND(cmd_chat_leave);
 USER_COMMAND(cmd_chat_list);
 USER_COMMAND(cmd_chat_send);

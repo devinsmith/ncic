@@ -465,17 +465,6 @@ int chat_user_left(	struct pork_acct *acct,
 	return (ret);
 }
 
-int chat_kick(	struct pork_acct *acct,
-				struct chatroom *chat,
-				char *user,
-				char *reason)
-{
-	if (acct->proto->chat_kick == nullptr)
-		return (-1);
-
-	return (acct->proto->chat_kick(acct, chat, user, reason));
-}
-
 int chat_ban(	struct pork_acct *acct,
 				struct chatroom *chat,
 				char *user)

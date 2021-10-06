@@ -44,8 +44,9 @@
 #define HIGHLIGHT_INVERSE		0x04
 
 static void irc_event(int sock, u_int32_t cond, void *data) {
-	if (cond & IO_COND_READ) {
     irc_session_t *session = static_cast<irc_session_t *>(data);
+
+	if (cond & IO_COND_READ) {
 		if (naken_input_dispatch(session) == -1) {
 			struct pork_acct *acct = static_cast<struct pork_acct *>(session->data);
 
@@ -57,18 +58,18 @@ static void irc_event(int sock, u_int32_t cond, void *data) {
 		}
 	}
 
-	irc_flush_outq(data);
+	irc_flush_outq(session);
 }
 
 static void irc_connected(int sock, u_int32_t cond, void *data) {
 	int ret;
-	irc_session_t *session = data;
+    irc_session_t *session = static_cast<irc_session_t *>(data);
 
 	pork_io_del(data);
 
 	ret = sock_is_error(sock);
 	if (ret != 0) {
-		struct pork_acct *acct = session->data;
+		struct pork_acct *acct = (struct pork_acct *)session->data;
 		char *errstr = strerror(ret);
 
 		screen_err_msg("network error: %s: %s", acct->username, errstr);
@@ -86,17 +87,17 @@ static void irc_connected(int sock, u_int32_t cond, void *data) {
 
 		// New context saying we are a client, and using SSL 2 or 3
 		session->sslContext = SSL_CTX_new(TLS_client_method());
-		if (session->sslContext == NULL) // Dumps to stderr, yuck
+		if (session->sslContext == nullptr) // Dumps to stderr, yuck
 			ERR_print_errors_fp (stderr);
 
-		SSL_CTX_set_verify(session->sslContext, SSL_VERIFY_NONE, NULL);
+		SSL_CTX_set_verify(session->sslContext, SSL_VERIFY_NONE, nullptr);
 		SSL_CTX_set_verify_depth(session->sslContext, 0);
 		SSL_CTX_set_mode(session->sslContext, SSL_MODE_AUTO_RETRY);
 		SSL_CTX_set_session_cache_mode(session->sslContext, SSL_SESS_CACHE_CLIENT);
 
 		// Create an SSL struct for the connection
 		session->sslHandle = SSL_new(session->sslContext);
-		if (session->sslHandle == NULL)
+		if (session->sslHandle == nullptr)
 			ERR_print_errors_fp(stderr);
 
 		// Connect the SSL struct to our connection
@@ -106,17 +107,17 @@ static void irc_connected(int sock, u_int32_t cond, void *data) {
 		while ((ret = SSL_connect(session->sslHandle)) == -1) {
 			fd_set fds;
 			int ssl_err;
-			struct pork_acct *acct = session->data;
+			struct pork_acct *acct = (struct pork_acct *)session->data;
 
 			FD_ZERO(&fds);
 			FD_SET(session->sock, &fds);
 
 			switch (ssl_err = SSL_get_error(session->sslHandle, ret)) {
 			case SSL_ERROR_WANT_READ:
-				select(session->sock + 1, &fds, NULL, NULL, NULL);
+				select(session->sock + 1, &fds, nullptr, nullptr, nullptr);
 				break;
 			case SSL_ERROR_WANT_WRITE:
-				select(session->sock + 1, NULL, &fds, NULL, NULL);
+				select(session->sock + 1, nullptr, &fds, nullptr, nullptr);
 				break;
 			default:
 				screen_err_msg("network error: %s: could not connect %d",
@@ -136,22 +137,22 @@ static void irc_connected(int sock, u_int32_t cond, void *data) {
 }
 
 static int irc_init(struct pork_acct *acct) {
-	irc_session_t *session = xcalloc(1, sizeof(*session));
+	irc_session_t *session = (irc_session_t *)xcalloc(1, sizeof(*session));
 	char *ircname;
 
 	ircname = getenv("IRCNAME");
-	if (ircname != NULL)
+	if (ircname != nullptr)
 		acct->profile = xstrdup(ircname);
 	else {
-		if (acct->profile == NULL)
+		if (acct->profile == nullptr)
 			acct->profile = xstrdup(DEFAULT_IRC_PROFILE);
 	}
 
 	session->outq = queue_new(0);
 	session->inq = queue_new(0);
 	session->sock = -1;
-	session->sslHandle = NULL;
-	session->sslContext = NULL;
+	session->sslHandle = nullptr;
+	session->sslContext = nullptr;
 
 	session->data = acct;
 	acct->data = session;
@@ -159,7 +160,7 @@ static int irc_init(struct pork_acct *acct) {
 }
 
 static int irc_free(struct pork_acct *acct) {
-	irc_session_t *session = acct->data;
+	irc_session_t *session = (irc_session_t *)acct->data;
 	u_int32_t i;
 
 	if (session->sslHandle) {
@@ -187,18 +188,18 @@ static int irc_free(struct pork_acct *acct) {
 }
 
 static inline int irc_is_chan_type(irc_session_t *session, char c) {
-	return (strchr(session->chantypes, c) != NULL);
+	return (strchr(session->chantypes, c) != nullptr);
 }
 
 static inline int irc_is_chan_prefix(irc_session_t *session, char c) {
-	return (session->prefix_codes != NULL && strchr(session->prefix_codes, c) != NULL);
+	return (session->prefix_codes != nullptr && strchr(session->prefix_codes, c) != nullptr);
 }
 
 static int irc_update(struct pork_acct *acct) {
-	irc_session_t *session = acct->data;
+	irc_session_t *session = (irc_session_t *)acct->data;
 	time_t time_now;
 
-	if (session == NULL)
+	if (session == nullptr)
 		return (-1);
 
 	time(&time_now);
@@ -212,9 +213,9 @@ static int irc_update(struct pork_acct *acct) {
 
 static u_int32_t irc_add_servers(struct pork_acct *acct, char *str) {
 	char *server;
-	irc_session_t *session = acct->data;
+	irc_session_t *session = (irc_session_t *)acct->data;
 
-	while ((server = strsep(&str, " ")) != NULL &&
+	while ((server = strsep(&str, " ")) != nullptr &&
 			session->num_servers < array_elem(session->servers))
 	{
 		session->servers[session->num_servers++] = xstrdup(server);
@@ -224,7 +225,7 @@ static u_int32_t irc_add_servers(struct pork_acct *acct, char *str) {
 }
 
 static int irc_do_connect(struct pork_acct *acct, char *args) {
-	irc_session_t *session = acct->data;
+    irc_session_t *session = (irc_session_t *)acct->data;
 	int sock;
 	int ret;
 
@@ -251,7 +252,7 @@ static int irc_do_connect(struct pork_acct *acct, char *args) {
 }
 
 static int irc_connect_abort(struct pork_acct *acct) {
-	irc_session_t *session = acct->data;
+    irc_session_t *session = (irc_session_t *)acct->data;
 
 	close(session->sock);
 	pork_io_del(session);
@@ -261,7 +262,7 @@ static int irc_connect_abort(struct pork_acct *acct) {
 static int irc_reconnect(struct pork_acct *acct, char *args __notused) {
 	int sock;
 	int ret;
-	irc_session_t *session = acct->data;
+    irc_session_t *session = (irc_session_t *)acct->data;
 	u_int32_t server_num;
 
 	server_num = (acct->reconnect_tries - 1) % session->num_servers;
@@ -287,18 +288,21 @@ static int irc_privmsg(struct pork_acct *acct, char *dest, char *msg) {
 
 	/* XXX - fix this */
 	p = strchr(dest, ',');
-	if (p != NULL)
+	if (p != nullptr)
 		*p = '\0';
 
-	return (irc_send_privmsg(acct->data, dest, msg));
+    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
+	return (irc_send_privmsg(session, dest, msg));
 }
 
 static int irc_mode(struct pork_acct *acct, char *str) {
-	return (irc_send_mode(acct->data, str));
+    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
+    return (irc_send_mode(session, str));
 }
 
 static int irc_ctcp(struct pork_acct *acct, char *dest, char *msg) {
-	return (irc_send_ctcp(acct->data, dest, msg));
+    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
+    return (irc_send_ctcp(session, dest, msg));
 }
 
 static int irc_chan_send(struct pork_acct *acct,
@@ -306,39 +310,43 @@ static int irc_chan_send(struct pork_acct *acct,
 			const char *target,
 			char *msg)
 {
-	return (naken_send(acct->data, msg));
+    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
+
+    return (naken_send(session, msg));
 }
 
 static int chat_find_compare_cb(void *l, void *r) {
-	char *str = l;
-	struct chatroom *chat = r;
+	char *str = (char *)l;
+	struct chatroom *chat = (struct chatroom *)r;
 
 	return (strcasecmp(str, chat->title));
 }
 
 static struct chatroom *irc_find_chat(struct pork_acct *acct, char *chat) {
 	dlist_t *node;
-	irc_session_t *session = acct->data;
+    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
 
 	while (irc_is_chan_prefix(session, *chat))
 		chat++;
 
-	if (session->chantypes != NULL && !irc_is_chan_type(session, *chat))
-		return (NULL);
+	if (session->chantypes != nullptr && !irc_is_chan_type(session, *chat))
+		return (nullptr);
 
 	node = dlist_find(acct->chat_list, chat, chat_find_compare_cb);
-	if (node == NULL)
-		return (NULL);
+	if (node == nullptr)
+		return (nullptr);
 
-	return (node->data);
+	return (struct chatroom *)(node->data);
 }
 
 static int
 naken_whois(struct pork_acct *acct, char *dest) {
 	char *p;
 
-	while ((p = strsep(&dest, ",")) != NULL)
-		irc_send_whois(acct->data, p);
+	while ((p = strsep(&dest, ",")) != NULL) {
+        irc_session_t *session = static_cast<irc_session_t *>(acct->data);
+        irc_send_whois(session, p);
+    }
 
 	return (0);
 }
@@ -346,8 +354,10 @@ naken_whois(struct pork_acct *acct, char *dest) {
 static int irc_whowas(struct pork_acct *acct, char *dest) {
 	char *p;
 
-	while ((p = strsep(&dest, ",")) != NULL)
-		irc_send_whowas(acct->data, p);
+	while ((p = strsep(&dest, ",")) != NULL) {
+        irc_session_t *session = static_cast<irc_session_t *>(acct->data);
+        irc_send_whowas(session, p);
+    }
 
 	return (0);
 }
@@ -366,31 +376,20 @@ static int irc_chan_get_name(	const char *str,
 	}
 
 	p = strchr(buf, ',');
-	if (p != NULL)
+	if (p != nullptr)
 		*p = '\0';
 
 	p = strchr(buf, ' ');
-	if (p != NULL)
+	if (p != nullptr)
 		*p++ = '\0';
 
-	if (p != NULL) {
+	if (p != nullptr) {
 		if (xstrncpy(arg_buf, p, arg_len) == -1)
 			return (-1);
 	} else
 		arg_buf[0] = '\0';
 
 	return (0);
-}
-
-static int irc_chan_kick(	struct pork_acct *acct,
-							struct chatroom *chat,
-							char *user,
-							char *reason)
-{
-	if (reason == NULL)
-		reason = "No reason given";
-
-	return (irc_send_kick(acct->data, chat->title, user, reason));
 }
 
 static int irc_chan_ban(	struct pork_acct *acct,
@@ -402,7 +401,7 @@ static int irc_chan_ban(	struct pork_acct *acct,
 	int ret = -1;
 
 	chat_user = chat_find_user(acct, chat, user);
-	if (chat_user != NULL && chat_user->host != NULL) {
+	if (chat_user != nullptr && chat_user->host != nullptr) {
 		ret = snprintf(buf, sizeof(buf), "%s +b *!%s",
 				chat->title, chat_user->host);
 	} else
@@ -411,7 +410,8 @@ static int irc_chan_ban(	struct pork_acct *acct,
 	if (ret < 0 || (size_t) ret >= sizeof(buf))
 		return (-1);
 
-	return (irc_send_mode(acct->data, buf));
+    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
+	return (irc_send_mode(session, buf));
 }
 
 static int irc_chan_notice(	struct pork_acct *acct,
@@ -419,20 +419,25 @@ static int irc_chan_notice(	struct pork_acct *acct,
 							char *target,
 							char *msg)
 {
-	return (irc_send_notice(acct->data, target, msg));
+    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
+	return (irc_send_notice(session, target, msg));
 }
 
 static int irc_notice(struct pork_acct *acct, char *dest, char *msg) {
-	return (irc_send_notice(acct->data, dest, msg));
+    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
+	return (irc_send_notice(session, dest, msg));
 }
 
 static int irc_ping(struct pork_acct *acct, char *str) {
-	return (irc_send_ping(acct->data, str));
+    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
+	return (irc_send_ping(session, str));
 }
 
 static int irc_quit(struct pork_acct *acct, const char *reason) {
-	if (acct->connected)
-		return (irc_send_quit(acct->data, reason));
+	if (acct->connected) {
+        irc_session_t *session = static_cast<irc_session_t *>(acct->data);
+        return (irc_send_quit(session, reason));
+    }
 
 	return (-1);
 }
@@ -440,7 +445,7 @@ static int irc_quit(struct pork_acct *acct, const char *reason) {
 static int irc_quote(struct pork_acct *acct, char *str) {
 	char *p = str;
 
-	if (str == NULL)
+	if (str == nullptr)
 		return (-1);
 
 	while (*p == ' ')
@@ -451,11 +456,13 @@ static int irc_quote(struct pork_acct *acct, char *str) {
 		return (-1);
 	}
 
-	return (irc_send_raw(acct->data, str));
+    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
+	return (irc_send_raw(session, str));
 }
 
 static int irc_action(struct pork_acct *acct, char *dest, char *msg) {
-	return (irc_send_action(acct->data, dest, msg));
+    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
+	return (irc_send_action(session, dest, msg));
 }
 
 static int irc_chan_action(	struct pork_acct *acct,
@@ -463,22 +470,26 @@ static int irc_chan_action(	struct pork_acct *acct,
 							char *target,
 							char *msg)
 {
-	return (irc_send_action(acct->data, target, msg));
+    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
+	return (irc_send_action(session, target, msg));
 }
 
 static int irc_away(struct pork_acct *acct, char *msg) {
-	return (irc_set_away(acct->data, msg));
+    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
+	return (irc_set_away(session, msg));
 }
 
 static int irc_back(struct pork_acct *acct) {
-	return (naken_set_back(acct->data, NULL));
+    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
+	return (naken_set_back(session, NULL));
 }
 
 static int irc_topic(	struct pork_acct *acct,
 						struct chatroom *chat,
 						char *topic)
 {
-	return (irc_send_topic(acct->data, chat->title, topic));
+    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
+	return (irc_send_topic(session, chat->title, topic));
 }
 
 static int irc_invite(	struct pork_acct *acct,
@@ -486,7 +497,8 @@ static int irc_invite(	struct pork_acct *acct,
 						char *user,
 						char *msg __notused)
 {
-	return (irc_send_invite(acct->data, chat->title, user));
+    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
+	return (irc_send_invite(session, chat->title, user));
 }
 
 char *irc_text_filter(char *str) {
@@ -504,7 +516,7 @@ char *irc_text_filter(char *str) {
 		return (xstrdup(""));
 
 	len = strlen(str) + 1024;
-	ret = xmalloc(len);
+	ret = (char *)xmalloc(len);
 
 	len--;
 	for (i = 0 ; i < len && *str != '\0' ;) {
@@ -610,7 +622,7 @@ char *irc_text_filter(char *str) {
 				else
 					str++;
 
-				fgcol = strtol(colbuf, NULL, 10) % 16;
+				fgcol = strtol(colbuf, nullptr, 10) % 16;
 
 				if (*str == ',') {
 					memcpy(colbuf, &str[1], 2);
@@ -622,7 +634,7 @@ char *irc_text_filter(char *str) {
 						else
 							str += 2;
 
-						bgcol = strtol(colbuf, NULL, 10) % 16;
+						bgcol = strtol(colbuf, nullptr, 10) % 16;
 					}
 				}
 
@@ -656,12 +668,12 @@ char *irc_text_filter(char *str) {
 					goto add;
 
 				end = strchr(&str[2], 'm');
-				if (end == NULL)
+				if (end == nullptr)
 					goto add;
 				*end++ = '\0';
 
 				str += 2;
-				while ((p = strsep(&str, ";")) != NULL) {
+				while ((p = strsep(&str, ";")) != nullptr) {
 					char *n;
 					int num;
 
@@ -769,12 +781,11 @@ int irc_chan_free(struct pork_acct *acct, void *data) {
 int irc_proto_init(struct pork_proto *proto) {
 	proto->chat_action = irc_chan_action;
 	proto->chat_join = irc_join;
-	proto->chat_rejoin = NULL;
+	proto->chat_rejoin = nullptr;
 	proto->chat_send = irc_chan_send;
 	proto->chat_find = irc_find_chat;
 	proto->chat_name = irc_chan_get_name;
-	proto->chat_leave = NULL;
-	proto->chat_kick = irc_chan_kick;
+	proto->chat_leave = nullptr;
 	proto->chat_ban = irc_chan_ban;
 	proto->chat_free = irc_chan_free;
 	proto->chat_send_notice = irc_chan_notice;
@@ -797,7 +808,7 @@ int irc_proto_init(struct pork_proto *proto) {
 	proto->send_msg = irc_privmsg;
 	proto->update = irc_update;
 	proto->user_compare = strcasecmp;
-	proto->change_nick = NULL;
+	proto->change_nick = nullptr;
 	proto->filter_text = irc_text_filter;
 	proto->filter_text_out = irc_text_filter;
 	proto->set_away = irc_away;

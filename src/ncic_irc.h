@@ -11,6 +11,10 @@
 #ifndef __NCIC_IRC_H__
 #define __NCIC_IRC_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define IRC_OUT_BUFLEN		2048
 #define IRC_IN_BUFLEN		8192
 
@@ -135,5 +139,9 @@ char *irc_get_chanmode_arg(struct irc_chan_data *chat, char mode);
 int irc_chanmode_has_arg(irc_session_t *session, char mode);
 int naken_input_dispatch(irc_session_t *session);
 char *irc_text_filter(char *str);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __NCIC_IRC_H__ */
