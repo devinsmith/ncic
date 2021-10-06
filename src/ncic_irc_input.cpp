@@ -10,10 +10,10 @@
 
 #include <unistd.h>
 #include <ncurses.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <cerrno>
 
 #include "ncic.h"
 #include "ncic_util.h"
@@ -37,7 +37,7 @@ static int naken_handler_nick(struct pork_acct *acct, struct naken_input *in,
 
 static int naken_process_input(irc_session_t *session, char *input, int len)
 {
-	struct pork_acct *acct = session->data;
+	struct pork_acct *acct = (struct pork_acct *)session->data;
 	struct naken_input *in;
 	char *tmp;
 	int number;
@@ -110,11 +110,11 @@ static int naken_process_input(irc_session_t *session, char *input, int len)
 
 static struct naken_input *naken_tokenize(irc_session_t *session, char *input)
 {
-	struct naken_input *in = xcalloc(1, sizeof(*in));
+	struct naken_input *in = (struct naken_input *)xcalloc(1, sizeof(*in));
 	char *sender;
 	char *message;
 	char *tmp;
-	struct pork_acct *acct = session->data;
+	struct pork_acct *acct = (struct pork_acct *)session->data;
 
 	in->orig = xstrdup(input);
 
@@ -152,12 +152,12 @@ static struct naken_input *naken_tokenize(irc_session_t *session, char *input)
 	/* Now we will get the sender, the number, and the message, using
 	 * strchr and strstr processing. */
 	message = strchr(input, ':');
-	if (message != NULL) {
+	if (message != nullptr) {
 		*message = '\0';
 		message += 2; /* Go past the NULL and the space */
 	} else {
 		in->msg_type = MSG_SYSTEM_NORMAL;
-		in->message = NULL;
+		in->message = nullptr;
 		return (in);
 	}
 	sender = input;
@@ -170,10 +170,10 @@ static struct naken_input *naken_tokenize(irc_session_t *session, char *input)
 		tmp = strchr(tmp + 1, '#');
 	} else {
 		tmp = strchr(sender, ']');
-		if (tmp != NULL) {
+		if (tmp != nullptr) {
 			in->msg_type = MSG_NORMAL;
 		} else {
-			in->message = NULL;
+			in->message = nullptr;
 			return (in);
 		}
 	}
@@ -223,7 +223,7 @@ int naken_input_dispatch(irc_session_t *session)
   size_t j;
   char *p;
   char *cur;
-  struct pork_acct *acct = session->data;
+  struct pork_acct *acct = (struct pork_acct *)session->data;
   char input[2048];
 
   nbytes = irc_read_data(session,
@@ -270,7 +270,7 @@ int naken_input_dispatch(irc_session_t *session)
 static int
 naken_handler_nick(struct pork_acct *acct, struct naken_input *in, char *old_name)
 {
-	if (in->args == NULL) {
+	if (in->args == nullptr) {
 		debug("invalid input from server: %s", in->orig);
 		return (-1);
 	}

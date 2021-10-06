@@ -17,7 +17,7 @@ set(SOURCES ncic.cpp ncic_acct.cpp ncic_alias.cpp ncic_bind.cpp
        ncic_list.c ncic_misc.c ncic_msg.c ncic_opt.c ncic_proto.c
        ncic_queue.c ncic_screen.c ncic_screen_io.c ncic_set.c ncic_slist2.c
        ncic_status.c ncic_swindow.c ncic_timer.c ncic_util.c
-       ncic_irc.cpp ncic_irc_input.c ncic_irc_output.c
+       ncic_irc.cpp ncic_irc_input.cpp ncic_irc_output.c
        ncic_naken.c
 )
 
