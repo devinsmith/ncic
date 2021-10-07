@@ -164,16 +164,16 @@ typedef union {
 } pref_val_t;
 
 struct global_pref {
-	char *name;
+	const char *name;
 	uint32_t type:31;
 	uint32_t dynamic:1;
 	int (*set)(uint32_t, char *);
-	void (*updated)(void);
+	void (*updated)();
 	pref_val_t val;
 };
 
 struct window_var {
-	char *name;
+	const char *name;
 	uint32_t type;
 	int (*set)(struct imwindow *, uint32_t, char *);
 	void (*updated)(struct imwindow *);

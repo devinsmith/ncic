@@ -15,11 +15,11 @@
 
 #include <unistd.h>
 #include <ncurses.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 #include <fcntl.h>
-#include <errno.h>
+#include <cerrno>
 #include <regex.h>
 #include <sys/uio.h>
 
@@ -189,7 +189,7 @@ void swindow_prune(struct swindow *swindow) {
 	serial_bot = ((struct imsg *) swindow->scrollbuf_bot->data)->serial;
 
 	while (cur != NULL && num > 0) {
-		struct imsg *imsg = cur->data;
+		struct imsg *imsg = (struct imsg *)cur->data;
 		dlist_t *next = cur->prev;
 
 		/* Don't prune anything that's still on the screen */
@@ -218,7 +218,7 @@ static void swindow_adjust_top(struct swindow *swindow, uint32_t n) {
 	dlist_t *cur = swindow->scrollbuf_top;
 
 	while (1) {
-		struct imsg *imsg = cur->data;
+		struct imsg *imsg = (struct imsg *)cur->data;
 		uint32_t visible_lines = imsg->lines;
 
 		if (swindow->top_hidden != 0) {
@@ -260,16 +260,16 @@ static void swindow_recalculate(struct swindow *swindow,
 	struct imsg *imsg_top;
 	uint32_t old_top;
 
-	if (swindow->scrollbuf_top == NULL) {
+	if (swindow->scrollbuf_top == nullptr) {
 		swindow->bottom_blank = swindow->rows;
 		return;
 	}
 
-	imsg_top = swindow->scrollbuf_top->data;
+	imsg_top = (struct imsg *)swindow->scrollbuf_top->data;
 	old_top = imsg_top->lines;
 
 	while (cur != NULL) {
-		struct imsg *imsg = cur->data;
+		struct imsg *imsg = (struct imsg *)cur->data;
 
 		imsg->lines = imsg_lines(swindow, imsg);
 		total_lines += imsg->lines;
@@ -345,7 +345,7 @@ void swindow_redraw(struct swindow *swindow) {
 	dlist_t *cur = swindow->scrollbuf_top;
 	uint32_t curs_pos = 0;
 
-	if (cur == NULL)
+	if (cur == nullptr)
 		return;
 	/*
 	** If part of the top message is scrolled off
@@ -353,7 +353,7 @@ void swindow_redraw(struct swindow *swindow) {
 	** the pointer to the next message.
 	*/
 	if (swindow->top_hidden != 0) {
-		struct imsg *imsg = cur->data;
+		struct imsg *imsg = (struct imsg *)cur->data;
 
 		curs_pos += imsg->lines - swindow->top_hidden;
 		if (curs_pos > swindow->rows) {
@@ -368,8 +368,8 @@ void swindow_redraw(struct swindow *swindow) {
 		cur = cur->prev;
 	}
 
-	while (cur != NULL && curs_pos < swindow->rows) {
-		struct imsg *imsg = cur->data;
+	while (cur != nullptr && curs_pos < swindow->rows) {
+		struct imsg *imsg = (struct imsg *)cur->data;
 
 		if (curs_pos + imsg->lines > swindow->rows) {
 			swindow->scrollbuf_bot = cur;
@@ -433,7 +433,7 @@ int swindow_add(struct swindow *swindow, struct imsg *imsg, uint32_t msgtype) {
 		plaintext = cstr_to_plaintext(imsg->text, imsg->len);
 		wvec[0].iov_base = plaintext;
 		wvec[0].iov_len = imsg->len;
-		wvec[1].iov_base = "\n";
+		wvec[1].iov_base = (void *)"\n";
 		wvec[1].iov_len = 1;
 
 		if (writev(swindow->log_fd, wvec, 2) != (int) imsg->len + 1) {
@@ -453,7 +453,7 @@ int swindow_add(struct swindow *swindow, struct imsg *imsg, uint32_t msgtype) {
 	** to it for use with the scrolling routines.
 	*/
 
-	if (old_head == NULL) {
+	if (old_head == nullptr) {
 		swindow->scrollbuf_end = swindow->scrollbuf;
 		swindow->scrollbuf_top = swindow->scrollbuf;
 	}
@@ -521,7 +521,7 @@ int swindow_add(struct swindow *swindow, struct imsg *imsg, uint32_t msgtype) {
 }
 
 /* Called when a message sent by a user is written to a window. */
-inline int swindow_input(struct swindow *swindow) {
+int swindow_input(struct swindow *swindow) {
 	/*
 	** If the window is scrolled up, and the scroll on
 	** input flag is set, scroll to the bottom of the
@@ -546,7 +546,7 @@ void swindow_scroll_to_end(struct swindow *swindow) {
 	dlist_t *cur;
 	uint32_t lines = 0;
 
-	if (swindow->scrollbuf == NULL)
+	if (swindow->scrollbuf == nullptr)
 		return;
 
 	/* Avoid a redraw if it's already at the bottom */
@@ -558,7 +558,7 @@ void swindow_scroll_to_end(struct swindow *swindow) {
 
 	cur = swindow->scrollbuf;
 	do {
-		struct imsg *imsg = cur->data;
+		struct imsg *imsg = (struct imsg *)cur->data;
 
 		lines += imsg->lines;
 		if (lines >= swindow->rows) {
@@ -567,7 +567,7 @@ void swindow_scroll_to_end(struct swindow *swindow) {
 			break;
 		}
 
-		if (cur->next == NULL) {
+		if (cur->next == nullptr) {
 			swindow->scrollbuf_top = cur;
 			swindow->top_hidden = 0;
 			break;
@@ -585,7 +585,7 @@ void swindow_scroll_to_end(struct swindow *swindow) {
 */
 
 void swindow_scroll_to_start(struct swindow *swindow) {
-	if (swindow->scrollbuf == NULL)
+	if (swindow->scrollbuf == nullptr)
 		return;
 
 	/* Avoid a redraw if it's already at the top */
@@ -612,18 +612,18 @@ static uint32_t swindow_scroll_down_by(struct swindow *swindow, uint32_t lines) 
 	for (i = 0 ; i < lines ; i++) {
 		struct imsg *imsg;
 
-		if (swindow->scrollbuf_bot->prev == NULL &&
+		if (swindow->scrollbuf_bot->prev == nullptr &&
 			swindow->bottom_hidden == 0)
 		{
 			swindow->held = 0;
 			break;
 		}
 
-		imsg = swindow->scrollbuf_top->data;
+		imsg = (struct imsg *)swindow->scrollbuf_top->data;
 
 		if (++swindow->top_hidden == imsg->lines) {
 			swindow->top_hidden = 0;
-			if (swindow->scrollbuf_top->prev == NULL)
+			if (swindow->scrollbuf_top->prev == nullptr)
 				return (1);
 			swindow->scrollbuf_top = swindow->scrollbuf_top->prev;
 		}
@@ -632,7 +632,7 @@ static uint32_t swindow_scroll_down_by(struct swindow *swindow, uint32_t lines) 
 			swindow->bottom_hidden--;
 		else {
 			swindow->scrollbuf_bot = swindow->scrollbuf_bot->prev;
-			imsg = swindow->scrollbuf_bot->data;
+			imsg = (struct imsg *)swindow->scrollbuf_bot->data;
 			swindow->bottom_hidden = imsg->lines - 1;
 		}
 	}
@@ -643,7 +643,7 @@ static uint32_t swindow_scroll_down_by(struct swindow *swindow, uint32_t lines) 
 static uint32_t swindow_scroll_up_by(struct swindow *swindow, uint32_t lines) {
 	dlist_t *cur;
 
-	if (swindow->top_hidden == 0 && swindow->scrollbuf_top->next == NULL)
+	if (swindow->top_hidden == 0 && swindow->scrollbuf_top->next == nullptr)
 		return (0);
 
 	if (swindow->top_hidden >= lines) {
@@ -655,8 +655,8 @@ static uint32_t swindow_scroll_up_by(struct swindow *swindow, uint32_t lines) {
 	swindow->top_hidden = 0;
 
 	cur = swindow->scrollbuf_top->next;
-	while (lines > 0 && cur != NULL) {
-		struct imsg *msg = cur->data;
+	while (lines > 0 && cur != nullptr) {
+		struct imsg *msg = (struct imsg *)cur->data;
 
 		if (msg->lines >= lines) {
 			swindow->scrollbuf_top = cur;
@@ -712,9 +712,9 @@ int swindow_print_matching(	struct swindow *swindow,
 	int cflags = REG_EXTENDED;
 	regex_t preg;
 	dlist_t *cur;
-	dlist_t *match_list = NULL;
+	dlist_t *match_list = nullptr;
 
-	if (regex == NULL)
+	if (regex == nullptr)
 		return (-1);
 
 	if (options & SWINDOW_FIND_ICASE)
@@ -726,13 +726,13 @@ int swindow_print_matching(	struct swindow *swindow,
 	if (regcomp(&preg, regex, cflags) != 0)
 		return (-1);
 
-	for (cur = swindow->scrollbuf ; cur != NULL ; cur = cur->next) {
-		struct imsg *imsg = cur->data;
+	for (cur = swindow->scrollbuf ; cur != nullptr ; cur = cur->next) {
+		struct imsg *imsg = (struct imsg *)cur->data;
 		char *buf;
 
 		buf = cstr_to_plaintext(imsg->text, imsg->len);
-		if (buf != NULL) {
-			if (regexec(&preg, buf, 0, NULL, 0) == 0)
+		if (buf != nullptr) {
+			if (regexec(&preg, buf, 0, nullptr, 0) == 0)
 				match_list = dlist_add_head(match_list, imsg);
 			free(buf);
 		}
@@ -747,10 +747,10 @@ int swindow_print_matching(	struct swindow *swindow,
 	** with swindow_prune() could occur.
 	*/
 	cur = match_list;
-	while (cur != NULL) {
+	while (cur != nullptr) {
 		dlist_t *next = cur->next;
 
-		swindow_add(swindow, imsg_copy(swindow, cur->data), MSG_TYPE_LASTLOG);
+		swindow_add(swindow, imsg_copy(swindow, (struct imsg *)cur->data), MSG_TYPE_LASTLOG);
 		free(cur);
 		cur = next;
 	}
@@ -762,11 +762,11 @@ int swindow_print_matching(	struct swindow *swindow,
 ** Turn timestamping on or off, depending on the value of "value"
 */
 
-inline void swindow_set_timestamp(struct swindow *swindow, uint32_t value) {
+void swindow_set_timestamp(struct swindow *swindow, uint32_t value) {
 	swindow->timestamp = value;
 }
 
-inline void swindow_set_wordwrap(struct swindow *swindow, uint32_t value) {
+void swindow_set_wordwrap(struct swindow *swindow, uint32_t value) {
 	/*
 	** Allow for updating after the continued char changed but the
 	** wordwrap enabled setting didn't.
@@ -786,18 +786,18 @@ int swindow_dump_buffer(struct swindow *swindow, char *file) {
 	dlist_t *cur;
 	struct iovec wvec[2];
 
-	if (swindow->scrollbuf_end == NULL)
+	if (swindow->scrollbuf_end == nullptr)
 		return (-1);
 
 	fd = open(file, O_WRONLY | O_CREAT | O_APPEND, 0600);
 	if (fd == -1)
 		return (-1);
 
-	wvec[1].iov_base = "\n";
+	wvec[1].iov_base = (void *)"\n";
 	wvec[1].iov_len = 1;
 
-	for (cur = swindow->scrollbuf_end ; cur != NULL ; cur = cur->prev) {
-		struct imsg *imsg = cur->data;
+	for (cur = swindow->scrollbuf_end ; cur != nullptr ; cur = cur->prev) {
+		struct imsg *imsg = (struct imsg *)cur->data;
 
 		wvec[0].iov_base = cstr_to_plaintext(imsg->text, imsg->len);
 		wvec[0].iov_len = imsg->len;
@@ -844,7 +844,7 @@ int swindow_set_log(struct swindow *swindow) {
 	char timebuf[128];
 	uint32_t len;
 
-	if (swindow->logfile == NULL) {
+	if (swindow->logfile == nullptr) {
 		screen_err_msg("No logfile has been specified for this window");
 		return (-1);
 	}
@@ -857,7 +857,7 @@ int swindow_set_log(struct swindow *swindow) {
 		return (-1);
 	}
 
-	cur_time = time(NULL);
+	cur_time = time(nullptr);
 	tm = localtime(&cur_time);
 
 	len = strftime(timebuf, sizeof(timebuf),
@@ -883,7 +883,7 @@ void swindow_end_log(struct swindow *swindow) {
 	if (swindow->log_fd == -1)
 		return;
 
-	cur_time = time(NULL);
+	cur_time = time(nullptr);
 	tm = localtime(&cur_time);
 
 	len = strftime(timebuf, sizeof(timebuf),
@@ -905,10 +905,10 @@ void swindow_end_log(struct swindow *swindow) {
 void swindow_clear(struct swindow *swindow) {
 	struct imsg *imsg;
 
-	if (swindow->scrollbuf == NULL)
+	if (swindow->scrollbuf == nullptr)
 		return;
 
-	imsg = swindow->scrollbuf->data;
+	imsg = (struct imsg *)swindow->scrollbuf->data;
 
 	swindow->scrollbuf_top = swindow->scrollbuf;
 	swindow->scrollbuf_bot = swindow->scrollbuf;
@@ -926,7 +926,7 @@ void swindow_clear(struct swindow *swindow) {
 */
 
 static void swindow_free(void *param __notused, void *data) {
-	struct imsg *imsg = data;
+	struct imsg *imsg = (struct imsg *)data;
 
 	free(imsg->text);
 	free(imsg);
@@ -938,12 +938,12 @@ static void swindow_free(void *param __notused, void *data) {
 */
 
 void swindow_erase(struct swindow *swindow) {
-	dlist_destroy(swindow->scrollbuf, NULL, swindow_free);
+	dlist_destroy(swindow->scrollbuf, nullptr, swindow_free);
 
-	swindow->scrollbuf = NULL;
-	swindow->scrollbuf_top = NULL;
-	swindow->scrollbuf_bot = NULL;
-	swindow->scrollbuf_end = NULL;
+	swindow->scrollbuf = nullptr;
+	swindow->scrollbuf_top = nullptr;
+	swindow->scrollbuf_bot = nullptr;
+	swindow->scrollbuf_end = nullptr;
 	swindow->top_hidden = 0;
 	swindow->bottom_hidden = 0;
 	swindow->scrollbuf_len = 0;
@@ -961,7 +961,7 @@ int swindow_destroy(struct swindow *swindow) {
 	if (swindow->logged)
 		swindow_end_log(swindow);
 
-	dlist_destroy(swindow->scrollbuf, NULL, swindow_free);
+	dlist_destroy(swindow->scrollbuf, nullptr, swindow_free);
 	delwin(swindow->win);
 
 	return (0);

@@ -16,8 +16,8 @@
 #include "config.h"
 
 #include <ncurses.h>
-#include <string.h>
-#include <stdarg.h>
+#include <cstring>
+#include <cstdarg>
 #include <sys/types.h>
 
 #include "ncic.h"
@@ -35,7 +35,7 @@
 #include "ncic_screen.h"
 #include "ncic_screen_io.h"
 
-inline void screen_doupdate(void) {
+void screen_doupdate(void) {
 	int cur_old = curs_set(0);
 
 	wmove(screen.status_bar, STATUS_ROWS - 1,
@@ -56,13 +56,13 @@ int screen_draw_input(void) {
 		len = input->width;
 		input_line = input_partial(input);
 
-		if (input_line == NULL)
+		if (input_line == nullptr)
 			return (0);
 
 		wmove(screen.status_bar, STATUS_ROWS - 1, 0);
 		wclrtoeol(screen.status_bar);
 
-		if (input_line == input->input_buf && input->prompt != NULL) {
+		if (input_line == input->input_buf && input->prompt != nullptr) {
 			wputnstr(screen.status_bar, input->prompt,
 				min(input->width, input->prompt_len));
 			len -= input->prompt_len;
@@ -87,7 +87,7 @@ int screen_draw_input(void) {
 	return (0);
 }
 
-inline int screen_set_quiet(int status) {
+int screen_set_quiet(int status) {
 	int ret = screen.quiet;
 
 	screen.quiet = status;
@@ -102,7 +102,7 @@ int screen_prompt_user(char *prompt, char *buf, size_t len) {
 	wmove(screen.status_bar, 1, 0);
 	wclrtoeol(screen.status_bar);
 
-	if (prompt != NULL)
+	if (prompt != nullptr)
 		waddstr(screen.status_bar, prompt);
 
 	wrefresh(screen.status_bar);
@@ -122,7 +122,7 @@ static void int_screen_win_msg(	struct imwindow *win,
 	size_t chlen = 0;
 	int (*cstr_conv)(chtype *, size_t, ...) = plaintext_to_cstr;
 	char tstxt[128];
-	char *banner_txt = "\0";
+	const char *banner_txt = "\0";
 	char *p;
 	int ret;
 
@@ -140,7 +140,7 @@ static void int_screen_win_msg(	struct imwindow *win,
 
 	if (opt & MSG_OPT_BANNER) {
 		banner_txt = opt_get_str(OPT_BANNER);
-		if (banner_txt == NULL)
+		if (banner_txt == nullptr)
 			banner_txt = "\0";
 		else
 			chlen += strlen(banner_txt);
@@ -153,7 +153,7 @@ static void int_screen_win_msg(	struct imwindow *win,
 	}
 
 	p = strchr(buf, '\n');
-	if (p != NULL) {
+	if (p != nullptr) {
 		*p++ = '\0';
 		chlen += ret - (p - buf);
 	} else
@@ -164,30 +164,30 @@ static void int_screen_win_msg(	struct imwindow *win,
 	** embedded tabs.
 	*/
 	chlen += 128;
-	ch = xmalloc(sizeof(chtype) * chlen);
+	ch = (chtype *)xmalloc(sizeof(chtype) * chlen);
 
 	chlen = cstr_conv(ch, chlen, tstxt, banner_txt, buf, NULL);
-	ch = xrealloc(ch, sizeof(chtype) * (chlen + 1));
+	ch = (chtype *)xrealloc(ch, sizeof(chtype) * (chlen + 1));
 	imwindow_add(win, imsg_new(&win->swindow, ch, chlen), msgtype);
 
-	while (p != NULL) {
+	while (p != nullptr) {
 		char *next;
 		size_t len;
 
 		next = strchr(p, '\n');
-		if (next != NULL) {
+		if (next != nullptr) {
 			*next++ = '\0';
 			len = next - p + 1;
 		} else
 			len = strlen(p);
 
 		len += 128;
-		ch = xmalloc(sizeof(chtype) * len);
+		ch = (chtype *)xmalloc(sizeof(chtype) * len);
 
 		/* XXX - this should be configurable */
 		len = cstr_conv(ch, len, " ", p, NULL);
 
-		ch = xrealloc(ch, sizeof(chtype) * (len + 1));
+		ch = (chtype *)xrealloc(ch, sizeof(chtype) * (len + 1));
 		imwindow_add(win, imsg_new(&win->swindow, ch, len), msgtype);
 
 		p = next;
@@ -199,41 +199,41 @@ void screen_print_str(struct imwindow *win, char *buf, size_t chlen, int type) {
 	chtype *ch;
 
 	p = strchr(buf, '\n');
-	if (p != NULL) {
+	if (p != nullptr) {
 		chlen = p - buf - 1;
 		*p++ = '\0';
 	}
 
 	chlen += 128;
 
-	ch = xmalloc(sizeof(chtype) * (chlen + 1));
+	ch = (chtype *)xmalloc(sizeof(chtype) * (chlen + 1));
 	chlen = plaintext_to_cstr(ch, chlen + 1, buf, NULL);
-	ch = xrealloc(ch, sizeof(chtype) * (chlen + 1));
+	ch = (chtype *)xrealloc(ch, sizeof(chtype) * (chlen + 1));
 	imwindow_add(win, imsg_new(&win->swindow, ch, chlen), type);
 
-	while (p != NULL) {
+	while (p != nullptr) {
 		chtype *ch;
 		char *next;
 		size_t len;
 
 		next = strchr(p, '\n');
-		if (next != NULL) {
+		if (next != nullptr) {
 			*next++ = '\0';
 			len = next - p + 1;
 		} else
 			len = strlen(p) + 1;
 
 		len += 128;
-		ch = xmalloc(sizeof(chtype) * len);
+		ch = (chtype *)xmalloc(sizeof(chtype) * len);
 		len = plaintext_to_cstr(ch, len, " ", p, NULL);
-		ch = xrealloc(ch, sizeof(chtype) * (len + 1));
+		ch = (chtype *)xrealloc(ch, sizeof(chtype) * (len + 1));
 		imwindow_add(win, imsg_new(&win->swindow, ch, len), type);
 
 		p = next;
 	}
 }
 
-inline void screen_win_msg(	struct imwindow *win,
+void screen_win_msg(	struct imwindow *win,
 							int ts,
 							int banner,
 							int color,

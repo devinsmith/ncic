@@ -14,10 +14,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <stdio.h>
-#include <string.h>
-
-#include "ncic_list.h"
+#include <cstdio>
+#include <cstring>
 
 #include "ncic_irc.h"
 #include "ncic_naken.h"

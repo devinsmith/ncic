@@ -8,19 +8,19 @@
 ** as published by the Free Software Foundation.
 */
 
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 #include "ncic_util.h"
 #include "ncic_proto.h"
 
 static struct pork_proto *proto_table[PROTO_MAX + 1];
 
-extern int irc_proto_init(struct pork_proto *proto);
+extern "C" int irc_proto_init(struct pork_proto *proto);
 
 struct pork_proto *proto_get(int protocol) {
 	if (protocol > PROTO_MAX || protocol < -1)
-		return (NULL);
+		return (nullptr);
 
 	return (proto_table[protocol + 1]);
 }
@@ -33,7 +33,7 @@ struct pork_proto *proto_get_name(const char *name) {
 			return (proto_table[i]);
 	}
 
-	return (NULL);
+	return (nullptr);
 }
 
 static int proto_new(	int protocol,
@@ -44,12 +44,12 @@ static int proto_new(	int protocol,
 	int ret;
 
 	if (protocol < -1 || protocol > PROTO_MAX ||
-		proto_table[protocol + 1] != NULL || init_func == NULL)
+		proto_table[protocol + 1] != nullptr || init_func == nullptr)
 	{
 		return (-1);
 	}
 
-	new_proto = xcalloc(1, sizeof(*new_proto));
+	new_proto = (struct pork_proto *)xcalloc(1, sizeof(*new_proto));
 	new_proto->protocol = protocol;
 	xstrncpy(new_proto->name, name, sizeof(new_proto->name));
 
@@ -66,7 +66,7 @@ static int proto_new(	int protocol,
 int proto_get_num(const char *name) {
 	size_t i;
 
-	for (i = 0 ; i <= PROTO_MAX && proto_table[i] != NULL ; i++) {
+	for (i = 0 ; i <= PROTO_MAX && proto_table[i] != nullptr ; i++) {
 		if (!strcasecmp(proto_table[i]->name, name))
 			return (proto_table[i]->protocol);
 	}

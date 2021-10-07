@@ -10,20 +10,15 @@
 
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/types.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <sys/socket.h>
 #include <netinet/in.h>
 
 #include "ncic_opt.h"
 
-#define OPTSTRING "vH:p:h"
-
-static u_int32_t flags;
-
-static void print_help_text(void);
+static void print_help_text();
 
 struct sockaddr_storage local_addr;
 in_port_t local_port;
@@ -51,11 +46,9 @@ int get_options(int argc, char *const argv[])
 	return (0);
 }
 
-static void print_help_text(void) {
+static void print_help_text() {
 	const char usage[] =
 "Usage: ncic [options]\n"
-"-H or --host <addr>    Use the local address specified for outgoing connections\n"
-"-p or --port <port>    Use the local port specified for the main connection\n"
 "-h or --help           Display this help text\n"
 "-v or --version        Display version information and exit\n";
 

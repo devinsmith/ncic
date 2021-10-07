@@ -8,14 +8,10 @@
 ** as published by the Free Software Foundation.
 */
 
-#include "config.h"
-
 #include <ncurses.h>
-#include <string.h>
+#include <cstring>
 
-#include "ncic.h"
 #include "ncic_util.h"
-#include "ncic_list.h"
 #include "ncic_misc.h"
 #include "ncic_set.h"
 #include "ncic_cstr.h"
@@ -30,7 +26,7 @@ int status_init(void) {
 	WINDOW *win;
 
 	win = newwin(STATUS_ROWS, screen.cols, screen.rows - STATUS_ROWS, 0);
-	if (win == NULL)
+	if (win == nullptr)
 		return (-1);
 
 	set_default_win_opts(win);

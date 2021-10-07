@@ -9,10 +9,9 @@
 */
 
 #include <ncurses.h>
-#include <ctype.h>
-#include <string.h>
-#include <time.h>
-#include <sys/time.h>
+#include <cctype>
+#include <cstring>
+#include <ctime>
 
 #include "ncic_util.h"
 #include "ncic_input.h"
@@ -47,7 +46,7 @@ int initialize_environment(void) {
 	WINDOW *win;
 
 	win = initscr();
-	if (win == NULL)
+	if (win == nullptr)
 		return (-1);
 
 	halfdelay(10);
@@ -106,14 +105,14 @@ int date_to_str(time_t timespec, char *buf, size_t len) {
 	char *p;
 
 	p = asctime(localtime(&timespec));
-	if (p == NULL)
+	if (p == nullptr)
 		return (-1);
 
 	if (xstrncpy(buf, p, len) == -1)
 		return (-1);
 
 	p = strchr(buf, '\n');
-	if (p != NULL)
+	if (p != nullptr)
 		*p = '\0';
 
 	return (0);
