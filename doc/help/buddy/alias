@@ -1,8 +1,0 @@
-SYNTAX: buddy alias <buddy> <alias>
-	Causes the specified user on the current account's buddy list to be called the specified alias everywhere the buddy's screen name is displayed.
-
-	The buddy for whom an alias is set must be on the current account's buddy list.
-
-PARAMETERS
-	<buddy>: The buddy for whom the alias will apply.
-	<alias>: The alias for the buddy.

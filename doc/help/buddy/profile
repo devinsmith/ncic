@@ -1,5 +1,0 @@
-SYNTAX: buddy profile <screen name>
-	Retrieves the profile and away message, if one is set for a specified screen name. It is analogous to the "get info" functionality in the Windows AIM client.
-
-PARAMETERS
-	<screen name>: The screen name whose profile information is to be retrieved.

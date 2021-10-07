@@ -1,5 +1,0 @@
-SYNTAX: blist width <new_width>
-	Changes the width of the buddy list window to the specified number of columns.
-
-PARAMETERS
-	<new_width>: The requested width in columns of the buddy list window.

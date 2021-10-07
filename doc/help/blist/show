@@ -1,2 +1,0 @@
-SYNTAX: blist show
-	Shows the buddy list in the current window. If the buddy list is already visible, no action is taken.

@@ -54,13 +54,6 @@ USER_COMMAND(cmd_whowas);
 USER_COMMAND(cmd_acct_save);
 USER_COMMAND(cmd_acct_set);
 
-USER_COMMAND(cmd_file);
-USER_COMMAND(cmd_file_cancel);
-USER_COMMAND(cmd_file_list);
-USER_COMMAND(cmd_file_get);
-USER_COMMAND(cmd_file_resume);
-USER_COMMAND(cmd_file_send);
-
 USER_COMMAND(cmd_win);
 USER_COMMAND(cmd_win_bind);
 USER_COMMAND(cmd_win_bind_next);

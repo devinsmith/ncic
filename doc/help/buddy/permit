@@ -1,8 +1,0 @@
-SYNTAX: buddy permit <screen name>
-	Adds a screen name to the current account's permitted users list. Note that for AIM, in order to activate the permitted users list, your privacy mode must be set to 3.
-
-PARAMETERS
-	<screen name>: The screen name to permit.
-
-SEE ALSO
-	buddy privacy_mode

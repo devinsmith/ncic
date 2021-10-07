@@ -1,5 +1,0 @@
-SYNTAX: buddy remove <screen name>
-	Removes a screen name from the current account's buddy list.
-
-PARAMETERS
-	<screen name>: The screen name that is to be removed.

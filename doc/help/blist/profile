@@ -1,2 +1,0 @@
-SYNTAX: blist profile
-	Request the profile and away message, if any, for the user the buddy list cursor is currently on. If the cursor is on a group entry, no action is taken.

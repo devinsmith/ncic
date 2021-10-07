@@ -1,5 +1,0 @@
-SYNTAX: buddy add_group <group name>
-	Adds a new group to the current account's buddy list.
-
-PARAMETERS
-	<group name>: The name of the group to add.

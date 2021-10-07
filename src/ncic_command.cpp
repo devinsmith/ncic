@@ -52,11 +52,8 @@ enum {
   CMDSET_HISTORY,
   CMDSET_INPUT,
   CMDSET_SCROLL,
-  CMDSET_BUDDY,
-  CMDSET_BLIST,
   CMDSET_TIMER,
   CMDSET_CHAT,
-  CMDSET_FILE,
   CMDSET_ACCT,
   CMDSET_PROTO,
 };
@@ -82,7 +79,6 @@ static struct command command[] = {
 	{ "ctcp",		cmd_ctcp			},
 	{ "disconnect", cmd_disconnect		},
 	{ "echo",		cmd_echo			},
-	{ "file",		cmd_file			},
 	{ "help",		cmd_help			},
 	{ "history",	cmd_history			},
 	{ "idle",		cmd_idle			},
@@ -1629,26 +1625,6 @@ USER_COMMAND(cmd_win) {
 		run_one_command(args, CMDSET_WIN);
 	else
 		run_one_command("list", CMDSET_WIN);
-}
-
-USER_COMMAND(cmd_file) {
-	if (!cur_window()->owner->can_connect)
-		return;
-
-	if (args != nullptr)
-		run_one_command(args, CMDSET_FILE);
-	else
-		run_one_command("list", CMDSET_FILE);
-}
-
-USER_COMMAND(cmd_buddy) {
-	if (!cur_window()->owner->connected)
-		return;
-
-	if (args != nullptr)
-		run_one_command(args, CMDSET_BUDDY);
-	else
-		run_one_command("list", CMDSET_BUDDY);
 }
 
 USER_COMMAND(cmd_input) {

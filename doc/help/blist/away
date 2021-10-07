@@ -1,2 +1,0 @@
-SYNTAX: blist away
-	Retrieves the away message and related information for the user that the buddy list's cursor is on. If the cursor is on a group, no action is taken.

@@ -1,5 +1,0 @@
-SYNTAX: buddy away <screen name>
-	Retrieves the away message, if one is set, for a specified screen name.
-
-PARAMETERS
-	<screen name>: The screen name whose away information is to be retrieved.

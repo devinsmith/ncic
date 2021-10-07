@@ -1,2 +1,0 @@
-SYNTAX: blist hide
-	Hides the buddy list in the current window. If it's already hidden, no action is taken.

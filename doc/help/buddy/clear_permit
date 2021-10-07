@@ -1,2 +1,0 @@
-SYNTAX: buddy clear_permit
-	Removes all entries from the current account's permitted users list.

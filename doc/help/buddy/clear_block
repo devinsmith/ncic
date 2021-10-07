@@ -1,2 +1,0 @@
-SYNTAX: buddy clear_block
-	Removes all entries from the current account's blocked users list.

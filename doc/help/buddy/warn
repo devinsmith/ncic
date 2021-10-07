@@ -1,5 +1,0 @@
-SYNTAX: buddy warn <screen name>
-	Warns a user.
-
-PARAMETERS
-	<screen name>: The screen name to warn.
