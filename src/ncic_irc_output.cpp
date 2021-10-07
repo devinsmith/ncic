@@ -28,6 +28,7 @@
 #include "ncic_screen_io.h"
 
 #include "ncic_irc.h"
+#include "ncic_naken.h"
 
 static int irc_send_server(irc_session_t *session, char *cmd, size_t len) {
 	return SSL_write (session->sslHandle, cmd, len);
@@ -39,7 +40,7 @@ int irc_send(irc_session_t *session, char *command, size_t len) {
 	int ret;
 
 	if (session->sock < 0) {
-		struct irc_cmd_q *cmd = xmalloc(sizeof(*cmd));
+		struct irc_cmd_q *cmd = (struct irc_cmd_q *)xmalloc(sizeof(*cmd));
 
 		cmd->cmd = xstrdup(command);
 		cmd->len = len;
@@ -67,7 +68,7 @@ int irc_flush_outq(irc_session_t *session) {
 	struct irc_cmd_q *cmd;
 	int ret = 0;
 
-	while ((cmd = queue_get(session->outq)) != NULL) {
+	while ((cmd = (struct irc_cmd_q *)queue_get((pork_queue_t *)session->outq)) != NULL) {
 		if (irc_send_server(session, cmd->cmd, cmd->len) > 0) {
 			ret++;
 			free(cmd->cmd);
@@ -155,7 +156,7 @@ int irc_send_raw(irc_session_t *session, char *str) {
 	size_t len;
 
 	len = strlen(str) + 3;
-	buf = xmalloc(len);
+	buf = (char *)xmalloc(len);
 	snprintf(buf, len, "%s\r\n", str);
 
 	ret = irc_send(session, buf, len - 1);
@@ -213,7 +214,7 @@ int irc_send_invite(irc_session_t *session, char *channel, char *user) {
 
 int irc_send_login(irc_session_t *session) {
 	char buf[IRC_OUT_BUFLEN];
-	struct pork_acct *acct = session->data;
+	struct pork_acct *acct = static_cast<struct pork_acct *>(session->data);
 	int ret;
 
 	ret = snprintf(buf, sizeof(buf), ".n%s\r\n", acct->username);
@@ -312,7 +313,7 @@ int irc_send_names(irc_session_t *session, char *chan) {
 int irc_send_whois(irc_session_t *session, char *dest) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
-	struct pork_acct *acct = session->data;
+	struct pork_acct *acct = static_cast<struct pork_acct *>(session->data);
 
 	if (dest == NULL)
 		dest = acct->username;
@@ -327,7 +328,7 @@ int irc_send_whois(irc_session_t *session, char *dest) {
 int irc_send_whowas(irc_session_t *session, char *dest) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
-	struct pork_acct *acct = session->data;
+	struct pork_acct *acct = static_cast<struct pork_acct *>(session->data);
 
 	if (dest == NULL)
 		dest = acct->username;
