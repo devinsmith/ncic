@@ -110,7 +110,7 @@ int bind_exec(struct key_binds *bind_set, int key) {
 ** Remove the binding for key "key" if it exists.
 */
 
-inline int bind_remove(struct key_binds *bind_set, int key) {
+int bind_remove(struct key_binds *bind_set, int key) {
 	int ret;
 
 	ret = hash_remove(&bind_set->hash,

@@ -33,7 +33,7 @@ static void alias_hash_remove(void *param __notused, void *data) {
 	free(alias);
 }
 
-inline int alias_remove(hash_t *alias_hash, char *alias) {
+int alias_remove(hash_t *alias_hash, char *alias) {
 	int ret;
 
 	ret = hash_remove(alias_hash, alias,
