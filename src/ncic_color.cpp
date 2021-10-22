@@ -24,16 +24,16 @@ static inline int color_get_highlighting(char code);
 */
 
 void color_init(void) {
-	int i;
-	int n = 1;
+	short i;
+	short n = 1;
 	int can_use_default;
 
 	start_color();
 	can_use_default = use_default_colors();
 
 	for (i = 0 ; i < 8 ; i++) {
-		int bgcolor = i;
-		int j;
+		short bgcolor = i;
+		short j;
 
 		if (bgcolor == COLOR_BLACK && can_use_default == OK)
 			bgcolor = -1;
