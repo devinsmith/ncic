@@ -31,7 +31,6 @@
 #include "ncic_alias.h"
 #include "ncic_chat.h"
 #include "ncic_conf.h"
-#include "ncic_timer.h"
 #include "ncic_msg.h"
 #include "ncic_command.h"
 #include "ncic_command_defs.h"
@@ -52,7 +51,6 @@ enum {
   CMDSET_HISTORY,
   CMDSET_INPUT,
   CMDSET_SCROLL,
-  CMDSET_TIMER,
   CMDSET_CHAT,
   CMDSET_ACCT,
   CMDSET_PROTO,
@@ -100,7 +98,6 @@ static struct command command[] = {
 	{ "save",		cmd_save			},
 	{ "scroll",		cmd_scroll			},
 	{ "set",		cmd_set				},
-	{ "timer",		cmd_timer			},
 	{ "unalias",	cmd_unalias			},
 	{ "unbind",		cmd_unbind			},
 	{ "whowas",		cmd_whowas			},
@@ -718,93 +715,6 @@ USER_COMMAND(cmd_buddy_warn_anon) {
 }
 
 /*
-** /timer commands
-*/
-
-static struct command timer_command[] = {
-	{ "add",			cmd_timer_add			},
-	{ "del",			cmd_timer_del			},
-	{ "del_refnum",		cmd_timer_del_refnum	},
-	{ "list",			cmd_timer_list			},
-	{ "purge",			cmd_timer_purge			},
-};
-
-USER_COMMAND(cmd_timer_add) {
-	char *p;
-	u_int32_t interval;
-	u_int32_t times;
-
-	if (args == nullptr)
-		return;
-
-	p = strsep(&args, " ");
-	if (p == nullptr)
-		return;
-
-	if (str_to_uint(p, &interval) != 0) {
-		screen_err_msg("Invalid timer interval: %s", p);
-		return;
-	}
-
-	p = strsep(&args, " ");
-	if (p == nullptr)
-		return;
-
-	if (str_to_uint(p, &times) != 0) {
-		screen_err_msg("Invalid number of times to run: %s", p);
-		return;
-	}
-
-	if (args == nullptr || blank_str(args))
-		return;
-
-	timer_add(&screen.timer_list, args, interval, times);
-}
-
-USER_COMMAND(cmd_timer_del) {
-	int ret;
-
-	if (args == nullptr)
-		return;
-
-	ret = timer_del(&screen.timer_list, args);
-	if (ret == -1)
-		screen_err_msg("No timer for \"%s\" was found", args);
-	else
-		screen_cmd_output("Timer for \"%s\" was removed", args);
-}
-
-USER_COMMAND(cmd_timer_del_refnum) {
-	u_int32_t refnum;
-	int ret;
-
-	if (args == nullptr)
-		return;
-
-	if (str_to_uint(args, &refnum) != 0) {
-		screen_err_msg("Bad timer refnum: %s", args);
-		return;
-	}
-
-	ret = timer_del_refnum(&screen.timer_list, refnum);
-	if (ret == -1)
-		screen_err_msg("No timer with refnum %u was found", refnum);
-	else
-		screen_cmd_output("Timer with refnum %u was removed", refnum);
-}
-
-USER_COMMAND(cmd_timer_list) {
-	dlist_iterate(screen.timer_list, print_timer, nullptr);
-}
-
-USER_COMMAND(cmd_timer_purge) {
-	if (screen.timer_list != nullptr) {
-		timer_destroy(&screen.timer_list);
-		screen_cmd_output("All timers have been removed");
-	}
-}
-
-/*
 ** acct commands
 */
 
@@ -1044,7 +954,6 @@ static struct command_set {
 	{	history_command,	array_elem(history_command),	"history "	},
 	{	input_command,		array_elem(input_command),		"input "	},
 	{	scroll_command,		array_elem(scroll_command),		"scroll "	},
-	{	timer_command,		array_elem(timer_command),		"timer "	},
 	{	chat_command,		array_elem(chat_command),		"chat "		},
 	{	acct_command,		array_elem(acct_command),		"acct "		},
 };
@@ -1644,13 +1553,6 @@ USER_COMMAND(cmd_scroll) {
 		run_one_command(args, CMDSET_SCROLL);
 }
 
-USER_COMMAND(cmd_timer) {
-	if (args != nullptr)
-		run_one_command(args, CMDSET_TIMER);
-	else
-		run_one_command("list", CMDSET_TIMER);
-}
-
 USER_COMMAND(cmd_set) {
 	char *variable;
 	char *value;
@@ -1779,13 +1681,6 @@ static int cmd_compare(const void *l, const void *r) {
 	struct command *cmd = (struct command *) r;
 
 	return (strcasecmp(key, cmd->name));
-}
-
-static void print_timer(void *data, void *nothing __notused) {
-	struct timer_entry *timer = static_cast<struct timer_entry *>(data);
-
-	screen_cmd_output("[refnum: %u] %d %u %s", timer->refnum,
-		(int) timer->interval, timer->times, timer->command);
 }
 
 USER_COMMAND(cmd_input_find_next_cmd) {

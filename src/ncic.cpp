@@ -45,7 +45,6 @@
 #include "ncic_conf.h"
 #include "ncic_color.h"
 #include "ncic_command.h"
-#include "ncic_timer.h"
 #include "ncic_io.h"
 #include "ncic_proto.h"
 
@@ -212,7 +211,6 @@ main(int argc, char *argv[])
 		time(&time_now);
 		if (timer_last_run < time_now) {
 			timer_last_run = time_now;
-			timer_run(&screen.timer_list);
 			pork_acct_reconnect_all();
 		}
 

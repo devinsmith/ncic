@@ -108,13 +108,6 @@ USER_COMMAND(cmd_history_list);
 USER_COMMAND(cmd_history_next);
 USER_COMMAND(cmd_history_prev);
 
-USER_COMMAND(cmd_timer);
-USER_COMMAND(cmd_timer_add);
-USER_COMMAND(cmd_timer_del);
-USER_COMMAND(cmd_timer_del_refnum);
-USER_COMMAND(cmd_timer_list);
-USER_COMMAND(cmd_timer_purge);
-
 USER_COMMAND(cmd_chat);
 USER_COMMAND(cmd_chat_ban);
 USER_COMMAND(cmd_chat_ignore);

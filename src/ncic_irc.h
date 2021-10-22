@@ -25,10 +25,6 @@ extern "C" {
 #include "ncic_acct.h"
 #include "ncic_queue.h"
 
-#define IRC_CHAN_OP			0x01
-#define IRC_CHAN_VOICE		0x02
-#define IRC_CHAN_HALFOP		0x04
-
 #include <openssl/rand.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
@@ -119,7 +115,6 @@ int irc_send_login(irc_session_t *session);
 int irc_send_privmsg(irc_session_t *session, char *dest, char *msg);
 int irc_send_mode(irc_session_t *session, char *mode_str);
 int irc_send_ctcp(irc_session_t *session, char *dest, char *msg);
-int irc_send_ctcp_reply(irc_session_t *session, char *dest, char *msg);
 int irc_send_names(irc_session_t *session, char *chan);
 int irc_send_who(irc_session_t *session, char *dest);
 int irc_send_whois(irc_session_t *session, char *dest);

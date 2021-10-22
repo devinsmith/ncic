@@ -92,20 +92,20 @@ int irc_connect(struct pork_acct *acct,
 	char *irchost = getenv("IRCHOST");
 	char *port;
 	char buf[IRC_OUT_BUFLEN];
-	char *passwd = NULL;
+	char *passwd = nullptr;
 
-	if (server == NULL || xstrncpy(buf, server, sizeof(buf)) == -1)
+	if (server == nullptr || xstrncpy(buf, server, sizeof(buf)) == -1)
 		return (-1);
 
 	memset(&ss, 0, sizeof(ss));
 	memset(&local, 0, sizeof(local));
 
 	port = strchr(buf, ':');
-	if (port != NULL) {
+	if (port != nullptr) {
 		*port++ = '\0';
 
 		passwd = strchr(port, ':');
-		if (passwd != NULL) {
+		if (passwd != nullptr) {
 			*passwd++ = '\0';
 		}
 	} else
@@ -125,7 +125,7 @@ int irc_connect(struct pork_acct *acct,
 		return (-1);
 	}
 
-	if (irchost != NULL) {
+	if (irchost != nullptr) {
 		if (get_addr(irchost, &local) != 0) {
 			screen_err_msg("Error: %s: Invalid local hostname: %s",
 				acct->username, irchost);
@@ -140,7 +140,7 @@ int irc_connect(struct pork_acct *acct,
 	free(acct->server);
 	acct->server = xstrdup(buf);
 
-	if (passwd != NULL && passwd[0] != '\0') {
+	if (passwd != nullptr && passwd[0] != '\0') {
 		free_str_wipe(acct->passwd);
 		acct->passwd = xstrdup(passwd);
 	}
@@ -190,7 +190,7 @@ int irc_set_away(irc_session_t *session, char *msg) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 
-	if (msg != NULL)
+	if (msg != nullptr)
 		ret = snprintf(buf, sizeof(buf), "%% is now away (%s)\r\n", msg);
 	else
 		ret = snprintf(buf, sizeof(buf), "%% is now away\r\n");
@@ -275,24 +275,13 @@ int irc_send_ping(irc_session_t *session, char *str) {
 	int ret;
 	struct timeval tv;
 
-	gettimeofday(&tv, NULL);
+	gettimeofday(&tv, nullptr);
 
 	ret = snprintf(buf, sizeof(buf), "PING %ld %ld", tv.tv_sec, tv.tv_usec);
 	if (ret < 0 || (size_t) ret >= sizeof(buf))
 		return (-1);
 
 	return (irc_send_ctcp(session, str, buf));
-}
-
-int irc_send_ctcp_reply(irc_session_t *session, char *dest, char *msg) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-
-	ret = snprintf(buf, sizeof(buf), "NOTICE %s :\x01%s\x01\r\n", dest, msg);
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
 }
 
 int irc_send_names(irc_session_t *session, char *chan) {

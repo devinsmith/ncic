@@ -15,7 +15,7 @@ set(SOURCES ncic.cpp ncic_acct.cpp ncic_alias.cpp ncic_bind.cpp
        ncic_imwindow.cpp ncic_inet.cpp ncic_input.cpp ncic_io.cpp
        ncic_list.cpp ncic_misc.cpp ncic_msg.cpp ncic_opt.cpp ncic_proto.cpp
        ncic_queue.cpp ncic_screen.cpp ncic_screen_io.cpp ncic_set.cpp
-       ncic_status.cpp ncic_swindow.cpp ncic_timer.cpp
+       ncic_status.cpp ncic_swindow.cpp
        ncic_util.cpp ncic_irc.cpp ncic_irc_input.cpp ncic_irc_output.cpp
        ncic_naken.cpp
 )
@@ -26,7 +26,7 @@ ncic_bind.h          ncic.h           ncic_misc.h    ncic_set.h
 ncic_help.h      ncic_msg.h
 ncic_chat.h          ncic_imsg.h      ncic_naken.h   ncic_status.h
 ncic_color.h         ncic_imwindow.h  ncic_opt.h     ncic_swindow.h
-ncic_command_defs.h  ncic_inet.h      ncic_proto.h   ncic_timer.h
+ncic_command_defs.h  ncic_inet.h      ncic_proto.h
 ncic_command.h       ncic_input.h     ncic_queue.h   ncic_util.h
 ncic_conf.h          ncic_io.h        ncic_screen.h
 )
