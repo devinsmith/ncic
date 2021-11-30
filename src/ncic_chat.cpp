@@ -389,7 +389,7 @@ int chat_nick_change(struct pork_acct *acct, char *old, char *new_nick) {
 
 			user->name = xstrdup(new_nick);
 
-			acct->proto->normalize(buf, new_nick, sizeof(buf));
+      xstrncpy(buf, new_nick, sizeof(buf));
 			user->nname = xstrdup(buf);
 		}
 

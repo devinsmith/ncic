@@ -319,7 +319,7 @@ static int format_status(char opt, char *buf, size_t len, va_list ap) {
 				else
 					ret = xstrncpy(buf, "disconnected", len);
 			} else if (acct->connected) {
-				if (acct->away_msg != NULL)
+				if (acct->away_msg != nullptr)
 					ret = xstrncpy(buf, "away", len);
 				else
 					ret = xstrncpy(buf, "online", len);

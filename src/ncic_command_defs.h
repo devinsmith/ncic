@@ -36,7 +36,6 @@ USER_COMMAND(cmd_mode);
 USER_COMMAND(cmd_msg);
 USER_COMMAND(cmd_nick);
 USER_COMMAND(cmd_notice);
-USER_COMMAND(cmd_profile);
 USER_COMMAND(cmd_query);
 USER_COMMAND(cmd_quit);
 USER_COMMAND(cmd_refresh);
@@ -45,7 +44,6 @@ USER_COMMAND(cmd_send);
 USER_COMMAND(cmd_set);
 USER_COMMAND(cmd_unbind);
 USER_COMMAND(cmd_unalias);
-USER_COMMAND(cmd_whowas);
 
 USER_COMMAND(cmd_acct_save);
 USER_COMMAND(cmd_acct_set);

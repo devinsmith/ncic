@@ -8,8 +8,6 @@
 ** as published by the Free Software Foundation.
 */
 
-#include "config.h"
-
 #include <unistd.h>
 #include <ncurses.h>
 #include <cstdio>
@@ -19,14 +17,10 @@
 #include <ctime>
 #include <sys/time.h>
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include <cerrno>
 
 #include "ncic.h"
 #include "ncic_util.h"
-#include "ncic_list.h"
 #include "ncic_queue.h"
 #include "ncic_inet.h"
 #include "ncic_acct.h"
@@ -187,14 +181,6 @@ static int irc_free(struct pork_acct *acct) {
 	return (0);
 }
 
-static inline int irc_is_chan_type(irc_session_t *session, char c) {
-	return (strchr(session->chantypes, c) != nullptr);
-}
-
-static inline int irc_is_chan_prefix(irc_session_t *session, char c) {
-	return (session->prefix_codes != nullptr && strchr(session->prefix_codes, c) != nullptr);
-}
-
 static int irc_update(struct pork_acct *acct) {
 	irc_session_t *session = (irc_session_t *)acct->data;
 	time_t time_now;
@@ -317,46 +303,6 @@ static int chat_find_compare_cb(void *l, void *r) {
 	return (strcasecmp(str, chat->title));
 }
 
-static struct chatroom *irc_find_chat(struct pork_acct *acct, char *chat) {
-	dlist_t *node;
-    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
-
-	while (irc_is_chan_prefix(session, *chat))
-		chat++;
-
-	if (session->chantypes != nullptr && !irc_is_chan_type(session, *chat))
-		return (nullptr);
-
-	node = dlist_find(acct->chat_list, chat, chat_find_compare_cb);
-	if (node == nullptr)
-		return (nullptr);
-
-	return (struct chatroom *)(node->data);
-}
-
-static int
-naken_whois(struct pork_acct *acct, char *dest) {
-	char *p;
-
-	while ((p = strsep(&dest, ",")) != NULL) {
-        irc_session_t *session = static_cast<irc_session_t *>(acct->data);
-        irc_send_whois(session, p);
-    }
-
-	return (0);
-}
-
-static int irc_whowas(struct pork_acct *acct, char *dest) {
-	char *p;
-
-	while ((p = strsep(&dest, ",")) != NULL) {
-        irc_session_t *session = static_cast<irc_session_t *>(acct->data);
-        irc_send_whowas(session, p);
-    }
-
-	return (0);
-}
-
 static int irc_chan_get_name(	const char *str,
 								char *buf,
 								size_t len,
@@ -387,28 +333,6 @@ static int irc_chan_get_name(	const char *str,
 	return (0);
 }
 
-static int irc_chan_ban(	struct pork_acct *acct,
-							struct chatroom *chat,
-							char *user)
-{
-	struct chat_user *chat_user;
-	char buf[1024];
-	int ret = -1;
-
-	chat_user = chat_find_user(acct, chat, user);
-	if (chat_user != nullptr && chat_user->host != nullptr) {
-		ret = snprintf(buf, sizeof(buf), "%s +b *!%s",
-				chat->title, chat_user->host);
-	} else
-		ret = snprintf(buf, sizeof(buf), "%s +b %s", chat->title, user);
-
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
-	return (irc_send_mode(session, buf));
-}
-
 static int irc_chan_notice(	struct pork_acct *acct,
 							struct chatroom *chat,
 							char *target,
@@ -421,11 +345,6 @@ static int irc_chan_notice(	struct pork_acct *acct,
 static int irc_notice(struct pork_acct *acct, char *dest, char *msg) {
     irc_session_t *session = static_cast<irc_session_t *>(acct->data);
 	return (irc_send_notice(session, dest, msg));
-}
-
-static int irc_ping(struct pork_acct *acct, char *str) {
-    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
-	return (irc_send_ping(session, str));
 }
 
 static int irc_quit(struct pork_acct *acct, const char *reason) {
@@ -458,15 +377,7 @@ static int irc_away(struct pork_acct *acct, char *msg) {
 
 static int irc_back(struct pork_acct *acct) {
     irc_session_t *session = static_cast<irc_session_t *>(acct->data);
-	return (naken_set_back(session, NULL));
-}
-
-static int irc_topic(	struct pork_acct *acct,
-						struct chatroom *chat,
-						char *topic)
-{
-    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
-	return (irc_send_topic(session, chat->title, topic));
+	return (naken_set_back(session, nullptr));
 }
 
 char *irc_text_filter(char *str) {
@@ -755,27 +666,21 @@ int irc_proto_init(struct pork_proto *proto) {
 	proto->chat_leave = nullptr;
 	proto->chat_free = irc_chan_free;
 	proto->chat_send_notice = irc_chan_notice;
-	proto->chat_set_topic = irc_topic;
 
 	proto->send_action = irc_action;
-	proto->get_profile = naken_whois;
 	proto->connect = irc_do_connect;
 	proto->connect_abort = irc_connect_abort;
 	proto->reconnect = irc_reconnect;
 	proto->free = irc_free;
 	proto->mode = irc_mode;
 	proto->init = irc_init;
-	proto->ping = irc_ping;
-	proto->whowas = irc_whowas;
 	proto->send_notice = irc_notice;
 	proto->signoff = irc_quit;
-	proto->normalize = xstrncpy;
 	proto->send_msg = irc_privmsg;
 	proto->update = irc_update;
 	proto->user_compare = strcasecmp;
 	proto->change_nick = nullptr;
 	proto->filter_text = irc_text_filter;
-	proto->filter_text_out = irc_text_filter;
 	proto->set_away = irc_away;
 	proto->set_back = irc_back;
 	proto->ctcp = irc_ctcp;

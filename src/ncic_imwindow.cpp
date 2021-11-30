@@ -47,7 +47,7 @@ struct imwindow *imwindow_new(	uint32_t rows,
 		return (nullptr);
 	}
 
-	owner->proto->normalize(nname, target, sizeof(nname));
+	xstrncpy(nname, target, sizeof(nname));
 
 	imwindow = (struct imwindow *)xcalloc(1, sizeof(*imwindow));
 	imwindow->refnum = refnum;
@@ -170,7 +170,7 @@ struct imwindow *imwindow_find(struct pork_acct *owner, const char *target) {
 	dlist_t *cur = list_start;
 	char nname[NUSER_LEN];
 
-	owner->proto->normalize(nname, target, sizeof(nname));
+	xstrncpy(nname, target, sizeof(nname));
 
 	do {
 		struct imwindow *imwindow = (struct imwindow *)cur->data;
@@ -194,7 +194,7 @@ struct imwindow *imwindow_find_chat_target(	struct pork_acct *owner,
 	dlist_t *cur = list_start;
 	char nname[NUSER_LEN];
 
-	owner->proto->normalize(nname, target, sizeof(nname));
+	xstrncpy(nname, target, sizeof(nname));
 
 	do {
 		struct imwindow *imwindow = (struct imwindow *)cur->data;

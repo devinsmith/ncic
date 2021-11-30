@@ -259,26 +259,6 @@ int pork_msg_send(struct pork_acct *acct, char *dest, char *msg) {
 	return (ret);
 }
 
-int pork_set_profile(struct pork_acct *acct, char *profile) {
-	int ret = 0;
-
-	free(acct->profile);
-	if (profile == nullptr)
-		acct->profile = nullptr;
-	else
-		acct->profile = xstrdup(profile);
-
-	if (acct->proto->set_profile != nullptr)
-		ret = acct->proto->set_profile(acct, profile);
-
-	if (ret == 0) {
-		screen_win_msg(cur_window(), 1, 1, 0, MSG_TYPE_CMD_OUTPUT,
-			"Profile for %s was %s", acct->username,
-			(profile == nullptr ? "cleared" : "set"));
-	}
-
-	return (ret);
-}
 
 int pork_set_idle_time(struct pork_acct *acct, u_int32_t seconds) {
 	char timebuf[32];
@@ -295,48 +275,6 @@ int pork_set_idle_time(struct pork_acct *acct, u_int32_t seconds) {
 	return (0);
 }
 
-int pork_send_warn(struct pork_acct *acct, char *user) {
-	int ret = 0;
-
-	if (acct->proto->warn == nullptr)
-		return (-1);
-
-	ret = acct->proto->warn(acct, user);
-	if (ret == 0) {
-		struct imwindow *win;
-
-		win = imwindow_find(acct, user);
-		if (win == nullptr)
-			win = cur_window();
-
-		screen_win_msg(win, 1, 1, 0,
-			MSG_TYPE_CMD_OUTPUT, "%s has warned %s", acct->username, user);
-	}
-
-	return (ret);
-}
-
-int pork_send_warn_anon(struct pork_acct *acct, char *user) {
-	int ret = 0;
-
-	if (acct->proto->warn_anon == nullptr)
-		return (-1);
-
-	ret = acct->proto->warn_anon(acct, user);
-	if (ret == 0) {
-		struct imwindow *win;
-
-		win = imwindow_find(acct, user);
-		if (win == nullptr)
-			win = cur_window();
-
-		screen_win_msg(win, 0, 0, 1,
-			MSG_TYPE_CMD_OUTPUT, "%s has warned %s anonymously",
-			acct->username, user);
-	}
-
-	return (ret);
-}
 
 int pork_change_nick(struct pork_acct *acct, char *nick) {
 	if (acct->proto->change_nick != nullptr)

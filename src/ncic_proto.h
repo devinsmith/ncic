@@ -28,19 +28,13 @@ enum {
 };
 
 struct pork_proto {
-	int protocol;
 	char name[32];
-
-	struct command *cmd;
-	size_t num_cmds;
 
 	int (*init)(struct pork_acct *);
 	int (*free)(struct pork_acct *);
 	int (*update)(struct pork_acct *);
-	int (*normalize)(char *dest, const char *str, size_t len);
 	int (*user_compare)(const char *u1, const char *u2);
 	char *(*filter_text)(char *);
-	char *(*filter_text_out)(char *);
 
 	int (*connect)(struct pork_acct *, char *);
 	int (*connect_abort)(struct pork_acct *acct);
@@ -58,14 +52,8 @@ struct pork_proto {
 	int (*chat_action)(struct pork_acct *, struct chatroom *, char *, char *msg);
 	int (*chat_send_notice)(struct pork_acct *, struct chatroom *, char *, char *);
 	int (*chat_user_free)(struct pork_acct *acct, struct chat_user *);
-	int (*chat_set_topic)(struct pork_acct *, struct chatroom *chat, char *topic);
 
-	int (*set_report_idle)(struct pork_acct *, int);
 	int (*set_idle_time)(struct pork_acct *, u_int32_t);
-	int (*set_privacy_mode)(struct pork_acct *, int);
-
-	int (*warn)(struct pork_acct *, char *);
-	int (*warn_anon)(struct pork_acct *, char *);
 
 	int (*send_action)(struct pork_acct *, char *target, char *msg);
 	int (*send_msg)(struct pork_acct *, char *target, char *msg);
@@ -73,21 +61,14 @@ struct pork_proto {
 	int (*send_msg_auto)(struct pork_acct *, char *target, char *msg);
 	int (*set_back)(struct pork_acct *);
 	int (*set_away)(struct pork_acct *, char *);
-	int (*get_away_msg)(struct pork_acct *, char *);
-	int (*set_profile)(struct pork_acct *, char *);
-	int (*get_profile)(struct pork_acct *, char *);
 
-	int (*whowas)(struct pork_acct *, char *);
 	int (*mode)(struct pork_acct *, char *);
-	int (*ping)(struct pork_acct *, char *str);
 	int (*ctcp)(struct pork_acct *, char *dest, char *str);
 
-	int (*keepalive)(struct pork_acct *);
 	int (*change_nick)(struct pork_acct *acct, char *nick);
 };
 
 int proto_init(void);
-int proto_get_num(const char *name);
 void proto_destroy(void);
 struct pork_proto *proto_get(int protocol);
 struct pork_proto *proto_get_name(const char *name);
