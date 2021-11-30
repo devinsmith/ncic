@@ -90,7 +90,6 @@ static struct command command[] = {
 	{ "msg",		cmd_msg				},
 	{ "nick",		cmd_nick			},
 	{ "notice",		cmd_notice			},
-	{ "ping",		cmd_ping			},
 	{ "profile",	cmd_profile,		},
 	{ "query",		cmd_query			},
 	{ "quit",		cmd_quit			},
@@ -735,126 +734,11 @@ USER_COMMAND(cmd_acct_set) {
 */
 
 static struct command chat_command[] = {
-	{ "ban",				cmd_chat_ban			},
-	{ "ignore",				cmd_chat_ignore			},
-	{ "invite",				cmd_chat_invite			},
-	{ "join",				cmd_chat_join			},
-	{ "leave",				cmd_chat_leave			},
 	{ "list",				cmd_chat_list			},
 	{ "send",				cmd_chat_send			},
 	{ "topic",				cmd_chat_topic			},
 	{ "unignore",			cmd_chat_unignore		},
 };
-
-USER_COMMAND(cmd_chat_ban) {
-	struct imwindow *win = cur_window();
-	struct pork_acct *acct = win->owner;
-	struct chatroom *chat;
-	char *arg1;
-	char *arg2;
-
-	if (args == nullptr)
-		return;
-
-	arg1 = strsep(&args, " ");
-
-	chat = chat_find(acct, arg1);
-	if (chat == nullptr) {
-		if (win->type == WIN_TYPE_CHAT && win->data != nullptr)
-			chat_ban(acct, (struct chatroom *)win->data, arg1);
-		else
-			screen_err_msg("%s is not a member of %s", acct->username, arg1);
-
-		return;
-	}
-
-	arg2 = strsep(&args, " ");
-	if (arg2 != nullptr)
-		chat_ban(acct, chat, arg2);
-}
-
-USER_COMMAND(cmd_chat_ignore) {
-	struct imwindow *imwindow = cur_window();
-	struct pork_acct *acct = imwindow->owner;
-	char *chat_name;
-	char *user_name;
-
-	if (args == nullptr)
-		return;
-
-	chat_name = strsep(&args, " ");
-	user_name = args;
-
-	if (user_name == nullptr) {
-		struct chatroom *chat = (struct chatroom *)imwindow->data;
-
-		if (imwindow->type != WIN_TYPE_CHAT || chat == nullptr) {
-			screen_err_msg("You must specify a chat room if the current window is not a chat window");
-			return;
-		}
-
-		user_name = chat_name;
-		chat_name = chat->title;
-	}
-
-	chat_ignore(acct, chat_name, user_name);
-}
-
-USER_COMMAND(cmd_chat_invite) {
-	struct imwindow *imwindow = cur_window();
-	struct pork_acct *acct = imwindow->owner;
-	char *chat_name;
-	char *user_name;
-	char *invite_msg;
-
-	if (args == nullptr)
-		return;
-
-	chat_name = strsep(&args, " ");
-	user_name = strsep(&args, " ");
-	invite_msg = args;
-
-	if (user_name == nullptr) {
-		struct chatroom *chat = (struct chatroom *)imwindow->data;
-
-		if (imwindow->type != WIN_TYPE_CHAT || chat == nullptr) {
-			screen_err_msg("You must specify a chat room if the current window is not a chat window");
-			return;
-		}
-
-		user_name = chat_name;
-		chat_name = chat->title;
-	}
-
-	chat_invite(acct, chat_name, user_name, invite_msg);
-}
-
-USER_COMMAND(cmd_chat_join) {
-	screen_err_msg("cmd_chat_join");
-	chat_join(cur_window()->owner, args);
-}
-
-USER_COMMAND(cmd_chat_leave) {
-	struct imwindow *win = cur_window();
-	char *name = args;
-
-	if (name == nullptr || blank_str(name)) {
-		struct chatroom *chat;
-
-		if (win->type != WIN_TYPE_CHAT) {
-			screen_err_msg("You must specify a chat room if the current window is not a chat window");
-			return;
-		}
-
-		if (win->data == nullptr)
-			return;
-
-		chat = (chatroom *)win->data;
-		name = chat->title;
-	}
-
-	chat_leave(win->owner, name, 1);
-}
 
 USER_COMMAND(cmd_chat_list) {
 	chat_list(cur_window()->owner);
@@ -1498,14 +1382,6 @@ USER_COMMAND(cmd_whowas) {
 
 	if (acct->proto->whowas != nullptr && args != nullptr)
 		acct->proto->whowas(acct, args);
-}
-
-USER_COMMAND(cmd_ping) {
-	struct imwindow *win = cur_window();
-	struct pork_acct *acct = win->owner;
-
-	if (acct->proto->ping != nullptr)
-		acct->proto->ping(acct, args);
 }
 
 USER_COMMAND(cmd_profile) {

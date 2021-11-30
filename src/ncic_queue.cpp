@@ -9,7 +9,6 @@
 */
 
 #include <cstdlib>
-#include <cstring>
 
 #include "ncic_util.h"
 #include "ncic_list.h"

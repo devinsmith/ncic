@@ -50,13 +50,9 @@ struct pork_proto {
 
 	struct chatroom *(*chat_find)(struct pork_acct *, char *);
 	int (*chat_free)(struct pork_acct *, void *chat_data);
-	int (*chat_ignore)(struct pork_acct *, struct chatroom *, char *user);
 	int (*chat_unignore)(struct pork_acct *, struct chatroom *, char *user);
-	int (*chat_join)(struct pork_acct *, char *name, char *args);
 	int (*chat_rejoin)(struct pork_acct *, struct chatroom *);
 	int (*chat_leave)(struct pork_acct *, struct chatroom *);
-	int (*chat_invite)(struct pork_acct *, struct chatroom *, char *, char *);
-	int (*chat_ban)(struct pork_acct *, struct chatroom *, char *user);
 	int (*chat_name)(const char *name, char *buf, size_t len, char *, size_t);
 	int (*chat_send)(struct pork_acct *, struct chatroom *chat, const char *, char *);
 	int (*chat_action)(struct pork_acct *, struct chatroom *, char *, char *msg);

@@ -130,39 +130,6 @@ int chat_send_action(	struct pork_acct *acct,
 	return (0);
 }
 
-int chat_ignore(struct pork_acct *acct, char *chat_name, char *user) {
-	struct chat_user *chat_user;
-	struct chatroom *chat;
-	char buf[4096];
-	int ret;
-
-	chat = chat_find(acct, chat_name);
-	if (chat == nullptr)
-		return (-1);
-
-	chat_user = chat_find_user(acct, chat, user);
-	if (chat_user == nullptr) {
-		screen_err_msg("%s is not a member of %s", user, chat->title_quoted);
-		return (-1);
-	}
-
-	chat_user->ignore = 1;
-
-	if (acct->proto->chat_ignore != nullptr) {
-		if (acct->proto->chat_ignore(acct, chat, user) == -1)
-			return (-1);
-	}
-
-	ret = fill_format_str(OPT_FORMAT_CHAT_IGNORE, buf, sizeof(buf),
-			acct, chat, chat->title, acct->username, user, NULL);
-	if (ret < 1)
-		return (-1);
-	screen_print_str(chat->win, buf, (size_t) ret,
-		MSG_TYPE_CHAT_STATUS);
-
-	return (0);
-}
-
 int chat_unignore(struct pork_acct *acct, char *chat_name, char *user) {
 	struct chat_user *chat_user;
 	struct chatroom *chat;
@@ -194,47 +161,6 @@ int chat_unignore(struct pork_acct *acct, char *chat_name, char *user) {
 		MSG_TYPE_CHAT_STATUS);
 
 	return (0);
-}
-
-int chat_join(struct pork_acct *acct, char *args) {
-	struct imwindow *imwindow = nullptr;
-	char buf[512];
-	char arg_buf[512];
-	int ret = 0;
-
-	screen_err_msg("Got here in chat_join");
-	if (acct->proto->chat_join == nullptr || acct->proto->chat_name == nullptr)
-		return (-1);
-
-	if (args == nullptr) {
-		imwindow = cur_window();
-
-		if (imwindow->type == WIN_TYPE_CHAT)
-			args = imwindow->target;
-		else
-			return (-1);
-	}
-
-	if (acct->proto->chat_name(args, buf, sizeof(buf),
-		arg_buf, sizeof(arg_buf)) == -1)
-	{
-		screen_err_msg("Invalid chat name: %s", args);
-		return (-1);
-	}
-
-	imwindow = imwindow_find_chat_target(acct, buf);
-	if (imwindow == nullptr) {
-		imwindow = screen_new_chat_window(acct, buf);
-		if (imwindow == nullptr) {
-			screen_err_msg("Unable to create a new window for %s", buf);
-			return (-1);
-		}
-	}
-
-	ret = acct->proto->chat_join(acct, buf, arg_buf);
-
-	screen_goto_window(imwindow->refnum);
-	return (ret);
 }
 
 int chat_leave(struct pork_acct *acct, char *chat_name, int close_window) {
@@ -274,52 +200,6 @@ int chat_leave_all(struct pork_acct *acct) {
 		chat_leave(acct, chat->title, 0);
 		cur = next;
 	}
-
-	return (0);
-}
-
-int chat_user_kicked(	struct pork_acct *acct,
-						struct chatroom *chat,
-						char *kicked,
-						char *kicker,
-						char *reason)
-{
-	char buf[4096];
-	int ret;
-
-	ret = fill_format_str(OPT_FORMAT_CHAT_KICK, buf, sizeof(buf), acct,
-			chat, chat->title, kicker, kicked, reason);
-	if (ret < 1)
-		return (-1);
-	screen_print_str(chat->win, buf, (size_t) ret,
-		MSG_TYPE_CHAT_STATUS);
-
-	chat_user_left(acct, chat, kicked, 1);
-	return (0);
-}
-
-int chat_invite(struct pork_acct *acct, char *chat_name, char *user, char *msg)
-{
-	struct chatroom *chat;
-	char buf[4096];
-	int ret;
-
-	if (acct->proto->chat_invite == nullptr)
-		return (-1);
-
-	chat = chat_find(acct, chat_name);
-	if (chat == nullptr)
-		return (-1);
-
-	if (acct->proto->chat_invite(acct, chat, user, msg) == -1)
-		return (-1);
-
-	ret = fill_format_str(OPT_FORMAT_CHAT_INVITE, buf, sizeof(buf), acct,
-			chat, chat->title, acct->username, user, msg);
-	if (ret < 1)
-		return (-1);
-	screen_print_str(chat->win, buf, (size_t) ret,
-		MSG_TYPE_CHAT_STATUS);
 
 	return (0);
 }
@@ -463,16 +343,6 @@ int chat_user_left(	struct pork_acct *acct,
 	}
 
 	return (ret);
-}
-
-int chat_ban(	struct pork_acct *acct,
-				struct chatroom *chat,
-				char *user)
-{
-	if (acct->proto->chat_ban == nullptr)
-		return (-1);
-
-	return (acct->proto->chat_ban(acct, chat, user));
 }
 
 int chat_rejoin(struct pork_acct *acct, struct chatroom *chat) {

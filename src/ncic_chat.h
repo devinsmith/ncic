@@ -51,38 +51,15 @@ struct chatroom *chat_new(	struct pork_acct *acct,
 
 int chat_send_msg(struct pork_acct *acct, struct chatroom *chat, const char *target, char *msg);
 int chat_send_notice(struct pork_acct *acct, struct chatroom *chat, char *target, char *msg);
-int chat_ignore(struct pork_acct *acct, char *chat_name, char *user);
 int chat_unignore(struct pork_acct *acct, char *chat_name, char *user);
-int chat_join(struct pork_acct *acct, char *args);
 int chat_leave(struct pork_acct *acct, char *chat_name, int close_window);
 int chat_leave_all(struct pork_acct *acct);
-int chat_invite(struct pork_acct *acct, char *chat_name, char *user, char *msg);
 struct chatroom *chat_find(struct pork_acct *acct, char *chat_name);
 void chat_list(struct pork_acct *acct);
 int chat_free(struct pork_acct *acct, struct chatroom *chat, int silent);
 int chat_rejoin(struct pork_acct *acct, struct chatroom *chat);
 int chat_rejoin_all(struct pork_acct *acct);
 int chat_nick_change(struct pork_acct *acct, char *old, char *new_nick);
-
-int chat_user_kicked(	struct pork_acct *acct,
-						struct chatroom *chat,
-						char *kicked,
-						char *kicker,
-						char *reason);
-
-int chat_user_left(	struct pork_acct *acct,
-					struct chatroom *chat,
-					char *user,
-					int silent);
-
-int chat_kick(	struct pork_acct *acct,
-				struct chatroom *chat,
-				char *user,
-				char *reason);
-
-int chat_ban(	struct pork_acct *acct,
-				struct chatroom *chat,
-				char *user);
 
 int chat_send_action(	struct pork_acct *acct,
 						struct chatroom *chat,

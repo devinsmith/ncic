@@ -8,17 +8,16 @@
 ** as published by the Free Software Foundation.
 */
 
-#include <stdio.h>
+#include <cstdio>
 #include <ncurses.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 #include <sys/time.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 
 #include "ncic.h"
 #include "ncic_util.h"
-#include "ncic_list.h"
 #include "ncic_queue.h"
 #include "ncic_inet.h"
 #include "ncic_io.h"
@@ -32,8 +31,6 @@
 
 static int irc_send_server(irc_session_t *session, char *cmd, size_t len) {
 	return SSL_write (session->sslHandle, cmd, len);
-
-	//return (sock_write(sock, cmd, len));
 }
 
 int irc_send(irc_session_t *session, char *command, size_t len) {
@@ -68,7 +65,7 @@ int irc_flush_outq(irc_session_t *session) {
 	struct irc_cmd_q *cmd;
 	int ret = 0;
 
-	while ((cmd = (struct irc_cmd_q *)queue_get((pork_queue_t *)session->outq)) != NULL) {
+	while ((cmd = (struct irc_cmd_q *)queue_get((pork_queue_t *)session->outq)) != nullptr) {
 		if (irc_send_server(session, cmd->cmd, cmd->len) > 0) {
 			ret++;
 			free(cmd->cmd);

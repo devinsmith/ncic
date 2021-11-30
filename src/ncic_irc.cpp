@@ -278,11 +278,6 @@ static int irc_reconnect(struct pork_acct *acct, char *args __notused) {
 	return (0);
 }
 
-static int irc_join(struct pork_acct *acct, char *chan, char *args) {
-	screen_err_msg("Got here: irc_join\n");
-  return (0);
-}
-
 static int irc_privmsg(struct pork_acct *acct, char *dest, char *msg) {
 	char *p;
 
@@ -442,24 +437,6 @@ static int irc_quit(struct pork_acct *acct, const char *reason) {
 	return (-1);
 }
 
-static int irc_quote(struct pork_acct *acct, char *str) {
-	char *p = str;
-
-	if (str == nullptr)
-		return (-1);
-
-	while (*p == ' ')
-		p++;
-
-	if (!strncasecmp(p, "NICK ", 5)) {
-		screen_err_msg("Use the /nick command.");
-		return (-1);
-	}
-
-    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
-	return (irc_send_raw(session, str));
-}
-
 static int irc_action(struct pork_acct *acct, char *dest, char *msg) {
     irc_session_t *session = static_cast<irc_session_t *>(acct->data);
 	return (irc_send_action(session, dest, msg));
@@ -490,15 +467,6 @@ static int irc_topic(	struct pork_acct *acct,
 {
     irc_session_t *session = static_cast<irc_session_t *>(acct->data);
 	return (irc_send_topic(session, chat->title, topic));
-}
-
-static int irc_invite(	struct pork_acct *acct,
-						struct chatroom *chat,
-						char *user,
-						char *msg __notused)
-{
-    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
-	return (irc_send_invite(session, chat->title, user));
 }
 
 char *irc_text_filter(char *str) {
@@ -780,17 +748,14 @@ int irc_chan_free(struct pork_acct *acct, void *data) {
 
 int irc_proto_init(struct pork_proto *proto) {
 	proto->chat_action = irc_chan_action;
-	proto->chat_join = irc_join;
 	proto->chat_rejoin = nullptr;
 	proto->chat_send = irc_chan_send;
-	proto->chat_find = irc_find_chat;
+	proto->chat_find = nullptr;
 	proto->chat_name = irc_chan_get_name;
 	proto->chat_leave = nullptr;
-	proto->chat_ban = irc_chan_ban;
 	proto->chat_free = irc_chan_free;
 	proto->chat_send_notice = irc_chan_notice;
 	proto->chat_set_topic = irc_topic;
-	proto->chat_invite = irc_invite;
 
 	proto->send_action = irc_action;
 	proto->get_profile = naken_whois;
