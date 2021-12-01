@@ -19,7 +19,6 @@ struct pork_acct;
 struct imwindow;
 struct chatroom;
 struct chat_user;
-struct buddy;
 
 enum {
 	PROTO_NULL = -1,
@@ -62,16 +61,12 @@ struct pork_proto {
 	int (*set_back)(struct pork_acct *);
 	int (*set_away)(struct pork_acct *, char *);
 
-	int (*mode)(struct pork_acct *, char *);
-	int (*ctcp)(struct pork_acct *, char *dest, char *str);
-
 	int (*change_nick)(struct pork_acct *acct, char *nick);
 };
 
 int proto_init(void);
 void proto_destroy(void);
 struct pork_proto *proto_get(int protocol);
-struct pork_proto *proto_get_name(const char *name);
 
 #ifdef __cplusplus
 }

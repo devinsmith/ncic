@@ -158,7 +158,6 @@ int screen_init(u_int32_t rows, u_int32_t cols) {
 	if (imwindow == nullptr)
 		return (-1);
 
-	wopt_set(imwindow, WOPT_SHOW_BLIST, "1");
 	screen_add_window(imwindow);
 	screen.status_win = imwindow;
 	return (0);
@@ -454,12 +453,7 @@ void screen_bind_all_unbound(struct pork_acct *acct) {
 
 		if (imwindow->owner == screen.null_acct) {
 			imwindow_bind_acct(imwindow, acct->refnum);
-
-			if (!imwindow->blist_visible) {
-				if (wopt_get_bool(imwindow->opts, WOPT_SHOW_BLIST))
-					wopt_set(imwindow, WOPT_SHOW_BLIST, "1");
-				}
-			}
+    }
 
 		node = node->next;
 	} while (node != screen.window_list);

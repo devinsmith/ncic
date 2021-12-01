@@ -281,11 +281,6 @@ static int irc_mode(struct pork_acct *acct, char *str) {
     return (irc_send_mode(session, str));
 }
 
-static int irc_ctcp(struct pork_acct *acct, char *dest, char *msg) {
-    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
-    return (irc_send_ctcp(session, dest, msg));
-}
-
 static int irc_chan_send(struct pork_acct *acct,
 			struct chatroom *chat,
 			const char *target,
@@ -391,7 +386,7 @@ char *irc_text_filter(char *str) {
 	int bgcol = -1;
 	u_int32_t highlighting = 0;
 
-	if (str == NULL)
+	if (str == nullptr)
 		return (xstrdup(""));
 
 	len = strlen(str) + 1024;
@@ -672,7 +667,6 @@ int irc_proto_init(struct pork_proto *proto) {
 	proto->connect_abort = irc_connect_abort;
 	proto->reconnect = irc_reconnect;
 	proto->free = irc_free;
-	proto->mode = irc_mode;
 	proto->init = irc_init;
 	proto->send_notice = irc_notice;
 	proto->signoff = irc_quit;
@@ -683,6 +677,5 @@ int irc_proto_init(struct pork_proto *proto) {
 	proto->filter_text = irc_text_filter;
 	proto->set_away = irc_away;
 	proto->set_back = irc_back;
-	proto->ctcp = irc_ctcp;
 	return (0);
 }

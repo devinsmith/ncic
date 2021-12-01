@@ -29,12 +29,12 @@
 
 extern struct screen screen;
 
-struct imwindow *imwindow_new(	uint32_t rows,
+struct imwindow *imwindow_new(uint32_t rows,
 								uint32_t cols,
 								uint32_t refnum,
 								uint32_t type,
 								struct pork_acct *owner,
-								char *target)
+								const char *target)
 {
 	WINDOW *swin;
 	struct imwindow *imwindow;
@@ -153,16 +153,6 @@ void imwindow_destroy(struct imwindow *imwindow) {
 }
 
 void imwindow_switch_focus(struct imwindow *imwindow) {
-	if (!imwindow->blist_visible)
-		return;
-
-	if (imwindow->input_focus == BINDS_MAIN) {
-		imwindow->input_focus = BINDS_BUDDY;
-		imwindow->active_binds = &screen.binds.blist;
-	} else {
-		imwindow->input_focus = BINDS_MAIN;
-		imwindow->active_binds = &screen.binds.main;
-	}
 }
 
 struct imwindow *imwindow_find(struct pork_acct *owner, const char *target) {

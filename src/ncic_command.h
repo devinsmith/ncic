@@ -15,7 +15,7 @@
 extern "C" {
 #endif
 
-#define USER_COMMAND(x)	void x (char *args __notused)
+#define USER_COMMAND(x)	static void x (char *args __notused)
 
 struct command {
 	const char *name;

@@ -26,7 +26,7 @@ ncic_bind.h          ncic.h           ncic_misc.h    ncic_set.h
 ncic_help.h      ncic_msg.h
 ncic_chat.h          ncic_imsg.h      ncic_naken.h   ncic_status.h
 ncic_color.h         ncic_imwindow.h  ncic_opt.h     ncic_swindow.h
-ncic_command_defs.h  ncic_inet.h      ncic_proto.h
+ncic_inet.h      ncic_proto.h
 ncic_command.h       ncic_input.h     ncic_queue.h   ncic_util.h
 ncic_conf.h          ncic_io.h        ncic_screen.h
 )

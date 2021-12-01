@@ -33,8 +33,92 @@
 #include "ncic_conf.h"
 #include "ncic_msg.h"
 #include "ncic_command.h"
-#include "ncic_command_defs.h"
 #include "ncic_help.h"
+
+USER_COMMAND(cmd_acct);
+USER_COMMAND(cmd_alias);
+USER_COMMAND(cmd_auto);
+USER_COMMAND(cmd_away);
+USER_COMMAND(cmd_bind);
+USER_COMMAND(cmd_compose);
+USER_COMMAND(cmd_connect);
+USER_COMMAND(cmd_disconnect);
+USER_COMMAND(cmd_echo);
+USER_COMMAND(cmd_eval);
+USER_COMMAND(cmd_help);
+USER_COMMAND(cmd_idle);
+USER_COMMAND(cmd_load);
+USER_COMMAND(cmd_me);
+USER_COMMAND(cmd_msg);
+USER_COMMAND(cmd_nick);
+USER_COMMAND(cmd_query);
+USER_COMMAND(cmd_quit);
+USER_COMMAND(cmd_refresh);
+USER_COMMAND(cmd_save);
+USER_COMMAND(cmd_send);
+USER_COMMAND(cmd_set);
+USER_COMMAND(cmd_unbind);
+USER_COMMAND(cmd_unalias);
+
+USER_COMMAND(cmd_acct_save);
+USER_COMMAND(cmd_acct_set);
+
+USER_COMMAND(cmd_win);
+USER_COMMAND(cmd_win_bind);
+USER_COMMAND(cmd_win_bind_next);
+USER_COMMAND(cmd_win_clear);
+USER_COMMAND(cmd_win_close);
+USER_COMMAND(cmd_win_dump);
+USER_COMMAND(cmd_win_erase);
+USER_COMMAND(cmd_win_ignore);
+USER_COMMAND(cmd_win_list);
+USER_COMMAND(cmd_win_next);
+USER_COMMAND(cmd_win_prev);
+USER_COMMAND(cmd_win_rename);
+USER_COMMAND(cmd_win_renumber);
+USER_COMMAND(cmd_win_set);
+USER_COMMAND(cmd_win_skip);
+USER_COMMAND(cmd_win_swap);
+USER_COMMAND(cmd_win_unignore);
+USER_COMMAND(cmd_win_unskip);
+
+USER_COMMAND(cmd_scroll);
+USER_COMMAND(cmd_scroll_by);
+USER_COMMAND(cmd_scroll_down);
+USER_COMMAND(cmd_scroll_end);
+USER_COMMAND(cmd_scroll_pgdown);
+USER_COMMAND(cmd_scroll_pgup);
+USER_COMMAND(cmd_scroll_start);
+USER_COMMAND(cmd_scroll_up);
+
+USER_COMMAND(cmd_input);
+USER_COMMAND(cmd_input_bkspace);
+USER_COMMAND(cmd_input_clear);
+USER_COMMAND(cmd_input_clear_prev);
+USER_COMMAND(cmd_input_clear_next);
+USER_COMMAND(cmd_input_clear_to_end);
+USER_COMMAND(cmd_input_clear_to_start);
+USER_COMMAND(cmd_input_delete);
+USER_COMMAND(cmd_input_end);
+USER_COMMAND(cmd_input_find_next_cmd);
+USER_COMMAND(cmd_input_insert);
+USER_COMMAND(cmd_input_left);
+USER_COMMAND(cmd_input_prev_word);
+USER_COMMAND(cmd_input_prompt);
+USER_COMMAND(cmd_input_next_word);
+USER_COMMAND(cmd_input_right);
+USER_COMMAND(cmd_input_send);
+USER_COMMAND(cmd_input_start);
+
+USER_COMMAND(cmd_history);
+USER_COMMAND(cmd_history_clear);
+USER_COMMAND(cmd_history_list);
+USER_COMMAND(cmd_history_next);
+USER_COMMAND(cmd_history_prev);
+
+USER_COMMAND(cmd_chat);
+USER_COMMAND(cmd_chat_list);
+USER_COMMAND(cmd_chat_send);
 
 extern struct sockaddr_storage local_addr;
 extern in_port_t local_port;
@@ -53,7 +137,6 @@ enum {
   CMDSET_SCROLL,
   CMDSET_CHAT,
   CMDSET_ACCT,
-  CMDSET_PROTO,
 };
 
 /*
@@ -80,12 +163,8 @@ static struct command command[] = {
 	{ "history",	cmd_history			},
 	{ "idle",		cmd_idle			},
 	{ "input",		cmd_input			},
-	{ "laddr",		cmd_laddr			},
-	{ "lastlog",	cmd_lastlog			},
 	{ "load",		cmd_load			},
-	{ "lport",		cmd_lport			},
 	{ "me",			cmd_me				},
-	{ "mode",		cmd_mode			},
 	{ "msg",		cmd_msg				},
 	{ "nick",		cmd_nick			},
 	{ "query",		cmd_query			},
@@ -113,7 +192,6 @@ static struct command input_command[] = {
 	{ "delete",					cmd_input_delete			},
 	{ "end",					cmd_input_end				},
 	{ "find_next_cmd",			cmd_input_find_next_cmd		},
-	{ "focus_next",				cmd_input_focus_next		},
 	{ "insert",					cmd_input_insert			},
 	{ "left",					cmd_input_left				},
 	{ "next_word",				cmd_input_next_word			},
@@ -142,12 +220,6 @@ USER_COMMAND(cmd_input_clear_next) {
 
 USER_COMMAND(cmd_input_clear_to_end) {
 	input_clear_to_end(cur_window()->input);
-}
-
-USER_COMMAND(cmd_input_focus_next) {
-	struct imwindow *win = cur_window();
-
-	imwindow_switch_focus(win);
 }
 
 USER_COMMAND(cmd_input_clear_to_start) {
@@ -803,20 +875,6 @@ USER_COMMAND(cmd_connect) {
 	pork_acct_connect(user, args, PROTO_IRC);
 }
 
-USER_COMMAND(cmd_ctcp) {
-	struct pork_acct *acct = cur_window()->owner;
-	char *dest;
-
-	if (acct->proto->ctcp == nullptr)
-		return;
-
-	dest = strsep(&args, " ");
-	if (dest == nullptr || args == nullptr)
-		return;
-
-	acct->proto->ctcp(acct, dest, args);
-}
-
 USER_COMMAND(cmd_echo) {
 	if (args != nullptr)
 		screen_win_msg(cur_window(), 0, 0, 1, MSG_TYPE_CMD_OUTPUT, args);
@@ -922,25 +980,6 @@ USER_COMMAND(cmd_idle) {
 	pork_set_idle_time(cur_window()->owner, idle_secs);
 }
 
-USER_COMMAND(cmd_laddr) {
-	if (args == nullptr) {
-		char buf[2048];
-
-		if (get_hostname(&local_addr, buf, sizeof(buf)) != 0)
-			xstrncpy(buf, "0.0.0.0", sizeof(buf));
-
-		screen_cmd_output("New connections will use the local address %s", buf);
-		return;
-	}
-
-	if (get_addr(args, &local_addr) != 0) {
-		screen_err_msg("Invalid local address: %s", args);
-		return;
-	}
-
-	screen_cmd_output("New connections will use the local address %s", args);
-}
-
 USER_COMMAND(cmd_lastlog) {
 	int opts = 0;
 
@@ -996,22 +1035,6 @@ USER_COMMAND(cmd_load) {
 	screen_set_quiet(quiet);
 }
 
-USER_COMMAND(cmd_lport) {
-	if (args == nullptr) {
-		screen_cmd_output("New connections will use local port %u",
-			ntohs(local_port));
-		return;
-	}
-
-	if (get_port(args, &local_port) != 0) {
-		screen_err_msg("Error: Invalid local port: %s", args);
-		return;
-	}
-
-	local_port = htons(local_port);
-	screen_cmd_output("New connections will use local port %s", args);
-}
-
 USER_COMMAND(cmd_me) {
 	struct imwindow *win = cur_window();
 
@@ -1046,16 +1069,6 @@ USER_COMMAND(cmd_msg) {
 		chat_send_msg(acct, chat, target, args);
 	else
 		pork_msg_send(acct, target, args);
-}
-
-USER_COMMAND(cmd_mode) {
-	struct pork_acct *acct = cur_window()->owner;
-
-	if (args == nullptr || !acct->connected)
-		return;
-
-	if (acct->proto->mode != nullptr)
-		acct->proto->mode(acct, args);
 }
 
 USER_COMMAND(cmd_query) {

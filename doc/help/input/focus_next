@@ -1,2 +1,0 @@
-SYNTAX: input focus_next
-	Changes the input focus. If the current input bindings are the buddy list bindings, this command will make the main input bindings active. If the main input bindings are active, this command will make the buddy list input bindings active.

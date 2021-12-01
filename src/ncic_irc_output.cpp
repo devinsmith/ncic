@@ -267,65 +267,6 @@ int irc_send_ctcp(irc_session_t *session, char *dest, char *msg) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_ping(irc_session_t *session, char *str) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-	struct timeval tv;
-
-	gettimeofday(&tv, nullptr);
-
-	ret = snprintf(buf, sizeof(buf), "PING %ld %ld", tv.tv_sec, tv.tv_usec);
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send_ctcp(session, str, buf));
-}
-
-int irc_send_names(irc_session_t *session, char *chan) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-
-	if (chan != NULL)
-		ret = snprintf(buf, sizeof(buf), "NAMES :%s\r\n", chan);
-	else
-		ret = snprintf(buf, sizeof(buf), "NAMES\r\n");
-
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
-}
-
-int irc_send_whois(irc_session_t *session, char *dest) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-	struct pork_acct *acct = static_cast<struct pork_acct *>(session->data);
-
-	if (dest == NULL)
-		dest = acct->username;
-
-	ret = snprintf(buf, sizeof(buf), ".i %s\r\n", dest);
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
-}
-
-int irc_send_whowas(irc_session_t *session, char *dest) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-	struct pork_acct *acct = static_cast<struct pork_acct *>(session->data);
-
-	if (dest == NULL)
-		dest = acct->username;
-
-	ret = snprintf(buf, sizeof(buf), "WHOWAS %s\r\n", dest);
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
-}
-
 int irc_send_quit(irc_session_t *session, const char *reason) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
@@ -349,42 +290,16 @@ int irc_send_notice(irc_session_t *session, char *dest, char *msg) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_kick(irc_session_t *session, char *chan, char *nick, char *msg) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-
-	ret = snprintf(buf, sizeof(buf), "KICK %s %s :%s\r\n", chan, nick, msg);
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
-}
-
-int irc_send_topic(irc_session_t *session, char *chan, char *topic) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-
-	if (topic != NULL)
-		ret = snprintf(buf, sizeof(buf), "TOPIC %s :%s\r\n", chan, topic);
-	else
-		ret = snprintf(buf, sizeof(buf), "TOPIC %s\r\n", chan);
-
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
-}
-
 int irc_send_action(irc_session_t *session, char *dest, char *msg) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 
-	if (dest == NULL || msg == NULL)
+	if (dest == nullptr || msg == nullptr)
 		return (-1);
 
 	ret = snprintf(buf, sizeof(buf), "ACTION %s", msg);
 	if (ret < 0 || (size_t) ret >= sizeof(buf))
 		return (-1);
 
-	return (irc_send_ctcp(session, dest, buf));
+	return (irc_send(session, buf, ret));
 }

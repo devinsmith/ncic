@@ -15,8 +15,6 @@
 extern "C" {
 #endif
 
-#define IMWINDOW(x)	((struct imwindow *) (x))
-
 struct pork_acct;
 struct imsg;
 
@@ -40,7 +38,6 @@ struct imwindow {
 	uint32_t refnum;
 	uint32_t type:2;
 	uint32_t typing:2;
-	uint32_t blist_visible:1;
 	uint32_t input_focus:1;
 	uint32_t ignore_activity:1;
 	uint32_t skip:1;
@@ -52,18 +49,13 @@ struct imwindow *imwindow_new(	uint32_t rows,
 								uint32_t refnum,
 								uint32_t type,
 								struct pork_acct *owner,
-								char *target);
+								const char *target);
 
 void imwindow_resize(	struct imwindow *imwindow,
 						uint32_t rows,
 						uint32_t cols);
 
 int imwindow_set_priv_input(struct imwindow *imwindow, int val);
-int imwindow_blist_refresh(struct imwindow *imwindow);
-void imwindow_blist_show(struct imwindow *imwindow);
-void imwindow_blist_hide(struct imwindow *imwindow);
-void imwindow_blist_toggle(struct imwindow *imwindow);
-void imwindow_blist_draw(struct imwindow *imwindow);
 void imwindow_send_msg(struct imwindow *win);
 void imwindow_recv_msg(struct imwindow *win);
 int imwindow_bind_acct(struct imwindow *imwindow, uint32_t refnum);
