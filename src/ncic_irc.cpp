@@ -215,7 +215,7 @@ static int irc_do_connect(struct pork_acct *acct, char *args) {
 	int sock;
 	int ret;
 
-	if (args == NULL) {
+	if (args == nullptr) {
 		screen_err_msg("Error: IRC: Syntax is /connect <nick> <server>[:<port>[:<passwd>]] ... <serverN>[:<port>[:<passwd>]]");
 		return (-1);
 	}
@@ -289,13 +289,6 @@ static int irc_chan_send(struct pork_acct *acct,
     irc_session_t *session = static_cast<irc_session_t *>(acct->data);
 
     return (naken_send(session, msg));
-}
-
-static int chat_find_compare_cb(void *l, void *r) {
-	char *str = (char *)l;
-	struct chatroom *chat = (struct chatroom *)r;
-
-	return (strcasecmp(str, chat->title));
 }
 
 static int irc_chan_get_name(	const char *str,
@@ -376,6 +369,12 @@ static int irc_back(struct pork_acct *acct) {
 }
 
 char *irc_text_filter(char *str) {
+  if (str == nullptr)
+    return (xstrdup(""));
+
+  return xstrdup(str);
+
+#if 0
 	static const char *mirc_fg_col = "wwbgrymyYGcCBMDW";
 	static const char *mirc_bg_col = "ddbgrymyygccbmww";
 	static const char *ansi_esc_col = "drgybmcwDRGYBMCW";
@@ -644,6 +643,7 @@ out:
 
 	ret[i] = '\0';
 	return (ret);
+#endif
 }
 
 int irc_chan_free(struct pork_acct *acct, void *data) {
@@ -654,13 +654,9 @@ int irc_chan_free(struct pork_acct *acct, void *data) {
 
 int irc_proto_init(struct pork_proto *proto) {
 	proto->chat_action = irc_chan_action;
-	proto->chat_rejoin = nullptr;
 	proto->chat_send = irc_chan_send;
-	proto->chat_find = nullptr;
 	proto->chat_name = irc_chan_get_name;
-	proto->chat_leave = nullptr;
 	proto->chat_free = irc_chan_free;
-	proto->chat_send_notice = irc_chan_notice;
 
 	proto->send_action = irc_action;
 	proto->connect = irc_do_connect;
@@ -668,7 +664,6 @@ int irc_proto_init(struct pork_proto *proto) {
 	proto->reconnect = irc_reconnect;
 	proto->free = irc_free;
 	proto->init = irc_init;
-	proto->send_notice = irc_notice;
 	proto->signoff = irc_quit;
 	proto->send_msg = irc_privmsg;
 	proto->update = irc_update;

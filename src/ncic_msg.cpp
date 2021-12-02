@@ -84,46 +84,6 @@ int pork_msg_send_auto(struct pork_acct *acct, char *sender) {
 	return (ret);
 }
 
-int pork_recv_msg(	struct pork_acct *acct,
-					char *dest,
-					char *sender,
-					char *userhost,
-					char *msg,
-					int autoresp)
-{
-	struct imwindow *win;
-	int type;
-	char buf[4096];
-	int ret;
-
-	screen_get_query_window(acct, sender, &win);
-	win->typing = 0;
-
-	if (autoresp)
-		type = OPT_FORMAT_IM_RECV_AUTO;
-	else {
-		if (win == screen.status_win)
-			type = OPT_FORMAT_IM_RECV_STATUS;
-		else
-			type = OPT_FORMAT_IM_RECV;
-	}
-
-	ret = fill_format_str(type, buf, sizeof(buf), acct, dest,
-			sender, userhost, msg);
-	if (ret < 1)
-		return (-1);
-	screen_print_str(win, buf, (size_t) ret, MSG_TYPE_PRIVMSG_RECV);
-	imwindow_recv_msg(win);
-
-	if (acct->away_msg != nullptr && !autoresp &&
-		opt_get_bool(OPT_AUTOSEND_AWAY))
-	{
-		pork_msg_send_auto(acct, sender);
-	}
-
-	return (0);
-}
-
 int ncic_recv_highlight_msg(struct pork_acct *acct, char *msg)
 {
   char buf[4096];
@@ -236,8 +196,7 @@ int pork_msg_send(struct pork_acct *acct, char *dest, char *msg) {
 			int ret;
 
 			if (acct->away_msg != nullptr) {
-				if (opt_get_bool(OPT_SEND_REMOVES_AWAY))
-					pork_set_back(acct);
+        pork_set_back(acct);
 			}
 
 			if (screen_get_query_window(acct, dest, &win) != 0)
@@ -281,34 +240,6 @@ int pork_change_nick(struct pork_acct *acct, char *nick) {
 		return (acct->proto->change_nick(acct, nick));
 
 	return (-1);
-}
-
-int pork_recv_action(	struct pork_acct *acct,
-						char *dest,
-						char *sender,
-						char *userhost,
-						char *msg)
-{
-	struct imwindow *win;
-	char buf[4096];
-	int type;
-	int ret;
-
-	screen_get_query_window(acct, sender, &win);
-
-	if (win == screen.status_win)
-		type = OPT_FORMAT_ACTION_RECV_STATUS;
-	else
-		type = OPT_FORMAT_ACTION_RECV;
-
-	ret = fill_format_str(type, buf, sizeof(buf), acct,
-			dest, sender, userhost, msg);
-	if (ret < 1)
-		return (-1);
-	screen_print_str(win, buf, (size_t) ret, MSG_TYPE_PRIVMSG_RECV);
-	imwindow_recv_msg(win);
-
-	return (0);
 }
 
 int pork_action_send(struct pork_acct *acct, char *dest, char *msg) {

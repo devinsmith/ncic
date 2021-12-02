@@ -152,9 +152,6 @@ void imwindow_destroy(struct imwindow *imwindow) {
 	free(imwindow);
 }
 
-void imwindow_switch_focus(struct imwindow *imwindow) {
-}
-
 struct imwindow *imwindow_find(struct pork_acct *owner, const char *target) {
 	dlist_t *list_start = screen.window_list;
 	dlist_t *cur = list_start;

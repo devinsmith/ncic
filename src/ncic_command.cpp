@@ -46,12 +46,10 @@ USER_COMMAND(cmd_disconnect);
 USER_COMMAND(cmd_echo);
 USER_COMMAND(cmd_eval);
 USER_COMMAND(cmd_help);
-USER_COMMAND(cmd_idle);
 USER_COMMAND(cmd_load);
 USER_COMMAND(cmd_me);
 USER_COMMAND(cmd_msg);
 USER_COMMAND(cmd_nick);
-USER_COMMAND(cmd_query);
 USER_COMMAND(cmd_quit);
 USER_COMMAND(cmd_refresh);
 USER_COMMAND(cmd_save);
@@ -126,7 +124,6 @@ extern in_port_t local_port;
 static void print_binding(void *data, void *nothing);
 static void print_alias(void *data, void *nothing);
 static int cmd_compare(const void *l, const void *r);
-static void print_timer(void *data, void *nothing);
 static int run_one_command(char *str, u_int32_t set);
 
 enum {
@@ -161,13 +158,11 @@ static struct command command[] = {
 	{ "echo",		cmd_echo			},
 	{ "help",		cmd_help			},
 	{ "history",	cmd_history			},
-	{ "idle",		cmd_idle			},
 	{ "input",		cmd_input			},
 	{ "load",		cmd_load			},
 	{ "me",			cmd_me				},
 	{ "msg",		cmd_msg				},
 	{ "nick",		cmd_nick			},
-	{ "query",		cmd_query			},
 	{ "quit",		cmd_quit			},
 	{ "refresh",	cmd_refresh			},
 	{ "save",		cmd_save			},
@@ -967,19 +962,6 @@ USER_COMMAND(cmd_help) {
 	}
 }
 
-USER_COMMAND(cmd_idle) {
-	u_int32_t idle_secs = 0;
-
-	if (args != nullptr && !blank_str(args)) {
-		if (str_to_uint(args, &idle_secs) != 0) {
-			screen_err_msg("Invalid time specification: %s", args);
-			return;
-		}
-	}
-
-	pork_set_idle_time(cur_window()->owner, idle_secs);
-}
-
 USER_COMMAND(cmd_lastlog) {
 	int opts = 0;
 
@@ -1069,18 +1051,6 @@ USER_COMMAND(cmd_msg) {
 		chat_send_msg(acct, chat, target, args);
 	else
 		pork_msg_send(acct, target, args);
-}
-
-USER_COMMAND(cmd_query) {
-	struct imwindow *imwindow = cur_window();
-
-	if (args != nullptr && !blank_str(args)) {
-		struct imwindow *conv_window;
-
-		screen_make_query_window(imwindow->owner, args, &conv_window);
-		screen_goto_window(conv_window->refnum);
-	} else
-		screen_close_window(imwindow);
 }
 
 USER_COMMAND(cmd_quit) {

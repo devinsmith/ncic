@@ -74,18 +74,6 @@ struct global_pref global_pref[] = {
 		opt_set_bool,
 		nullptr,
 		SET_BOOL(DEFAULT_AUTO_RECONNECT)
-	},{	"AUTO_REJOIN",
-		OPT_BOOL,
-		0,
-		opt_set_bool,
-		nullptr,
-		SET_BOOL(DEFAULT_AUTO_REJOIN)
-	},{	"AUTOSEND_AWAY",
-		OPT_BOOL,
-		0,
-		opt_set_bool,
-		nullptr,
-		SET_BOOL(DEFAULT_AUTOSEND_AWAY)
 	},{	"BANNER",
 		OPT_STR,
 		0,

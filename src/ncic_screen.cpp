@@ -402,23 +402,6 @@ int screen_get_query_window(struct pork_acct *acct,
 ** When we really want a query window.
 */
 
-int screen_make_query_window(struct pork_acct *acct,
-							char *name,
-							struct imwindow **winr)
-{
-	struct imwindow *win;
-	int newid = 0;
-
-	win = imwindow_find(acct, name);
-	if (win == nullptr || win->type != WIN_TYPE_PRIVMSG) {
-		win = screen_new_window(acct, name, name);
-		newid++;
-	}
-
-	*winr = win;
-	return (newid);
-}
-
 void screen_cycle_fwd(void) {
 	dlist_t *cur = screen.cur_window;
 	struct imwindow *win;
