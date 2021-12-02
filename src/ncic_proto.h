@@ -46,7 +46,6 @@ struct pork_proto {
 	int (*chat_unignore)(struct pork_acct *, struct chatroom *, char *user);
 	int (*chat_rejoin)(struct pork_acct *, struct chatroom *);
 	int (*chat_leave)(struct pork_acct *, struct chatroom *);
-	int (*chat_name)(const char *name, char *buf, size_t len, char *, size_t);
 	int (*chat_send)(struct pork_acct *, struct chatroom *chat, const char *, char *);
 	int (*chat_action)(struct pork_acct *, struct chatroom *, char *, char *msg);
 	int (*chat_send_notice)(struct pork_acct *, struct chatroom *, char *, char *);

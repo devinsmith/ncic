@@ -291,50 +291,6 @@ static int irc_chan_send(struct pork_acct *acct,
     return (naken_send(session, msg));
 }
 
-static int irc_chan_get_name(	const char *str,
-								char *buf,
-								size_t len,
-								char *arg_buf,
-								size_t arg_len)
-{
-	char *p;
-
-	if (xstrncpy(buf, str, len) == -1) {
-		debug("xstrncpy failed: %s", str);
-		return (-1);
-	}
-
-	p = strchr(buf, ',');
-	if (p != nullptr)
-		*p = '\0';
-
-	p = strchr(buf, ' ');
-	if (p != nullptr)
-		*p++ = '\0';
-
-	if (p != nullptr) {
-		if (xstrncpy(arg_buf, p, arg_len) == -1)
-			return (-1);
-	} else
-		arg_buf[0] = '\0';
-
-	return (0);
-}
-
-static int irc_chan_notice(	struct pork_acct *acct,
-							struct chatroom *chat,
-							char *target,
-							char *msg)
-{
-    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
-	return (irc_send_notice(session, target, msg));
-}
-
-static int irc_notice(struct pork_acct *acct, char *dest, char *msg) {
-    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
-	return (irc_send_notice(session, dest, msg));
-}
-
 static int irc_quit(struct pork_acct *acct, const char *reason) {
 	if (acct->connected) {
         irc_session_t *session = static_cast<irc_session_t *>(acct->data);
@@ -655,7 +611,6 @@ int irc_chan_free(struct pork_acct *acct, void *data) {
 int irc_proto_init(struct pork_proto *proto) {
 	proto->chat_action = irc_chan_action;
 	proto->chat_send = irc_chan_send;
-	proto->chat_name = irc_chan_get_name;
 	proto->chat_free = irc_chan_free;
 
 	proto->send_action = irc_action;

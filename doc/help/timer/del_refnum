@@ -1,8 +1,0 @@
-SYNTAX: timer del_refnum <refnum>
-	Delete the timer event that has the specified reference number. The reference number for timer events can be obtained via the timer list command.
-
-PARAMETERS
-	<refnum>: The reference number of the timer that is to be deleted.
-
-SEE ALSO
-	timer del_refnum

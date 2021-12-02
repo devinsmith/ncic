@@ -114,25 +114,6 @@ void sin_set_port(struct sockaddr_storage *ss, in_port_t port) {
 }
 
 /*
-** Return the canonical hostname of the given address.
-*/
-
-int get_hostname(struct sockaddr_storage *addr,
-						char *hostbuf,
-						size_t len)
-{
-	int ret;
-
-	ret = getnameinfo((struct sockaddr *) addr, sizeof(struct sockaddr_storage),
-					hostbuf, len, nullptr, 0, 0);
-
-	if (ret != 0)
-		debug("getnameinfo: %s", strerror(errno));
-
-	return (ret);
-}
-
-/*
 ** Get the port associated with a tcp service name.
 */
 

@@ -25,8 +25,6 @@ extern "C" {
 #	define MAX_IPLEN	46
 #endif
 
-#define MAX_HOSTLEN		256
-
 #define SIN4(x) ((struct sockaddr_in *) (x))
 #define SIN6(x) ((struct sockaddr_in6 *) (x))
 #define VALID_PORT(x) ((((x) & 0xffff) == (x)) && ((x) != 0))
@@ -45,9 +43,6 @@ int sock_setflags(int sock, u_int32_t flags);
 void sock_setkeepalive(int sock);
 int sock_is_error(int sock);
 
-int get_hostname(struct sockaddr_storage *addr,
-						char *hostbuf,
-						size_t len);
 
 #ifdef __cplusplus
 }

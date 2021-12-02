@@ -18,7 +18,6 @@ extern "C" {
 #define HELP_TABSTOP			4
 #define HELP_SECTION_STYLE		"%W"
 #define HELP_HEADER_STYLE		"%W"
-#define HELP_HEADER_STYLE_END	"%x"
 
 int pork_help_print(const char *section, char *command);
 int pork_help_get_cmds(const char *section, char *buf, size_t len);

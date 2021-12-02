@@ -1,6 +1,0 @@
-SYNTAX: notice <user> <notice>
-	Sends a notice.
-
-PARAMETERS
-	<user>   : The user to whom to send the notice.
-	<notice> : The notice to send.

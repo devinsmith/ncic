@@ -211,29 +211,6 @@ struct chatroom *chat_find(struct pork_acct *acct, char *chat_name) {
 	return (acct->proto->chat_find(acct, chat_name));
 }
 
-void chat_list(struct pork_acct *acct) {
-	dlist_t *cur;
-
-	cur = acct->chat_list;
-	if (cur == nullptr) {
-		screen_cmd_output("%s is not a member of any chat rooms",
-			acct->username);
-		return;
-	}
-
-	screen_cmd_output("%s is joined to the following chat rooms",
-		acct->username);
-
-	do {
-		struct chatroom *chat = (struct chatroom *)cur->data;
-
-		screen_cmd_output("  %s in window refnum %u",
-			chat->title_quoted, chat->win->refnum);
-
-		cur = cur->next;
-	} while (cur != nullptr);
-}
-
 int chat_free(struct pork_acct *acct, struct chatroom *chat, int silent) {
 	dlist_t *cur;
 

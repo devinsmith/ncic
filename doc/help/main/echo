@@ -1,8 +1,0 @@
-SYNTAX: echo <string>
-	Writes the specified string to the currently window. The string may contain embedded color codes.
-
-PARAMETERS
-	<string>: The string to be echoed.
-
-SEE ALSO
-	color

@@ -1,5 +1,0 @@
-SYNTAX: timer list
-	Print the list of timer events to the screen. This command can be used to obtain the reference number for timer events that is used by timer del_refnum.
-
-SEE ALSO
-	timer del_refnum

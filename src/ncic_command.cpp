@@ -43,8 +43,6 @@ USER_COMMAND(cmd_bind);
 USER_COMMAND(cmd_compose);
 USER_COMMAND(cmd_connect);
 USER_COMMAND(cmd_disconnect);
-USER_COMMAND(cmd_echo);
-USER_COMMAND(cmd_eval);
 USER_COMMAND(cmd_help);
 USER_COMMAND(cmd_load);
 USER_COMMAND(cmd_me);
@@ -114,10 +112,6 @@ USER_COMMAND(cmd_history_list);
 USER_COMMAND(cmd_history_next);
 USER_COMMAND(cmd_history_prev);
 
-USER_COMMAND(cmd_chat);
-USER_COMMAND(cmd_chat_list);
-USER_COMMAND(cmd_chat_send);
-
 extern struct sockaddr_storage local_addr;
 extern in_port_t local_port;
 
@@ -132,7 +126,6 @@ enum {
   CMDSET_HISTORY,
   CMDSET_INPUT,
   CMDSET_SCROLL,
-  CMDSET_CHAT,
   CMDSET_ACCT,
 };
 
@@ -152,10 +145,8 @@ static struct command command[] = {
 	{ "auto",		cmd_auto			},
 	{ "away",		cmd_away			},
 	{ "bind",		cmd_bind			},
-	{ "chat",		cmd_chat			},
 	{ "connect",	cmd_connect			},
 	{ "disconnect", cmd_disconnect		},
-	{ "echo",		cmd_echo			},
 	{ "help",		cmd_help			},
 	{ "history",	cmd_history			},
 	{ "input",		cmd_input			},
@@ -678,43 +669,6 @@ USER_COMMAND(cmd_acct_save) {
 	pork_acct_save(cur_window()->owner);
 }
 
-/*
-** /chat commands
-*/
-
-static struct command chat_command[] = {
-	{ "list",				cmd_chat_list			},
-	{ "send",				cmd_chat_send			},
-};
-
-USER_COMMAND(cmd_chat_list) {
-	chat_list(cur_window()->owner);
-}
-
-USER_COMMAND(cmd_chat_send) {
-	struct pork_acct *acct = cur_window()->owner;
-	struct imwindow *win;
-	char *chat_name;
-
-	if (args == nullptr)
-		return;
-
-	chat_name = strsep(&args, " ");
-	if (chat_name == nullptr || args == nullptr) {
-		screen_err_msg("You must specify a chatroom and a message");
-		return;
-	}
-
-	win = imwindow_find_chat_target(acct, chat_name);
-	if (win == nullptr || win->data == nullptr) {
-		screen_err_msg("%s is not joined to %s", acct->username, chat_name);
-		return;
-	}
-
-	chat_send_msg(acct, (chatroom *)win->data, chat_name, args);
-}
-
-
 static struct command_set {
 	struct command *set;
 	size_t elem;
@@ -725,7 +679,6 @@ static struct command_set {
 	{	history_command,	array_elem(history_command),	"history "	},
 	{	input_command,		array_elem(input_command),		"input "	},
 	{	scroll_command,		array_elem(scroll_command),		"scroll "	},
-	{	chat_command,		array_elem(chat_command),		"chat "		},
 	{	acct_command,		array_elem(acct_command),		"acct "		},
 };
 
@@ -868,11 +821,6 @@ USER_COMMAND(cmd_connect) {
 
 	user = strsep(&args, " ");
 	pork_acct_connect(user, args, PROTO_IRC);
-}
-
-USER_COMMAND(cmd_echo) {
-	if (args != nullptr)
-		screen_win_msg(cur_window(), 0, 0, 1, MSG_TYPE_CMD_OUTPUT, args);
 }
 
 USER_COMMAND(cmd_disconnect) {
@@ -1169,16 +1117,6 @@ USER_COMMAND(cmd_acct) {
 		run_one_command(args, CMDSET_ACCT);
 	else
 		run_one_command("list", CMDSET_ACCT);
-}
-
-USER_COMMAND(cmd_chat) {
-	if (!cur_window()->owner->connected)
-		return;
-
-	if (args != nullptr)
-		run_one_command(args, CMDSET_CHAT);
-	else
-		run_one_command("list", CMDSET_CHAT);
 }
 
 USER_COMMAND(cmd_win) {

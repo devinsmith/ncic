@@ -124,7 +124,7 @@ static struct naken_input *naken_tokenize(irc_session_t *session, char *input)
 	if (input[0] == '>') {
 		in->msg_type = MSG_SYSTEM_ALERT;
 		/* Process system messages. They all start with >> */
-		if (strstr(input, ">> Your name is") != NULL) {
+		if (strstr(input, ">> Your name is") != nullptr) {
 			char *old_name;
 
 			/* Handle name change */
@@ -135,7 +135,7 @@ static struct naken_input *naken_tokenize(irc_session_t *session, char *input)
 			in->args = tmp;
 			naken_handler_nick(acct, in, old_name);
 			free(old_name);
-		} else if (strstr(input, ">> You just logged on line") != NULL) {
+		} else if (strstr(input, ">> You just logged on line") != nullptr) {
 		  sscanf(input, "%*c%*c %*s %*s %*s %*s %*s %d", &acct->id);
 		}
 		return (in);

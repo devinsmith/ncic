@@ -42,8 +42,6 @@ struct pork_acct {
 
 	time_t last_input;
 
-	struct timeval last_flush;
-
 	int id;
 	int state;
 

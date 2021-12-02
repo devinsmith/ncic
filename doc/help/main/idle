@@ -1,5 +1,0 @@
-SYNTAX: idle [<idle seconds>]
-	Sets the idle time for the current screen name to the specified number of seconds. If no parameter is specified, the idle time for the current screen name is set to 0.
-
-PARAMETERS
-	<idle seconds>: (Optional) The time, in seconds, to which to mark the current screen name idle.

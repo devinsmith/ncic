@@ -1,2 +1,0 @@
-THE TIMER COMMAND SET
-	Pork supports a timer system that allows commands to be executed at a regular interval a specified number of times. For example, it's possible to add a timer that causes the command "echo hi" to be executed every 2 seconds, 10 times (/timer add 2 10 echo hi). Specifying 0 for the number of times the command should be executed means it will be executed at the specified interval an unlimited number of times.
