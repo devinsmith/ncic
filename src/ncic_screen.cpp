@@ -127,7 +127,7 @@ static void screen_window_list_remove(dlist_t *node) {
 ** list visible in it by default.
 */
 
-int screen_init(u_int32_t rows, u_int32_t cols) {
+int screen_init(int rows, int cols) {
 	struct imwindow *imwindow;
 	struct pork_acct *acct;
 

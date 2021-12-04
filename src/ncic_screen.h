@@ -17,29 +17,24 @@ extern "C" {
 
 extern struct screen screen;
 
-enum {
-	FOCUS_MSG,
-	FOCUS_BUDDY
-};
-
-struct blist;
 struct imwindow;
-struct pork_acct;
+class pork_acct;
 
 #include "ncic_input.h"
 #include "ncic_bind.h"
 
 struct screen {
-	u_int32_t rows;
-	u_int32_t cols;
+	int rows;
+	int cols;
 	dlist_t *cur_window;
 	dlist_t *window_list;
-	dlist_t *timer_list;
 	struct imwindow *status_win;
-  struct pork_acct *acct;
+
+  pork_acct *acct;
 	WINDOW *status_bar;
 	u_int32_t quiet:1;
-	struct pork_acct *null_acct;
+
+	pork_acct *null_acct;
 	struct input input;
 	struct binds binds;
 	hash_t alias_hash;
@@ -47,7 +42,7 @@ struct screen {
 
 #define cur_window() ((struct imwindow *) (screen.cur_window->data))
 
-int screen_init(u_int32_t rows, u_int32_t cols);
+int screen_init(int rows, int cols);
 void screen_destroy(void);
 
 int screen_renumber(struct imwindow *imwindow, u_int32_t refnum);

@@ -9,9 +9,9 @@
 */
 
 #include <ncurses.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 #include <sys/time.h>
 #include <sys/types.h>
 
@@ -29,28 +29,6 @@
 
 extern struct sockaddr_storage local_addr;
 extern in_port_t local_port;
-
-
-
-/*
-** Free everything that needs freeing.
-*/
-
-static void pork_acct_free(struct pork_acct *acct) {
-	/* XXX - really? */
-  if (acct->proto->free != nullptr)
-		acct->proto->free(acct);
-
-	hash_destroy(&acct->autoreply);
-
-	free_str_wipe(acct->passwd);
-	free(acct->away_msg);
-	free(acct->username);
-	free(acct->profile);
-	free(acct->server);
-	free(acct->fport);
-	free(acct);
-}
 
 struct pork_acct *pork_acct_find(u_int32_t refnum) {
   return screen.acct;
@@ -102,7 +80,7 @@ void pork_acct_del(struct pork_acct *acct, const char *reason) {
 
 	/* This must always be the case. */
 	if (acct != nullptr) {
-		pork_acct_free(acct);
+		delete acct;
 	}
 }
 
@@ -202,21 +180,20 @@ static inline u_int32_t pork_acct_get_new_refnum() {
 */
 
 struct pork_acct *pork_acct_init(const char *user, int protocol) {
-	struct pork_acct *acct;
-
-	acct = (pork_acct *)xcalloc(1, sizeof(*acct));
+  auto *acct = new pork_acct;
 	acct->username = xstrdup(user);
 	acct->state = STATE_DISCONNECTED;
-
 	acct->proto = proto_get(protocol);
 
 	if (protocol < 0)
 		return (acct);
 
-	if (acct->proto->init != nullptr && acct->proto->init(acct) == -1)
-		goto out_fail2;
+	if (acct->proto->init != nullptr && acct->proto->init(acct) == -1) {
+    delete acct;
+    return nullptr;
+  }
 
-	acct->can_connect = 1;
+	acct->can_connect = true;
 	acct->refnum = pork_acct_get_new_refnum();
 
 	memcpy(&acct->laddr, &local_addr, sizeof(acct->laddr));
@@ -224,23 +201,6 @@ struct pork_acct *pork_acct_init(const char *user, int protocol) {
 
 	time(&acct->last_input);
 	return (acct);
-
-out_fail2:
-	free(acct->username);
-	free(acct);
-	return (nullptr);
-}
-
-void pork_acct_connected(struct pork_acct *acct) {
-	acct->successful_connect = 1;
-	acct->connected = 1;
-
-	if (acct->reconnecting)
-		chat_rejoin_all(acct);
-
-	acct->disconnected = 0;
-	acct->reconnecting = 0;
-	acct->reconnect_tries = 0;
 }
 
 static int pork_acct_reconnect(struct pork_acct *acct) {
@@ -253,7 +213,7 @@ static int pork_acct_reconnect(struct pork_acct *acct) {
 	}
 
 	acct->reconnect_tries++;
-	acct->reconnecting = 1;
+	acct->reconnecting = true;
 
 	screen_err_msg("Automatically reconnecting account %s (attempt %u)",
 		acct->username, acct->reconnect_tries);
@@ -270,9 +230,9 @@ static int pork_acct_connect_fail(struct pork_acct *acct) {
 	connect_interval = opt_get_int(OPT_RECONNECT_INTERVAL);
 	connect_interval_max = opt_get_int(OPT_RECONNECT_MAX_INTERVAL);
 
-	acct->connected = 0;
-	acct->reconnecting = 0;
-	acct->disconnected = 1;
+	acct->connected = false;
+	acct->reconnecting = false;
+	acct->disconnected = true;
 
 	if (acct->reconnect_tries >= max_reconnect_tries) {
 		screen_err_msg("Failed to reconnect %s after %u tries. Giving up.",
@@ -299,10 +259,10 @@ int pork_acct_disconnected(struct pork_acct *acct) {
 	screen_win_msg(cur_window(), 1, 1, 0, MSG_TYPE_SIGNOFF,
 		"%s has been disconnected", acct->username);
 
-	acct->connected = 0;
-	acct->reconnecting = 0;
+	acct->connected = false;
+	acct->reconnecting = false;
 	acct->reconnect_tries = 0;
-	acct->disconnected = 1;
+	acct->disconnected = true;
 	acct->reconnect_next_try = time(nullptr);
 
 	if (acct->proto->disconnected != nullptr)
@@ -335,6 +295,39 @@ void pork_acct_reconnect_all(void) {
 	}
 }
 
-int pork_acct_save(struct pork_acct *acct) {
-	return (0);
+pork_acct::pork_acct() : username{nullptr}, passwd{nullptr},
+  userhost{nullptr}, away_msg{nullptr}, last_input{0}, id{0}, state{0},
+  idle_time{0}, report_idle{false}, marked_idle{false}, can_connect{false},
+  connected{false}, successful_connect{false}, disconnected{false},
+  reconnecting{false}
+{
+
+}
+
+pork_acct::~pork_acct()
+{
+  /* XXX - really? */
+  if (proto->free != nullptr)
+    proto->free(this);
+
+  hash_destroy(&autoreply);
+
+  free_str_wipe(passwd);
+  free(away_msg);
+  free(username);
+  free(server);
+  free(fport);
+}
+
+void pork_acct::set_connected()
+{
+  successful_connect = true;
+  connected = true;
+
+  if (reconnecting)
+    chat_rejoin_all(this);
+
+  disconnected = false;
+  reconnecting = false;
+  reconnect_tries = 0;
 }

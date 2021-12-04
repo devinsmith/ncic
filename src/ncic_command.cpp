@@ -56,9 +56,6 @@ USER_COMMAND(cmd_set);
 USER_COMMAND(cmd_unbind);
 USER_COMMAND(cmd_unalias);
 
-USER_COMMAND(cmd_acct_save);
-USER_COMMAND(cmd_acct_set);
-
 USER_COMMAND(cmd_win);
 USER_COMMAND(cmd_win_bind);
 USER_COMMAND(cmd_win_bind_next);
@@ -126,7 +123,6 @@ enum {
   CMDSET_HISTORY,
   CMDSET_INPUT,
   CMDSET_SCROLL,
-  CMDSET_ACCT,
 };
 
 /*
@@ -140,7 +136,6 @@ enum {
 
 static struct command command[] = {
 	{ "",			cmd_send			},
-	{ "acct",		cmd_acct			},
 	{ "alias",		cmd_alias			},
 	{ "auto",		cmd_auto			},
 	{ "away",		cmd_away			},
@@ -657,18 +652,6 @@ USER_COMMAND(cmd_history_prev) {
 	input_history_prev(cur_window()->input);
 }
 
-/*
-** acct commands
-*/
-
-static struct command acct_command[] = {
-	{ "save",	cmd_acct_save		},
-};
-
-USER_COMMAND(cmd_acct_save) {
-	pork_acct_save(cur_window()->owner);
-}
-
 static struct command_set {
 	struct command *set;
 	size_t elem;
@@ -679,7 +662,6 @@ static struct command_set {
 	{	history_command,	array_elem(history_command),	"history "	},
 	{	input_command,		array_elem(input_command),		"input "	},
 	{	scroll_command,		array_elem(scroll_command),		"scroll "	},
-	{	acct_command,		array_elem(acct_command),		"acct "		},
 };
 
 /*
@@ -1110,13 +1092,6 @@ USER_COMMAND(cmd_notice) {
 		chat_send_notice(acct, chat, target, args);
 	else
 		pork_notice_send(acct, target, args);
-}
-
-USER_COMMAND(cmd_acct) {
-	if (args != nullptr)
-		run_one_command(args, CMDSET_ACCT);
-	else
-		run_one_command("list", CMDSET_ACCT);
 }
 
 USER_COMMAND(cmd_win) {

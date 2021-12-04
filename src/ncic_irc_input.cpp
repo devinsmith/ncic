@@ -46,7 +46,7 @@ static int naken_process_input(irc_session_t *session, char *input, int len)
 		struct chatroom *chat;
 
 		acct->state = STATE_READY;
-		pork_acct_connected(acct);
+    acct->set_connected();
 
 		chat = chat_new(acct, "main", "main", screen.status_win);
 		return 0;

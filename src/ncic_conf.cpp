@@ -148,9 +148,6 @@ static int read_acct_conf(struct pork_acct *acct, const char *filename) {
 			}
 
 			acct->passwd = xstrdup(p);
-		} else if (!strcasecmp(buf, "profile")) {
-			free(acct->profile);
-			acct->profile = xstrdup(p);
 		} else {
 			screen_err_msg("Error: account config line %d: bad setting: %s",
 				line, buf);
@@ -208,8 +205,6 @@ static int save_acct_conf(struct pork_acct *acct, char *filename) {
 
 	if (acct->username != nullptr)
 		fprintf(fp, "username: %s\n", acct->username);
-	if (acct->profile != nullptr)
-		fprintf(fp, "profile: %s\n", acct->profile);
 	if (opt_get_bool(OPT_SAVE_PASSWD) && acct->passwd != nullptr)
 		fprintf(fp, "password: %s\n", acct->passwd);
 

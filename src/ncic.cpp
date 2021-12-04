@@ -80,8 +80,7 @@ static inline void binding_run(struct binding *binding) {
 		run_mcommand(binding->binding);
 }
 
-static void
-resize_display() {
+static void resize_display() {
 	struct winsize size;
 
 	if (ioctl(1, TIOCGWINSZ, &size) != 0) {

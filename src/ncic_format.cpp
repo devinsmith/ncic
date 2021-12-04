@@ -332,12 +332,6 @@ static int format_status(char opt, char *buf, size_t len, va_list ap) {
 			ret = xstrncpy(buf, acct->proto->name, len);
 			break;
 
-		/* User mode */
-		case 'u':
-		case 'U':
-			ret = xstrncpy(buf, acct->umode, len);
-			break;
-
 		/* Timestamp */
 		case 't':
 		case 'T':

@@ -132,15 +132,6 @@ static void irc_connected(int sock, u_int32_t cond, void *data) {
 
 static int irc_init(struct pork_acct *acct) {
 	irc_session_t *session = (irc_session_t *)xcalloc(1, sizeof(*session));
-	char *ircname;
-
-	ircname = getenv("IRCNAME");
-	if (ircname != nullptr)
-		acct->profile = xstrdup(ircname);
-	else {
-		if (acct->profile == nullptr)
-			acct->profile = xstrdup(DEFAULT_IRC_PROFILE);
-	}
 
 	session->outq = queue_new(0);
 	session->inq = queue_new(0);
@@ -211,12 +202,12 @@ static u_int32_t irc_add_servers(struct pork_acct *acct, char *str) {
 }
 
 static int irc_do_connect(struct pork_acct *acct, char *args) {
-    irc_session_t *session = (irc_session_t *)acct->data;
+  irc_session_t *session = acct->data;
 	int sock;
 	int ret;
 
 	if (args == nullptr) {
-		screen_err_msg("Error: IRC: Syntax is /connect <nick> <server>[:<port>[:<passwd>]] ... <serverN>[:<port>[:<passwd>]]");
+		screen_err_msg("Error: Syntax is /connect <nick> <server>[:<port>[:<passwd>]] ... <serverN>[:<port>[:<passwd>]]");
 		return (-1);
 	}
 
@@ -238,7 +229,7 @@ static int irc_do_connect(struct pork_acct *acct, char *args) {
 }
 
 static int irc_connect_abort(struct pork_acct *acct) {
-    irc_session_t *session = (irc_session_t *)acct->data;
+    auto *session = acct->data;
 
 	close(session->sock);
 	pork_io_del(session);
