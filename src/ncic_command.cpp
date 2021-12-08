@@ -109,9 +109,6 @@ USER_COMMAND(cmd_history_list);
 USER_COMMAND(cmd_history_next);
 USER_COMMAND(cmd_history_prev);
 
-extern struct sockaddr_storage local_addr;
-extern in_port_t local_port;
-
 static void print_binding(void *data, void *nothing);
 static void print_alias(void *data, void *nothing);
 static int cmd_compare(const void *l, const void *r);

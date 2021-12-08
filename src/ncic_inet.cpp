@@ -231,8 +231,7 @@ int sock_setflags(int sock, uint32_t flags) {
 	return (ret);
 }
 
-int nb_connect(	struct sockaddr_storage *ss,
-				struct sockaddr_storage *laddr,
+int nb_connect(struct sockaddr_storage *ss,
 				in_port_t port,
 				int *dsock)
 {
@@ -243,12 +242,6 @@ int nb_connect(	struct sockaddr_storage *ss,
 	if (sock < 0) {
 		debug("socket: %s", strerror(errno));
 		return (-1);
-	}
-
-	if (laddr != nullptr) {
-		if (bind(sock, (struct sockaddr *) laddr, sin_len(laddr)) != 0) {
-			screen_err_msg("Failed to bind: %s", strerror(errno));
-		}
 	}
 
 	/* Set nonblocking socket */

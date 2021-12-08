@@ -78,9 +78,6 @@ public:
 	char *fport{};
 	char *server{};
 
-	in_port_t lport{};
-	struct sockaddr_storage laddr{};
-
 	struct pork_proto *proto{};
 	irc_session_t *data{};
 };

@@ -86,7 +86,6 @@ int irc_connect(struct pork_acct *acct,
 	struct sockaddr_storage ss;
 	struct sockaddr_storage local;
 	in_port_t port_num;
-	char *irchost = getenv("IRCHOST");
 	char *port;
 	char buf[IRC_OUT_BUFLEN];
 	char *passwd = nullptr;
@@ -122,15 +121,6 @@ int irc_connect(struct pork_acct *acct,
 		return (-1);
 	}
 
-	if (irchost != nullptr) {
-		if (get_addr(irchost, &local) != 0) {
-			screen_err_msg("Error: %s: Invalid local hostname: %s",
-				acct->username, irchost);
-			memcpy(&local, &acct->laddr, sizeof(local));
-		}
-	} else
-		memcpy(&local, &acct->laddr, sizeof(local));
-
 	free(acct->fport);
 	acct->fport = xstrdup(port);
 
@@ -142,9 +132,8 @@ int irc_connect(struct pork_acct *acct,
 		acct->passwd = xstrdup(passwd);
 	}
 
-	sin_set_port(&local, acct->lport);
 	memset(buf, 0, sizeof(buf));
-	return (nb_connect(&ss, &local, port_num, sock));
+	return (nb_connect(&ss, port_num, sock));
 }
 
 int irc_send_raw(irc_session_t *session, char *str) {

@@ -29,8 +29,7 @@ extern "C" {
 #define SIN6(x) ((struct sockaddr_in6 *) (x))
 #define VALID_PORT(x) ((((x) & 0xffff) == (x)) && ((x) != 0))
 
-int nb_connect(	struct sockaddr_storage *ss,
-				struct sockaddr_storage *local,
+int nb_connect(struct sockaddr_storage *ss,
 				in_port_t port,
 				int *dsock);
 

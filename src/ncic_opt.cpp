@@ -13,15 +13,28 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <sys/socket.h>
-#include <netinet/in.h>
 
 #include "ncic_opt.h"
 
-static void print_help_text();
+char *g_log_file = nullptr;
 
-struct sockaddr_storage local_addr;
-in_port_t local_port;
+static void print_help_text()
+{
+  const char usage[] =
+          "Usage: ncic [options]\n"
+          "-h or --help           Display this help text\n"
+          "-v or --version        Display version information and exit\n";
+
+  printf("%s", usage);
+}
+
+static void args_required(char * arg, const char *argname)
+{
+  fprintf(stderr, "ncic: option '%s' expects a parameter (%s)\n", arg,
+    argname);
+
+  exit(1);
+}
 
 int get_options(int argc, char *const argv[])
 {
@@ -37,6 +50,11 @@ int get_options(int argc, char *const argv[])
 	  } else if (!strcmp(p, "-h")) {
       print_help_text();
       exit(0);
+    } else if (!strcmp(p, "--log")) {
+      if (!argv[1]) {
+        args_required(p, "log");
+      }
+      g_log_file = *++argv, --argc;
 	  } else {
 	    print_help_text();
 	    exit(1);
@@ -44,13 +62,4 @@ int get_options(int argc, char *const argv[])
 	}
 
 	return (0);
-}
-
-static void print_help_text() {
-	const char usage[] =
-"Usage: ncic [options]\n"
-"-h or --help           Display this help text\n"
-"-v or --version        Display version information and exit\n";
-
-	printf("%s", usage);
 }

@@ -15,6 +15,8 @@
 extern "C" {
 #endif
 
+extern char *g_log_file;
+
 int get_options(int argc, char *const argv[]);
 
 #ifdef __cplusplus

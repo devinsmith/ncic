@@ -27,9 +27,6 @@
 #include "ncic_msg.h"
 #include "ncic_chat.h"
 
-extern struct sockaddr_storage local_addr;
-extern in_port_t local_port;
-
 struct pork_acct *pork_acct_find(u_int32_t refnum) {
   return screen.acct;
 }
@@ -119,13 +116,6 @@ int pork_acct_connect(const char *user, char *args, int protocol) {
   }
 
   screen.acct = acct;
-
-  if (!acct->can_connect || acct->proto->connect == nullptr) {
-    screen_err_msg("You must specify a screen name before connecting");
-    pork_acct_del_refnum(acct->refnum, nullptr);
-    return (-1);
-  }
-
   screen_bind_all_unbound(acct);
 
   if (acct->proto->connect(acct, args) == -1) {
@@ -195,9 +185,6 @@ struct pork_acct *pork_acct_init(const char *user, int protocol) {
 
 	acct->can_connect = true;
 	acct->refnum = pork_acct_get_new_refnum();
-
-	memcpy(&acct->laddr, &local_addr, sizeof(acct->laddr));
-	acct->lport = local_port;
 
 	time(&acct->last_input);
 	return (acct);
