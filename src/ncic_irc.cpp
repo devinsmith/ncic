@@ -207,7 +207,7 @@ static int irc_do_connect(struct pork_acct *acct, char *args) {
 	int ret;
 
 	if (args == nullptr) {
-		screen_err_msg("Error: Syntax is /connect <nick> <server>[:<port>[:<passwd>]] ... <serverN>[:<port>[:<passwd>]]");
+		screen_err_msg("Error: Syntax is /connect <nick>[=passwd] <server>[:<port>]");
 		return (-1);
 	}
 
