@@ -1181,31 +1181,6 @@ int opt_set_str(uint32_t opt, char *args) {
 	return (0);
 }
 
-int opt_set_color(uint32_t opt, char *args) {
-	attr_t attr = 0;
-
-	if (*args != '%') {
-		if (color_parse_code(args, &attr) == -1)
-			return (-1);
-	} else {
-		char buf[32];
-		chtype ch[4];
-
-		snprintf(buf, sizeof(buf), "%s ", args);
-		if (plaintext_to_cstr(ch, array_elem(ch), buf, nullptr) != 1)
-			return (-1);
-
-		attr = ch[0] & A_ATTRIBUTES;
-	}
-
-	global_pref[opt].val.i = attr;
-
-	if (global_pref[opt].updated != nullptr)
-		global_pref[opt].updated();
-
-	return (0);
-}
-
 int opt_set(uint32_t opt, char *args) {
 	struct global_pref *var = &global_pref[opt];
 
