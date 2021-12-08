@@ -8,8 +8,6 @@
 ** as published by the Free Software Foundation.
 */
 
-#include "config.h"
-
 #include <unistd.h>
 #include <ncurses.h>
 #include <cstdlib>
@@ -29,6 +27,7 @@
 #include "ncic_screen_io.h"
 #include "ncic_io.h"
 #include "ncic_status.h"
+#include "ncic_log.h"
 
 /*
 ** Find the window having the specified refnum, and return
@@ -141,6 +140,8 @@ int screen_init(int rows, int cols) {
 
 	if (status_init() == -1)
 		return (-1);
+
+  log_tmsg(0, "Setting up NULL account");
 
 	acct = pork_acct_init(opt_get_str(OPT_TEXT_NO_NAME), PROTO_NULL);
 	if (acct == nullptr)

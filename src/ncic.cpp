@@ -47,6 +47,7 @@
 #include "ncic_command.h"
 #include "ncic_io.h"
 #include "ncic_proto.h"
+#include "ncic_log.h"
 
 struct screen screen;
 
@@ -133,8 +134,15 @@ keyboard_input(int fd, uint32_t cond, void *data)
 	}
 }
 
-int
-main(int argc, char *argv[])
+static void init_logging()
+{
+  if (g_log_file != nullptr) {
+    log_init();
+    log_set_logfile(g_log_file);
+  }
+}
+
+int main(int argc, char *argv[])
 {
 	struct passwd *pw;
 	char buf[PATH_MAX];
@@ -156,6 +164,9 @@ main(int argc, char *argv[])
 		fprintf(stderr, "Fatal: Error getting options.\n");
 		exit(-1);
 	}
+
+  init_logging();
+  log_tmsg(0, "Starting up!");
 
 	if (initialize_environment() != 0) {
 		fprintf(stderr, "Fatal: Error initializing the terminal.\n");
