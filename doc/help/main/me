@@ -1,5 +1,0 @@
-SYNTAX: me <msg>
-	Sends an action (if the current user's protocol supports it).
-
-PARAMETERS
-	<msg>: The action message to send.

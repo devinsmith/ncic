@@ -45,7 +45,6 @@ USER_COMMAND(cmd_connect);
 USER_COMMAND(cmd_disconnect);
 USER_COMMAND(cmd_help);
 USER_COMMAND(cmd_load);
-USER_COMMAND(cmd_me);
 USER_COMMAND(cmd_msg);
 USER_COMMAND(cmd_nick);
 USER_COMMAND(cmd_quit);
@@ -142,7 +141,6 @@ static struct command command[] = {
 	{ "history",	cmd_history			},
 	{ "input",		cmd_input			},
 	{ "load",		cmd_load			},
-	{ "me",			cmd_me				},
 	{ "msg",		cmd_msg				},
 	{ "nick",		cmd_nick			},
 	{ "quit",		cmd_quit			},
@@ -922,25 +920,6 @@ USER_COMMAND(cmd_load) {
 		screen_err_msg("Error reading %s: %s", buf, strerror(errno));
 
 	screen_set_quiet(quiet);
-}
-
-USER_COMMAND(cmd_me) {
-	struct imwindow *win = cur_window();
-
-	if (args == nullptr)
-		return;
-
-  log_tmsg(0, "/me %s, %d", args, win->type);
-
-	if (win->type == WIN_TYPE_PRIVMSG)
-		pork_action_send(win->owner, cur_window()->target, args);
-	else if (win->type == WIN_TYPE_CHAT) {
-		struct chatroom *chat;
-
-		chat = (chatroom *)win->data;
-		if (chat != nullptr)
-			chat_send_action(win->owner, chat, chat->title, args);
-	}
 }
 
 USER_COMMAND(cmd_msg) {

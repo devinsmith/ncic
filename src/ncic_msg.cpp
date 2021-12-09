@@ -156,33 +156,6 @@ int pork_change_nick(struct pork_acct *acct, char *nick) {
 	return (-1);
 }
 
-int pork_action_send(struct pork_acct *acct, char *dest, char *msg) {
-	if (acct->proto->send_action == nullptr || dest == nullptr)
-		return (-1);
-
-	if (acct->proto->send_action(acct, dest, msg) != -1) {
-		char buf[4096];
-		struct imwindow *win;
-		int type;
-		int ret;
-
-		screen_get_query_window(acct, dest, &win);
-
-		if (win == screen.status_win)
-			type = OPT_FORMAT_ACTION_SEND_STATUS;
-		else
-			type = OPT_FORMAT_ACTION_SEND;
-
-		ret = fill_format_str(type, buf, sizeof(buf), acct, dest, msg);
-		if (ret < 1)
-			return (-1);
-		screen_print_str(win, buf, (size_t) ret, MSG_TYPE_PRIVMSG_SEND);
-		imwindow_send_msg(win);
-	}
-
-	return (0);
-}
-
 int pork_notice_send(struct pork_acct *acct, char *dest, char *msg) {
 	struct imwindow *win;
 

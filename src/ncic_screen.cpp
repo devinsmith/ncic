@@ -335,51 +335,6 @@ void screen_refresh(void) {
 	screen_doupdate();
 }
 
-struct imwindow *screen_new_window(	struct pork_acct *acct,
-									char *target,
-									char *name)
-{
-	u_int32_t refnum = screen_get_new_refnum();
-	struct imwindow *imwindow;
-	u_int32_t rows;
-
-	rows = max(1, (int) screen.rows - STATUS_ROWS);
-
-	imwindow = imwindow_new(rows, screen.cols,
-		refnum, WIN_TYPE_PRIVMSG, acct, target);
-	if (imwindow == nullptr)
-		return (nullptr);
-
-	if (name != nullptr)
-		imwindow_rename(imwindow, name);
-
-	screen_add_window(imwindow);
-	status_draw(imwindow->owner);
-
-	return (imwindow);
-}
-
-int screen_get_query_window(struct pork_acct *acct,
-							char *name,
-							struct imwindow **winr)
-{
-	struct imwindow *win;
-	int newid = 0;
-
-	win = imwindow_find(acct, name);
-	if (win == nullptr || win->type != WIN_TYPE_PRIVMSG) {
-		if (opt_get_bool(OPT_DUMP_MSGS_TO_STATUS))
-			win = screen.status_win;
-		else {
-			win = screen_new_window(acct, name, name);
-			newid++;
-		}
-	}
-
-	*winr = win;
-	return (newid);
-}
-
 /*
 ** When we really want a query window.
 */
