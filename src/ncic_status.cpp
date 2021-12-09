@@ -41,7 +41,7 @@ int status_init(void) {
 ** and the status bar isn't redrawn all that much anyway.
 */
 
-void status_draw(struct pork_acct *acct) {
+void status_draw(pork_acct *acct) {
 	char buf[1024];
 	chtype status_bar[screen.cols + 1];
 	struct imwindow *win = cur_window();

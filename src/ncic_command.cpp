@@ -34,6 +34,7 @@
 #include "ncic_msg.h"
 #include "ncic_command.h"
 #include "ncic_help.h"
+#include "ncic_log.h"
 
 USER_COMMAND(cmd_acct);
 USER_COMMAND(cmd_alias);
@@ -396,6 +397,7 @@ USER_COMMAND(cmd_win_bind) {
 }
 
 USER_COMMAND(cmd_win_bind_next) {
+
 	if (imwindow_bind_next_acct(cur_window()) != -1)
 		screen_refresh();
 }
@@ -792,7 +794,7 @@ USER_COMMAND(cmd_bind) {
 	screen_err_msg("Error binding %s", key_str);
 }
 
-USER_COMMAND(cmd_connect) {
+static void cmd_connect(char *args) {
 	char *user;
 
 	if (args == nullptr || blank_str(args))
@@ -802,10 +804,9 @@ USER_COMMAND(cmd_connect) {
 	pork_acct_connect(user, args, PROTO_IRC);
 }
 
-USER_COMMAND(cmd_disconnect) {
+static void cmd_disconnect(char *args) {
 	struct pork_acct *acct = cur_window()->owner;
 	u_int32_t dest;
-	dlist_t *node;
 
 	if (!acct->can_connect)
 		return;
@@ -827,11 +828,6 @@ USER_COMMAND(cmd_disconnect) {
 	acct = pork_acct_find(dest);
 	if (acct == nullptr) {
 		screen_err_msg("Account refnum %u is not logged in", dest);
-		return;
-	}
-
-	if (!acct->can_connect) {
-		screen_err_msg("You cannot sign %s off", acct->username);
 		return;
 	}
 
@@ -949,6 +945,8 @@ USER_COMMAND(cmd_me) {
 
 	if (args == nullptr)
 		return;
+
+  log_tmsg(0, "/me %s, %d", args, win->type);
 
 	if (win->type == WIN_TYPE_PRIVMSG)
 		pork_action_send(win->owner, cur_window()->target, args);

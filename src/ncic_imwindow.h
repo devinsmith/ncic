@@ -11,11 +11,7 @@
 #ifndef __NCIC_IMWINDOW_H__
 #define __NCIC_IMWINDOW_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-struct pork_acct;
+class pork_acct;
 struct imsg;
 
 #include "ncic_set.h"
@@ -30,7 +26,7 @@ enum {
 struct imwindow {
 	struct swindow swindow;
 	struct input *input;
-	struct pork_acct *owner;
+	pork_acct *owner;
 	struct key_binds *active_binds;
 	char *target;
 	char *name;
@@ -38,7 +34,6 @@ struct imwindow {
 	uint32_t refnum;
 	uint32_t type:2;
 	uint32_t typing:2;
-	uint32_t input_focus:1;
 	uint32_t ignore_activity:1;
 	uint32_t skip:1;
 	pref_val_t opts[WOPT_NUM_OPTS];
@@ -62,14 +57,10 @@ int imwindow_bind_acct(struct imwindow *imwindow, uint32_t refnum);
 int imwindow_bind_next_acct(struct imwindow *imwindow);
 int imwindow_refresh(struct imwindow *imwindow);
 void imwindow_destroy(struct imwindow *imwindow);
-void imwindow_switch_focus(struct imwindow *imwindow);
 void imwindow_buffer_find(struct imwindow *imwindow, char *str, uint32_t opt);
 
 struct imwindow *imwindow_find_refnum(uint32_t refnum);
 struct imwindow *imwindow_find(struct pork_acct *owner, const char *target);
-struct imwindow *imwindow_find_name(struct pork_acct *owner, const char *name);
-struct imwindow *imwindow_find_chat_target(	struct pork_acct *owner,
-											const char *target);
 
 int imwindow_add(struct imwindow *imwindow,
 						struct imsg *imsg,
@@ -90,9 +81,5 @@ void imwindow_scroll_start(struct imwindow *imwindow);
 void imwindow_scroll_end(struct imwindow *imwindow);
 void imwindow_clear(struct imwindow *imwindow);
 void imwindow_erase(struct imwindow *imwindow);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* __NCIC_IMWINDOW_H__ */

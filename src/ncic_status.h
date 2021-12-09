@@ -17,10 +17,10 @@ extern "C" {
 
 #define STATUS_ROWS 2
 
-struct pork_acct;
+class pork_acct;
 
 int status_init(void);
-void status_draw(struct pork_acct *acct);
+void status_draw(pork_acct *acct);
 
 #ifdef __cplusplus
 }

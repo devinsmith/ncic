@@ -275,42 +275,6 @@ static int format_status(char opt, char *buf, size_t len, va_list ap) {
 			}
 			break;
 
-		/* Chat mode, if applicable; M includes arguments, m doesn't. */
-		case 'M':
-		case 'm':
-			if (imwindow->type == WIN_TYPE_CHAT && imwindow->data != nullptr) {
-				struct chatroom *chat = (struct chatroom *)imwindow->data;
-
-				ret = xstrncpy(buf, chat->mode, len);
-				if (opt == 'm') {
-					char *p;
-
-					p = strchr(buf, ' ');
-					if (p != nullptr)
-						*p = '\0';
-				}
-			}
-			break;
-
-		/* Chat status, if applicable */
-		case '@':
-			if (imwindow->type == WIN_TYPE_CHAT && imwindow->data != nullptr) {
-				struct chatroom *chat = (struct chatroom *)imwindow->data;
-				struct chat_user *user;
-
-				user = chat_find_user(acct, chat, acct->username);
-				if (user == nullptr)
-					break;
-
-				if (user->status & CHAT_STATUS_OP)
-					ret = xstrncpy(buf, "@", len);
-				else if (user->status & CHAT_STATUS_HALFOP)
-					ret = xstrncpy(buf, "%%", len);
-				else if (user->status & CHAT_STATUS_VOICE)
-					ret = xstrncpy(buf, "+", len);
-			}
-			break;
-
 		/* User status */
 		case '!':
 			if (acct->disconnected) {
