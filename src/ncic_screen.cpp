@@ -359,25 +359,6 @@ struct imwindow *screen_new_window(	struct pork_acct *acct,
 	return (imwindow);
 }
 
-struct imwindow *screen_new_chat_window(struct pork_acct *acct, char *name) {
-	u_int32_t refnum = screen_get_new_refnum();
-	struct imwindow *imwindow;
-	u_int32_t rows;
-
-	rows = max(1, (int) screen.rows - STATUS_ROWS);
-	imwindow = imwindow_new(rows, screen.cols,
-		refnum, WIN_TYPE_CHAT, acct, name);
-	if (imwindow == nullptr)
-		return (nullptr);
-
-	imwindow->data = nullptr;
-
-	screen_add_window(imwindow);
-	status_draw(imwindow->owner);
-
-	return (imwindow);
-}
-
 int screen_get_query_window(struct pork_acct *acct,
 							char *name,
 							struct imwindow **winr)

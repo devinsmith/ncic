@@ -28,62 +28,6 @@
 #include "ncic_screen.h"
 #include "ncic_msg.h"
 
-int pork_msg_autoreply(struct pork_acct *acct, char *dest, char *msg) {
-	struct imwindow *win;
-	char buf[4096];
-	int ret;
-
-	if (acct->proto->send_msg_auto == nullptr)
-		return (-1);
-
-	if (acct->proto->send_msg_auto(acct, dest, msg) == -1)
-		return (-1);
-
-	screen_get_query_window(acct, dest, &win);
-	ret = fill_format_str(OPT_FORMAT_IM_SEND_AUTO, buf, sizeof(buf), acct, dest, msg);
-	if (ret < 1)
-		return (-1);
-	screen_print_str(win, buf, (size_t) ret, MSG_TYPE_PRIVMSG_SEND);
-	imwindow_send_msg(win);
-	return (0);
-}
-
-int pork_msg_send_auto(struct pork_acct *acct, char *sender) {
-	dlist_t *node;
-	u_int32_t hash_val;
-	int ret = 0;
-
-	if (acct->away_msg != nullptr && acct->proto->send_msg_auto == nullptr)
-		return (-1);
-
-	hash_val = string_hash(sender, acct->autoreply.order);
-	node = hash_find(&acct->autoreply, sender, hash_val);
-	if (node == nullptr) {
-		struct autoresp *autoresp;
-
-		autoresp = (struct autoresp *)xcalloc(1, sizeof(*autoresp));
-		autoresp->name = xstrdup(sender);
-		autoresp->last = time(nullptr);
-
-		hash_add(&acct->autoreply, autoresp, hash_val);
-		ret = pork_msg_autoreply(acct, sender, acct->away_msg);
-	} else {
-		time_t time_now = time(nullptr);
-		struct autoresp *autoresp = (struct autoresp *)node->data;
-
-		/*
-		** Only send someone an auto-reply every 10 minutes.
-		** XXX: maybe this should be a configurable value.
-		*/
-		if (autoresp->last + 600 <= time_now) {
-			autoresp->last = time_now;
-			ret = pork_msg_autoreply(acct, sender, acct->away_msg);
-		}
-	}
-
-	return (ret);
-}
-
 int ncic_recv_highlight_msg(struct pork_acct *acct, char *msg)
 {
   char buf[4096];
@@ -184,36 +128,6 @@ int pork_set_back(struct pork_acct *acct) {
 int pork_msg_send(struct pork_acct *acct, char *dest, char *msg) {
 	int ret = 0;
 
-	if (acct->proto->send_msg != nullptr) {
-		ret = acct->proto->send_msg(acct, dest, msg);
-		if (ret == -1) {
-			screen_err_msg("Error: the last message to %s could not be sent",
-				dest);
-		} else {
-			struct imwindow *win;
-			char buf[4096];
-			int type;
-			int ret;
-
-			if (acct->away_msg != nullptr) {
-        pork_set_back(acct);
-			}
-
-			if (screen_get_query_window(acct, dest, &win) != 0)
-				screen_goto_window(win->refnum);
-
-			if (win == screen.status_win)
-				type = OPT_FORMAT_IM_SEND_STATUS;
-			else
-				type = OPT_FORMAT_IM_SEND;
-
-			ret = fill_format_str(type, buf, sizeof(buf), acct, dest, msg);
-			if (ret < 1)
-				return (-1);
-			screen_print_str(win, buf, (size_t) ret, MSG_TYPE_PRIVMSG_SEND);
-			imwindow_send_msg(win);
-		}
-	}
 
 	return (ret);
 }

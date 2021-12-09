@@ -38,7 +38,6 @@
 
 USER_COMMAND(cmd_acct);
 USER_COMMAND(cmd_alias);
-USER_COMMAND(cmd_auto);
 USER_COMMAND(cmd_away);
 USER_COMMAND(cmd_bind);
 USER_COMMAND(cmd_compose);
@@ -135,7 +134,6 @@ enum {
 static struct command command[] = {
 	{ "",			cmd_send			},
 	{ "alias",		cmd_alias			},
-	{ "auto",		cmd_auto			},
 	{ "away",		cmd_away			},
 	{ "bind",		cmd_bind			},
 	{ "connect",	cmd_connect			},
@@ -704,20 +702,6 @@ USER_COMMAND(cmd_alias) {
 	}
 
 	screen_err_msg("Error adding alias for %s", alias);
-}
-
-USER_COMMAND(cmd_auto) {
-	struct pork_acct *acct = cur_window()->owner;
-	char *target;
-
-	if (args == nullptr || !acct->connected)
-		return;
-
-	target = strsep(&args, " ");
-	if (target == nullptr || args == nullptr)
-		return;
-
-	pork_msg_autoreply(acct, target, args);
 }
 
 USER_COMMAND(cmd_away) {

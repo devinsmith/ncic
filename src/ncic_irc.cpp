@@ -255,23 +255,6 @@ static int irc_reconnect(struct pork_acct *acct, char *args __notused) {
 	return (0);
 }
 
-static int irc_privmsg(struct pork_acct *acct, char *dest, char *msg) {
-	char *p;
-
-	/* XXX - fix this */
-	p = strchr(dest, ',');
-	if (p != nullptr)
-		*p = '\0';
-
-    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
-	return (irc_send_privmsg(session, dest, msg));
-}
-
-static int irc_mode(struct pork_acct *acct, char *str) {
-    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
-    return (irc_send_mode(session, str));
-}
-
 static int irc_chan_send(struct pork_acct *acct,
 			struct chatroom *chat,
 			const char *target,
@@ -611,7 +594,6 @@ int irc_proto_init(struct pork_proto *proto) {
 	proto->free = irc_free;
 	proto->init = irc_init;
 	proto->signoff = irc_quit;
-	proto->send_msg = irc_privmsg;
 	proto->update = irc_update;
 	proto->user_compare = strcasecmp;
 	proto->change_nick = nullptr;

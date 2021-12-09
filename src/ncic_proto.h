@@ -56,7 +56,6 @@ struct pork_proto {
 	int (*send_action)(struct pork_acct *, char *target, char *msg);
 	int (*send_msg)(struct pork_acct *, char *target, char *msg);
 	int (*send_notice)(struct pork_acct *, char *target, char *msg);
-	int (*send_msg_auto)(struct pork_acct *, char *target, char *msg);
 	int (*set_back)(struct pork_acct *);
 	int (*set_away)(struct pork_acct *, char *);
 
