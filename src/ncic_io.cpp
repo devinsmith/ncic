@@ -21,6 +21,7 @@
 #include "ncic_list.h"
 #include "ncic_io.h"
 #include "ncic_inet.h"
+#include "ncic_log.h"
 
 static dlist_t *io_list;
 
@@ -58,6 +59,8 @@ int pork_io_add(int fd,
 	dlist_t *node;
 	struct io_source *io;
 
+  log_tmsg(0, "Adding new condition on fd: %d, key: %p, cond: %d", fd, key, cond);
+
 	/*
 	** If there's already an entry for this key, delete it
 	** and replace it with the new one.
@@ -81,6 +84,8 @@ int pork_io_add(int fd,
 int pork_io_del(void *key) {
 	dlist_t *node;
 	struct io_source *io;
+
+  log_tmsg(0, "Removing io for key: %p", key);
 
 	node = dlist_find(io_list, key, pork_io_find_cb);
 	if (node == nullptr)
