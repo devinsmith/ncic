@@ -29,6 +29,7 @@
 #include "ncic_imwindow.h"
 #include "ncic_screen_io.h"
 #include "ncic_chat.h"
+#include "ncic_log.h"
 
 #include "ncic_irc.h"
 #include "ncic_naken.h"
@@ -46,7 +47,8 @@ static void irc_event(int sock, u_int32_t cond, void *data) {
 
 			pork_sock_err(acct, sock);
 			pork_io_del(data);
-			pork_acct_disconnected(acct);
+			int ret = pork_acct_disconnected(acct);
+      log_tmsg(0, "Acct disconnected: %d", ret);
 
 			return;
 		}
