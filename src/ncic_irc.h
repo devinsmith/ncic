@@ -18,8 +18,7 @@ extern "C" {
 #define IRC_OUT_BUFLEN		2048
 #define IRC_IN_BUFLEN		8192
 
-#define DEFAULT_IRC_PROFILE "i <3 pork"
-#define DEFAULT_SECURE_PORT	"6667"
+#define DEFAULT_SECURE_PORT	6667
 
 #include "ncic_acct.h"
 #include "ncic_queue.h"
@@ -29,6 +28,7 @@ extern "C" {
 #include <openssl/err.h>
 
 struct chatroom;
+class pork_acct;
 
 enum {
 	MODE_PLUS = '+',
@@ -43,15 +43,7 @@ struct irc_session_t {
 	pork_queue_t *inq;
 	pork_queue_t *outq;
 
-	char *servers[24];
-	char *chanmodes;
-	char *chantypes;
-	char *prefix_types;
-	char *prefix_codes;
-
-	u_int32_t num_servers;
-
-	hash_t callbacks;
+	char *server;
 
 	time_t last_update;
 	size_t input_offset;
@@ -83,22 +75,12 @@ int irc_proto_init(struct pork_proto *proto);
 int irc_flush_outq(irc_session_t *session);
 int irc_connect(struct pork_acct *a, const char *server, int *sock);
 
-int irc_send_raw(irc_session_t *session, char *str);
 int irc_send_pong(irc_session_t *session, char *dest);
 int irc_send_login(irc_session_t *session);
-int irc_send_privmsg(irc_session_t *session, char *dest, char *msg);
-int irc_send_mode(irc_session_t *session, char *mode_str);
-int irc_send_ctcp(irc_session_t *session, char *dest, char *msg);
-int irc_send_whois(irc_session_t *session, char *dest);
-int irc_send_whowas(irc_session_t *session, char *dest);
-int irc_send_ping(irc_session_t *session, char *str);
 int irc_send_quit(irc_session_t *session, const char *reason);
-int irc_send_topic(irc_session_t *session, char *chan, char *topic);
-int irc_send_notice(irc_session_t *session, char *dest, char *msg);
 int irc_set_away(irc_session_t *session, char *msg);
 int irc_send_action(irc_session_t *session, char *dest, char *msg);
 int irc_chan_free(struct pork_acct *acct, void *data);
-int irc_send_invite(irc_session_t *session, char *channel, char *user);
 
 int naken_input_dispatch(irc_session_t *session);
 char *irc_text_filter(char *str);

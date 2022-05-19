@@ -147,7 +147,7 @@ static int irc_init(struct pork_acct *acct) {
 }
 
 static int irc_free(struct pork_acct *acct) {
-	irc_session_t *session = (irc_session_t *)acct->data;
+	irc_session_t *session = acct->data;
 	u_int32_t i;
 
 	if (session->sslHandle) {
@@ -155,16 +155,13 @@ static int irc_free(struct pork_acct *acct) {
 		SSL_free(session->sslHandle);
 	}
 
-	if (session->sslContext)
+	if (session->sslContext) {
 		SSL_CTX_free(session->sslContext);
+  }
 
-	for (i = 0 ; i < session->num_servers ; i++)
-		free_str_wipe(session->servers[i]);
-
-	free(session->chanmodes);
-	free(session->chantypes);
-	free(session->prefix_types);
-	free(session->prefix_codes);
+  if (session->server != nullptr) {
+    free_str_wipe(session->server);
+  }
 
 	queue_destroy(session->inq, free);
 	queue_destroy(session->outq, free);
@@ -191,16 +188,14 @@ static int irc_update(struct pork_acct *acct) {
 }
 
 static u_int32_t irc_add_servers(struct pork_acct *acct, char *str) {
-	char *server;
-	irc_session_t *session = (irc_session_t *)acct->data;
+	irc_session_t *session = acct->data;
 
-	while ((server = strsep(&str, " ")) != nullptr &&
-			session->num_servers < array_elem(session->servers))
-	{
-		session->servers[session->num_servers++] = xstrdup(server);
-	}
+  if (blank_str(str)) {
+    return 0;
+  }
 
-	return (session->num_servers);
+  session->server = xstrdup(str);
+	return 1;
 }
 
 static int irc_do_connect(struct pork_acct *acct, char *args) {
@@ -218,8 +213,8 @@ static int irc_do_connect(struct pork_acct *acct, char *args) {
 		return (-1);
 	}
 
-	screen_err_msg("Server is %s", session->servers[0]);
-	ret = irc_connect(acct, session->servers[0], &sock);
+	screen_err_msg("Server is %s", session->server);
+	ret = irc_connect(acct, session->server, &sock);
 	if (ret == 0)
 		irc_connected(sock, 0, session);
 	else if (ret == -EINPROGRESS)
@@ -241,12 +236,9 @@ static int irc_connect_abort(struct pork_acct *acct) {
 static int irc_reconnect(struct pork_acct *acct, char *args __notused) {
 	int sock;
 	int ret;
-    irc_session_t *session = (irc_session_t *)acct->data;
-	u_int32_t server_num;
+  irc_session_t *session = acct->data;
 
-	server_num = (acct->reconnect_tries - 1) % session->num_servers;
-
-	ret = irc_connect(acct, session->servers[server_num], &sock);
+	ret = irc_connect(acct, session->server, &sock);
 	if (ret == 0) {
 		irc_connected(sock, 0, session);
 	} else if (ret == -EINPROGRESS)
@@ -276,20 +268,6 @@ static int irc_quit(struct pork_acct *acct, const char *reason) {
 	return (-1);
 }
 
-static int irc_action(struct pork_acct *acct, char *dest, char *msg) {
-    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
-	return (irc_send_action(session, dest, msg));
-}
-
-static int irc_chan_action(	struct pork_acct *acct,
-							struct chatroom *chat,
-							char *target,
-							char *msg)
-{
-    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
-	return (irc_send_action(session, target, msg));
-}
-
 static int irc_away(struct pork_acct *acct, char *msg) {
     irc_session_t *session = static_cast<irc_session_t *>(acct->data);
 	return (irc_set_away(session, msg));
@@ -306,276 +284,6 @@ char *irc_text_filter(char *str) {
 
   return xstrdup(str);
 
-#if 0
-	static const char *mirc_fg_col = "wwbgrymyYGcCBMDW";
-	static const char *mirc_bg_col = "ddbgrymyygccbmww";
-	static const char *ansi_esc_col = "drgybmcwDRGYBMCW";
-	size_t len;
-	char *ret;
-	size_t i;
-	int fgcol = 7;
-	int bgcol = -1;
-	u_int32_t highlighting = 0;
-
-	if (str == nullptr)
-		return (xstrdup(""));
-
-	len = strlen(str) + 1024;
-	ret = (char *)xmalloc(len);
-
-	len--;
-	for (i = 0 ; i < len && *str != '\0' ;) {
-		switch (*str) {
-			case '%':
-				if (i + 2 >= len)
-					goto out;
-				memcpy(&ret[i], "%%", 2);
-				i += 2;
-				str++;
-				break;
-
-			/* ^B - bold */
-			case 0x02:
-				if (!(highlighting & HIGHLIGHT_BOLD)) {
-					if (i + 2 >= len)
-						goto out;
-
-					memcpy(&ret[i], "%1", 2);
-					i += 2;
-					highlighting |= HIGHLIGHT_BOLD;
-				} else {
-					if (i + 3 >= len)
-						goto out;
-					memcpy(&ret[i], "%-1", 3);
-					i += 3;
-					highlighting &= ~HIGHLIGHT_BOLD;
-				}
-				str++;
-				break;
-
-			/* ^O - clear everything */
-			case 0x0f:
-				if (i + 2 >= len)
-					goto out;
-				memcpy(&ret[i], "%x", 2);
-				i += 2;
-				highlighting = 0;
-				str++;
-				break;
-
-			/* ^V - inverse */
-			case 0x16:
-				if (!(highlighting & HIGHLIGHT_INVERSE)) {
-					if (i + 2 >= len)
-						goto out;
-
-					memcpy(&ret[i], "%2", 2);
-					i += 2;
-					highlighting |= HIGHLIGHT_INVERSE;
-				} else {
-					if (i + 3 >= len)
-						goto out;
-
-					memcpy(&ret[i], "%-2", 3);
-					i += 3;
-					highlighting &= ~HIGHLIGHT_INVERSE;
-				}
-				str++;
-				break;
-
-			/* ^_ - underline */
-			case 0x1f:
-				if (!(highlighting & HIGHLIGHT_UNDERLINE)) {
-					if (i + 2 >= len)
-						goto out;
-					memcpy(&ret[i], "%3", 2);
-					i += 2;
-
-					highlighting |= HIGHLIGHT_UNDERLINE;
-				} else {
-					if (i + 3 >= len)
-						goto out;
-					memcpy(&ret[i], "%-3", 3);
-					i += 3;
-
-					highlighting &= ~HIGHLIGHT_UNDERLINE;
-				}
-				str++;
-				break;
-
-			/* ^C - mirc color code */
-			case 0x03: {
-				int fgcol = -1;
-				int bgcol = -1;
-				char colbuf[4];
-
-				if (!isdigit(str[1])) {
-					if (i + 2 >= len)
-						goto out;
-					memcpy(&ret[i], "%x", 2);
-					str++;
-					i += 2;
-					break;
-				}
-				str++;
-
-				memcpy(colbuf, str, 2);
-				colbuf[2] = '\0';
-
-				if (isdigit(colbuf[1]))
-					str += 2;
-				else
-					str++;
-
-				fgcol = strtol(colbuf, nullptr, 10) % 16;
-
-				if (*str == ',') {
-					memcpy(colbuf, &str[1], 2);
-					colbuf[2] = '\0';
-
-					if (isdigit(colbuf[0])) {
-						if (isdigit(str[2]))
-							str += 3;
-						else
-							str += 2;
-
-						bgcol = strtol(colbuf, nullptr, 10) % 16;
-					}
-				}
-
-				if (i + 2 >= len)
-					goto out;
-
-				ret[i++] = '%';
-				ret[i++] = mirc_fg_col[fgcol];
-
-				if (bgcol >= 0) {
-					if (i + 2 >= len)
-						goto out;
-
-					ret[i++] = ',';
-					ret[i++] = mirc_bg_col[bgcol];
-				}
-
-				break;
-			}
-
-			/* ^[ - ANSI escape sequence */
-			case 0x1b: {
-				char *end;
-				char *p;
-				int bold = 0;
-				char buf[64];
-				int slen;
-
-				buf[0] = '\0';
-				if (str[1] != '[')
-					goto add;
-
-				end = strchr(&str[2], 'm');
-				if (end == nullptr)
-					goto add;
-				*end++ = '\0';
-
-				str += 2;
-				while ((p = strsep(&str, ";")) != nullptr) {
-					char *n;
-					int num;
-
-					num = strtoul(p, &n, 10);
-					if (*n != '\0')
-						continue;
-
-					switch (num) {
-						/* foreground color */
-						case 30 ... 39:
-							fgcol = num - 30;
-							break;
-
-						/* background color */
-						case 40 ... 49:
-							bgcol = num - 40;
-							break;
-
-						/* bold */
-						case 1:
-							bold = 8;
-							break;
-
-						/* underscore */
-						case 4:
-							if (xstrncat(buf, "%3", sizeof(buf)) == -1)
-								goto out;
-							break;
-
-						/* blink */
-						case 5:
-							if (xstrncat(buf, "%4", sizeof(buf)) == -1)
-								goto out;
-							break;
-
-						/* reverse */
-						case 7:
-							if (xstrncat(buf, "%2", sizeof(buf)) == -1)
-								goto out;
-							break;
-
-						/* clear all attributes */
-						case 0:
-							if (p[1] != 'm')
-								break;
-
-							if (xstrncat(buf, "%x", sizeof(buf)) == -1)
-								goto out;
-							fgcol = -1;
-							bgcol = -1;
-							bold = 0;
-							break;
-					}
-				}
-
-				if (fgcol >= 0 || bgcol >= 0) {
-					if (fgcol < 0)
-						fgcol = 7;
-
-					if (i + 2 >= len)
-						goto out;
-
-					ret[i++] = '%';
-					ret[i++] = ansi_esc_col[fgcol + bold];
-
-					if (bgcol >= 0) {
-						if (i + 2 >= len)
-							goto out;
-						ret[i++] = ',';
-						ret[i++] = ansi_esc_col[bgcol];
-					}
-				} else if (bold) {
-					if (xstrncat(buf, "%1", sizeof(buf)) == -1)
-						goto out;
-				}
-
-				ret[i] = '\0';
-				slen = xstrncat(ret, buf, len - i);
-				if (slen == -1)
-					goto out;
-				i += slen;
-				str = end;
-
-				break;
-			}
-
-			default:
-			add:
-				ret[i++] = *str++;
-				break;
-		}
-	}
-out:
-
-	ret[i] = '\0';
-	return (ret);
-#endif
 }
 
 int irc_chan_free(struct pork_acct *acct, void *data) {
@@ -585,11 +293,9 @@ int irc_chan_free(struct pork_acct *acct, void *data) {
 }
 
 int irc_proto_init(struct pork_proto *proto) {
-	proto->chat_action = irc_chan_action;
 	proto->chat_send = irc_chan_send;
 	proto->chat_free = irc_chan_free;
 
-	proto->send_action = irc_action;
 	proto->connect = irc_do_connect;
 	proto->connect_abort = irc_connect_abort;
 	proto->reconnect = irc_reconnect;

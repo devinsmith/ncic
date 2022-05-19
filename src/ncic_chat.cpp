@@ -105,64 +105,6 @@ int chat_send_notice(	struct pork_acct *acct,
 	return (0);
 }
 
-int chat_send_action(	struct pork_acct *acct,
-						struct chatroom *chat,
-						char *target,
-						char *msg)
-{
-	if (acct->proto->chat_action == nullptr || chat == nullptr)
-		return (-1);
-
-	if (acct->proto->chat_action(acct, chat, target, msg) != -1) {
-		char buf[4096];
-		int ret;
-
-		ret = fill_format_str(OPT_FORMAT_CHAT_SEND_ACTION, buf, sizeof(buf),
-				acct, chat, target, msg);
-		if (ret < 1)
-			return (-1);
-		screen_print_str(chat->win, buf, (size_t) ret,
-			MSG_TYPE_CHAT_ACTION_SEND);
-		imwindow_send_msg(chat->win);
-	} else
-		return (-1);
-
-	return (0);
-}
-
-int chat_unignore(struct pork_acct *acct, char *chat_name, char *user) {
-	struct chat_user *chat_user;
-	struct chatroom *chat;
-	char buf[4096];
-	int ret;
-
-	chat = chat_find(acct, chat_name);
-	if (chat == nullptr)
-		return (-1);
-
-	chat_user = chat_find_user(acct, chat, user);
-	if (chat_user == nullptr) {
-		screen_err_msg("%s is not a member of %s", user, chat->title_quoted);
-		return (-1);
-	}
-
-	chat_user->ignore = 0;
-
-	if (acct->proto->chat_unignore != nullptr) {
-		if (acct->proto->chat_unignore(acct, chat, user) == -1)
-			return (-1);
-	}
-
-	ret = fill_format_str(OPT_FORMAT_CHAT_UNIGNORE, buf, sizeof(buf), acct,
-			chat, chat->title, acct->username, user, NULL);
-	if (ret < 1)
-		return (-1);
-	screen_print_str(chat->win, buf, (size_t) ret,
-		MSG_TYPE_CHAT_STATUS);
-
-	return (0);
-}
-
 int chat_leave(struct pork_acct *acct, char *chat_name, int close_window) {
 	struct chatroom *chat;
 	struct imwindow *win;
@@ -170,14 +112,6 @@ int chat_leave(struct pork_acct *acct, char *chat_name, int close_window) {
 	chat = chat_find(acct, chat_name);
 	if (chat == nullptr)
 		return (-1);
-
-	if (acct->proto->chat_leave != nullptr) {
-		if (acct->proto->chat_leave(acct, chat) == -1) {
-			screen_err_msg("Error leaving chat room %s for %s",
-				chat->title_quoted, acct->username);
-			return (-1);
-		}
-	}
 
 	win = chat->win;
 	win->data = nullptr;
@@ -204,7 +138,7 @@ int chat_leave_all(struct pork_acct *acct) {
 	return (0);
 }
 
-struct chatroom *chat_find(struct pork_acct *acct, char *chat_name) {
+struct chatroom *chat_find(struct pork_acct *acct, const char *chat_name) {
 	if (acct->proto->chat_find == nullptr)
 		return (nullptr);
 
@@ -284,42 +218,6 @@ struct chat_user *chat_find_user(struct pork_acct *acct,
 		return (nullptr);
 
 	return (struct chat_user *)(cur->data);
-}
-
-int chat_user_left(	struct pork_acct *acct,
-					struct chatroom *chat,
-					char *user,
-					int silent)
-{
-	dlist_t *node;
-	struct chat_user *chat_user = nullptr;
-	int ret = 0;
-
-	node = chat_find_user_node(acct, chat, user);
-
-	if (!silent) {
-		char buf[4096];
-		int ret;
-
-		ret = fill_format_str(OPT_FORMAT_CHAT_LEAVE, buf, sizeof(buf), acct,
-				chat, chat->title, user, NULL, NULL);
-		if (ret < 1)
-			return (-1);
-		screen_print_str(chat->win, buf, (size_t) ret,
-			MSG_TYPE_CHAT_STATUS);
-	}
-
-	if (node != nullptr) {
-		chat->num_users--;
-
-		chat_user = (struct chat_user *)node->data;
-		chat->user_list = dlist_remove(chat->user_list, node);
-		chat_destroy_user_list_cb(acct, chat_user);
-	} else {
-		debug("unknown user %s left %s", user, chat->title_quoted);
-	}
-
-	return (ret);
 }
 
 int chat_rejoin(struct pork_acct *acct, struct chatroom *chat) {

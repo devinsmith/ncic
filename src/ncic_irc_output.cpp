@@ -9,7 +9,6 @@
 */
 
 #include <cstdio>
-#include <ncurses.h>
 #include <cstdlib>
 #include <cstring>
 #include <sys/time.h>
@@ -22,8 +21,6 @@
 #include "ncic_inet.h"
 #include "ncic_io.h"
 #include "ncic_acct.h"
-#include "ncic_imwindow.h"
-#include "ncic_screen.h"
 #include "ncic_screen_io.h"
 
 #include "ncic_irc.h"
@@ -100,19 +97,20 @@ int irc_connect(struct pork_acct *acct,
 	if (port != nullptr) {
 		*port++ = '\0';
 
-		passwd = strchr(port, ':');
+    if (get_port(port, &port_num) != 0) {
+      screen_err_msg("Error: %s: Invalid IRC server port: %s",
+                     acct->username, port);
+      memset(buf, 0, sizeof(buf));
+      return (-1);
+    }
+
+    passwd = strchr(port, ':');
 		if (passwd != nullptr) {
 			*passwd++ = '\0';
 		}
-	} else
-		port = DEFAULT_SECURE_PORT;
-
-	if (get_port(port, &port_num) != 0) {
-		screen_err_msg("Error: %s: Invalid IRC server port: %s",
-			acct->username, port);
-		memset(buf, 0, sizeof(buf));
-		return (-1);
-	}
+	} else {
+    port_num = DEFAULT_SECURE_PORT;
+  }
 
 	if (get_addr(buf, &ss) != 0) {
 		screen_err_msg("Error: %s: Invalid IRC server host: %s",
@@ -122,7 +120,10 @@ int irc_connect(struct pork_acct *acct,
 	}
 
 	free(acct->fport);
-	acct->fport = xstrdup(port);
+  acct->fport = nullptr;
+  if (port != nullptr) {
+    acct->fport = xstrdup(port);
+  }
 
 	free(acct->server);
 	acct->server = xstrdup(buf);
@@ -134,31 +135,6 @@ int irc_connect(struct pork_acct *acct,
 
 	memset(buf, 0, sizeof(buf));
 	return (nb_connect(&ss, port_num, sock));
-}
-
-int irc_send_raw(irc_session_t *session, char *str) {
-	int ret;
-	char *buf;
-	size_t len;
-
-	len = strlen(str) + 3;
-	buf = (char *)xmalloc(len);
-	snprintf(buf, len, "%s\r\n", str);
-
-	ret = irc_send(session, buf, len - 1);
-	free(buf);
-	return (ret);
-}
-
-int irc_send_mode(irc_session_t *session, char *mode_str) {
-	int ret;
-	char buf[IRC_OUT_BUFLEN];
-
-	ret = snprintf(buf, sizeof(buf), "MODE %s\r\n", mode_str);
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
 }
 
 int irc_send_pong(irc_session_t *session, char *dest) {
@@ -187,17 +163,6 @@ int irc_set_away(irc_session_t *session, char *msg) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_invite(irc_session_t *session, char *channel, char *user) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-
-	ret = snprintf(buf, sizeof(buf), "INVITE %s %s\r\n", user, channel);
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
-}
-
 int irc_send_login(irc_session_t *session) {
 	char buf[IRC_OUT_BUFLEN];
 	struct pork_acct *acct = static_cast<struct pork_acct *>(session->data);
@@ -218,17 +183,6 @@ int irc_send_login(irc_session_t *session) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_privmsg(irc_session_t *session, char *dest, char *msg) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-
-	ret = snprintf(buf, sizeof(buf), "PRIVMSG %s :%s\r\n", dest, msg);
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
-}
-
 int
 naken_send(irc_session_t *session, char *msg)
 {
@@ -236,20 +190,6 @@ naken_send(irc_session_t *session, char *msg)
 	int ret;
 
 	ret = snprintf(buf, sizeof(buf), "%s\r\n", msg);
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
-}
-
-int irc_send_ctcp(irc_session_t *session, char *dest, char *msg) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-
-	if (!strcmp(dest, "*"))
-		dest = cur_window()->target;
-
-	ret = snprintf(buf, sizeof(buf), "PRIVMSG %s :\x01%s\x01\r\n", dest, msg);
 	if (ret < 0 || (size_t) ret >= sizeof(buf))
 		return (-1);
 
@@ -265,17 +205,6 @@ int irc_send_quit(irc_session_t *session, const char *reason) {
 		return (-1);
 
 	pork_io_del(session);
-	return (irc_send(session, buf, ret));
-}
-
-int irc_send_notice(irc_session_t *session, char *dest, char *msg) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-
-	ret = snprintf(buf, sizeof(buf), "NOTICE %s :%s\r\n", dest, msg);
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
 	return (irc_send(session, buf, ret));
 }
 

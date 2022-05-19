@@ -54,7 +54,7 @@ int chat_send_notice(struct pork_acct *acct, struct chatroom *chat, char *target
 int chat_unignore(struct pork_acct *acct, char *chat_name, char *user);
 int chat_leave(struct pork_acct *acct, char *chat_name, int close_window);
 int chat_leave_all(struct pork_acct *acct);
-struct chatroom *chat_find(struct pork_acct *acct, char *chat_name);
+struct chatroom *chat_find(struct pork_acct *acct, const char *chat_name);
 void chat_list(struct pork_acct *acct);
 int chat_free(struct pork_acct *acct, struct chatroom *chat, int silent);
 int chat_rejoin(struct pork_acct *acct, struct chatroom *chat);

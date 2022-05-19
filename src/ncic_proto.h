@@ -41,20 +41,15 @@ struct pork_proto {
 	int (*disconnected)(struct pork_acct *);
 	int (*signoff)(struct pork_acct *acct, const char *reason);
 
-	struct chatroom *(*chat_find)(struct pork_acct *, char *);
+	struct chatroom *(*chat_find)(struct pork_acct *, const char *);
 	int (*chat_free)(struct pork_acct *, void *chat_data);
-	int (*chat_unignore)(struct pork_acct *, struct chatroom *, char *user);
 	int (*chat_rejoin)(struct pork_acct *, struct chatroom *);
-	int (*chat_leave)(struct pork_acct *, struct chatroom *);
 	int (*chat_send)(struct pork_acct *, struct chatroom *chat, const char *, char *);
-	int (*chat_action)(struct pork_acct *, struct chatroom *, char *, char *msg);
 	int (*chat_send_notice)(struct pork_acct *, struct chatroom *, char *, char *);
 	int (*chat_user_free)(struct pork_acct *acct, struct chat_user *);
 
 	int (*set_idle_time)(struct pork_acct *, u_int32_t);
 
-	int (*send_action)(struct pork_acct *, char *target, char *msg);
-	int (*send_msg)(struct pork_acct *, char *target, char *msg);
 	int (*send_notice)(struct pork_acct *, char *target, char *msg);
 	int (*set_back)(struct pork_acct *);
 	int (*set_away)(struct pork_acct *, char *);

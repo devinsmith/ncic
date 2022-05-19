@@ -308,12 +308,6 @@ static int format_status(char opt, char *buf, size_t len, va_list ap) {
 			ret = fill_format_str(OPT_FORMAT_STATUS_ACTIVITY, buf, len);
 			break;
 
-		/* Typing */
-		case 'y':
-		case 'Y':
-			ret = fill_format_str(OPT_FORMAT_STATUS_TYPING, buf, len, imwindow);
-			break;
-
 		/* Held Messages */
 		case 'h':
 		case 'H':
