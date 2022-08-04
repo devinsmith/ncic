@@ -4,6 +4,7 @@ project(ncic)
 set(TARGET_NAME ncic)
 
 find_package(OpenSSL REQUIRED)
+set(CURSES_NEED_NCURSES TRUE)
 find_package(Curses REQUIRED)
 
 # Disable rdynamic
