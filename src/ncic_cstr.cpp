@@ -90,14 +90,14 @@ int plaintext_to_cstr(chtype *ch, size_t len, ...) {
 				if (str[spos + 1] != '\0' && str[++spos] != '%') {
 					int ret = color_parse_code(&str[spos], &color_attr);
 					if (ret == -1)
-						ch[i] = str[--spos];
+						ch[i] = (unsigned char)str[--spos];
 					else {
 						i--;
 						spos += ret;
 						continue;
 					}
 				} else
-					ch[i] = str[spos];
+					ch[i] = (unsigned char)str[spos];
 			} else if (str[spos] == '\t') {
 				size_t pad = PORK_TABSTOP - i % PORK_TABSTOP;
 				size_t j;
@@ -106,7 +106,7 @@ int plaintext_to_cstr(chtype *ch, size_t len, ...) {
 					ch[i++] = ' ' | color_attr;
 				i--;
 			} else
-				ch[i] = str[spos];
+				ch[i] = (unsigned char)str[spos];
 
 			ch[i] |= color_attr;
 
@@ -144,7 +144,7 @@ int plaintext_to_cstr_nocolor(chtype *ch, size_t len, ...) {
 					ch[i++] = ' ';
 				i--;
 			} else
-				ch[i] = *str;
+				ch[i] = (unsigned char)*str;
 
 			str++;
 		}
