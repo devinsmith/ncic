@@ -332,8 +332,6 @@ int save_global_config(void) {
 	hash_iterate(&screen.alias_hash, write_alias_line, fp);
 	fprintf(fp, "\n");
 	hash_iterate(&screen.binds.main.hash, write_bind_line, fp);
-	fprintf(fp, "\n");
-	hash_iterate(&screen.binds.blist.hash, write_bind_blist_line, fp);
 
 	fclose(fp);
 

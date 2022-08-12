@@ -725,9 +725,7 @@ USER_COMMAND(cmd_bind) {
 	}
 
 	if (key_str[0] == '-' && key_str[1] != '\0') {
-		if (!strcasecmp(key_str, "-b") || !strcasecmp(key_str, "-buddy"))
-			target_binds = &screen.binds.blist;
-		else if (!strcasecmp(key_str, "-m") || !strcasecmp(key_str, "-main"))
+		if (!strcasecmp(key_str, "-m") || !strcasecmp(key_str, "-main"))
 			target_binds = &screen.binds.main;
 		else {
 			screen_err_msg("Bad bind flag: %s", key_str);
@@ -989,9 +987,7 @@ USER_COMMAND(cmd_unbind) {
 		return;
 
 	if (binding[0] == '-' && binding[1] != '\0') {
-		if (!strcasecmp(binding, "-b") || !strcasecmp(binding, "-buddy"))
-			target_binds = &screen.binds.blist;
-		else if (!strcasecmp(binding, "-m") || !strcasecmp(binding, "-main"))
+		if (!strcasecmp(binding, "-m") || !strcasecmp(binding, "-main"))
 			target_binds = &screen.binds.main;
 		else {
 			screen_err_msg("Bad unbind flag: %s", binding);

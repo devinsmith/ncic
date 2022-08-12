@@ -194,7 +194,6 @@ int main(int argc, char *argv[])
 
 	bind_init(&screen.binds);
 	bind_set_handlers(&screen.binds.main, binding_run, binding_insert);
-	bind_set_handlers(&screen.binds.blist, binding_run, nullptr);
 
 	alias_init(&screen.alias_hash);
 

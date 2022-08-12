@@ -16,8 +16,7 @@ extern "C" {
 #endif
 
 enum {
-	BINDS_MAIN,
-	BINDS_BUDDY
+	BINDS_MAIN
 };
 
 struct binding {
@@ -33,7 +32,6 @@ struct key_binds {
 
 struct binds {
 	struct key_binds main;
-	struct key_binds blist;
 };
 
 int bind_init(struct binds *binds);

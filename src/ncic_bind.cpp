@@ -156,16 +156,12 @@ int bind_init(struct binds *binds) {
 	if (hash_init(&binds->main.hash, 5, bind_compare, bind_hash_remove) != 0)
 		return (-1);
 
-	if (hash_init(&binds->blist.hash, 3, bind_compare, bind_hash_remove) != 0)
-		return (-1);
-
 	bind_add_default(binds);
 	return (0);
 }
 
 void bind_destroy(struct binds *binds) {
 	hash_destroy(&binds->main.hash);
-	hash_destroy(&binds->blist.hash);
 }
 
 void bind_set_handlers(	struct key_binds *bind_set,
