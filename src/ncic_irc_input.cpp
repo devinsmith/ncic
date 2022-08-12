@@ -191,7 +191,11 @@ static ssize_t irc_read_data(irc_session_t *session, char *buf, size_t len) {
 	ssize_t ret = 0;
 
 	for (i = 0 ; i < 5 ; i++) {
-		ret = SSL_read(session->sslHandle, buf, len - 1);
+    if (session->use_ssl) {
+      ret = SSL_read(session->sslHandle, buf, len - 1);
+    } else {
+      ret = read(session->sock, buf, len - 1);
+    }
 		if (ret == -1) {
 			if (errno == EINTR)
 				continue;

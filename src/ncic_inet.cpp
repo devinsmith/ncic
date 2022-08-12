@@ -129,11 +129,6 @@ int get_port(const char *name, in_port_t *port) {
 
 		temp_port = strtol(name, &end, 10);
 
-		if (*end != '\0') {
-			debug("invalid port: %s", name);
-			return (-1);
-		}
-
 		if (!VALID_PORT(temp_port)) {
 			debug("invalid port: %s", name);
 			return (-1);

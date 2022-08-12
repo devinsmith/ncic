@@ -37,6 +37,8 @@ enum {
 
 struct irc_session_t {
 	int sock;
+
+  bool use_ssl;
 	SSL *sslHandle;
 	SSL_CTX *sslContext;
 

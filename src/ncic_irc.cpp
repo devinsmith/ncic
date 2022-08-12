@@ -75,53 +75,56 @@ static void irc_connected(int sock, u_int32_t cond, void *data) {
 	} else {
 		session->sock = sock;
 
-		/* Register the error strings for libcrypto & libssl */
-		SSL_load_error_strings();
-		/* Register the available ciphers and digests */
-		SSL_library_init();
-		OpenSSL_add_all_algorithms();
+    if (session->use_ssl) {
 
-		// New context saying we are a client, and using SSL 2 or 3
-		session->sslContext = SSL_CTX_new(TLS_client_method());
-		if (session->sslContext == nullptr) // Dumps to stderr, yuck
-			ERR_print_errors_fp (stderr);
+      /* Register the error strings for libcrypto & libssl */
+      SSL_load_error_strings();
+      /* Register the available ciphers and digests */
+      SSL_library_init();
+      OpenSSL_add_all_algorithms();
 
-		SSL_CTX_set_verify(session->sslContext, SSL_VERIFY_NONE, nullptr);
-		SSL_CTX_set_verify_depth(session->sslContext, 0);
-		SSL_CTX_set_mode(session->sslContext, SSL_MODE_AUTO_RETRY);
-		SSL_CTX_set_session_cache_mode(session->sslContext, SSL_SESS_CACHE_CLIENT);
+      // New context saying we are a client, and using SSL 2 or 3
+      session->sslContext = SSL_CTX_new(TLS_client_method());
+      if (session->sslContext == nullptr) // Dumps to stderr, yuck
+        ERR_print_errors_fp(stderr);
 
-		// Create an SSL struct for the connection
-		session->sslHandle = SSL_new(session->sslContext);
-		if (session->sslHandle == nullptr)
-			ERR_print_errors_fp(stderr);
+      SSL_CTX_set_verify(session->sslContext, SSL_VERIFY_NONE, nullptr);
+      SSL_CTX_set_verify_depth(session->sslContext, 0);
+      SSL_CTX_set_mode(session->sslContext, SSL_MODE_AUTO_RETRY);
+      SSL_CTX_set_session_cache_mode(session->sslContext, SSL_SESS_CACHE_CLIENT);
 
-		// Connect the SSL struct to our connection
-		if (!SSL_set_fd(session->sslHandle, session->sock))
-			ERR_print_errors_fp(stderr);
+      // Create an SSL struct for the connection
+      session->sslHandle = SSL_new(session->sslContext);
+      if (session->sslHandle == nullptr)
+        ERR_print_errors_fp(stderr);
 
-		while ((ret = SSL_connect(session->sslHandle)) == -1) {
-			fd_set fds;
-			int ssl_err;
-			struct pork_acct *acct = (struct pork_acct *)session->data;
+      // Connect the SSL struct to our connection
+      if (!SSL_set_fd(session->sslHandle, session->sock))
+        ERR_print_errors_fp(stderr);
 
-			FD_ZERO(&fds);
-			FD_SET(session->sock, &fds);
+      while ((ret = SSL_connect(session->sslHandle)) == -1) {
+        fd_set fds;
+        int ssl_err;
+        struct pork_acct *acct = (struct pork_acct *) session->data;
 
-			switch (ssl_err = SSL_get_error(session->sslHandle, ret)) {
-			case SSL_ERROR_WANT_READ:
-				select(session->sock + 1, &fds, nullptr, nullptr, nullptr);
-				break;
-			case SSL_ERROR_WANT_WRITE:
-				select(session->sock + 1, nullptr, &fds, nullptr, nullptr);
-				break;
-			default:
-				screen_err_msg("network error: %s: could not connect %d",
-				    acct->username, ssl_err);
-				return;
-				break;
-			}
-		}
+        FD_ZERO(&fds);
+        FD_SET(session->sock, &fds);
+
+        switch (ssl_err = SSL_get_error(session->sslHandle, ret)) {
+          case SSL_ERROR_WANT_READ:
+            select(session->sock + 1, &fds, nullptr, nullptr, nullptr);
+            break;
+          case SSL_ERROR_WANT_WRITE:
+            select(session->sock + 1, nullptr, &fds, nullptr, nullptr);
+            break;
+          default:
+            screen_err_msg("network error: %s: could not connect %d",
+                           acct->username, ssl_err);
+            return;
+            break;
+        }
+      }
+    }
 
 		sock_setflags(sock, 0);
 
@@ -140,6 +143,7 @@ static int irc_init(struct pork_acct *acct) {
 	session->sock = -1;
 	session->sslHandle = nullptr;
 	session->sslContext = nullptr;
+  session->use_ssl = true;
 
 	session->data = acct;
 	acct->data = session;
@@ -150,12 +154,12 @@ static int irc_free(struct pork_acct *acct) {
 	irc_session_t *session = acct->data;
 	u_int32_t i;
 
-	if (session->sslHandle) {
+	if (session->sslHandle != nullptr) {
 		SSL_shutdown(session->sslHandle);
 		SSL_free(session->sslHandle);
 	}
 
-	if (session->sslContext) {
+	if (session->sslContext != nullptr) {
 		SSL_CTX_free(session->sslContext);
   }
 
@@ -192,6 +196,10 @@ static u_int32_t irc_add_servers(struct pork_acct *acct, char *str) {
 
   if (blank_str(str)) {
     return 0;
+  }
+
+  if (strstr(str, "--no-ssl") != nullptr) {
+    session->use_ssl = false;
   }
 
   session->server = xstrdup(str);

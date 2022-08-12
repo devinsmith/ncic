@@ -27,7 +27,10 @@
 #include "ncic_naken.h"
 
 static int irc_send_server(irc_session_t *session, char *cmd, size_t len) {
-	return SSL_write (session->sslHandle, cmd, len);
+  if (session->use_ssl) {
+    return SSL_write(session->sslHandle, cmd, len);
+  }
+  return sock_write(session->sock, cmd, len);
 }
 
 int irc_send(irc_session_t *session, char *command, size_t len) {
