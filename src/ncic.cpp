@@ -22,6 +22,7 @@
 #include <csignal>
 #include <sys/ioctl.h>
 #include <ctime>
+#include <locale.h>
 
 #ifdef HAVE_TERMIOS_H
 #	include <termios.h>
@@ -164,6 +165,8 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "Fatal: Error getting options.\n");
 		exit(-1);
 	}
+
+  setlocale(LC_ALL, "");
 
   init_logging();
   log_tmsg(0, "Starting up!");
