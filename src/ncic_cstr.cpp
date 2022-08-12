@@ -16,7 +16,6 @@
 
 #include "ncic_util.h"
 #include "ncic_color.h"
-#include "ncic_set.h"
 #include "ncic_cstr.h"
 
 /*
@@ -165,18 +164,11 @@ int plaintext_to_cstr_nocolor(chtype *ch, size_t len, ...) {
 
 inline size_t wputstr(WINDOW *win, chtype *ch) {
 	size_t i = 0;
-	u_int32_t beeps = 0;
-	u_int32_t beeps_max = opt_get_int(OPT_BEEP_MAX);
 
 	while (ch[i] != 0) {
 		int c = chtype_get(ch[i]);
 
 		if (iscntrl(c)) {
-			if (c == 0x07 && opt_get_bool(OPT_BEEP) && beeps < beeps_max) {
-				beep();
-				beeps++;
-			}
-
 			waddch(win, chtype_ctrl(c));
 		} else
 			waddch(win, ch[i]);
@@ -205,18 +197,11 @@ size_t mvwputstr(WINDOW *win, int y, int x, chtype *ch) {
 
 size_t wputnstr(WINDOW *win, chtype *ch, size_t n) {
 	size_t i;
-	u_int32_t beeps = 0;
-	u_int32_t beeps_max = opt_get_int(OPT_BEEP_MAX);
 
 	for (i = 0 ; i < n && ch[i] != 0 ; i++) {
 		int c = chtype_get(ch[i]);
 
 		if (iscntrl(c)) {
-			if (c == 0x07 && opt_get_bool(OPT_BEEP) && beeps < beeps_max) {
-				beep();
-				beeps++;
-			}
-
 			waddch(win, chtype_ctrl(c));
 		} else
 			waddch(win, ch[i]);
