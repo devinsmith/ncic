@@ -67,7 +67,6 @@ USER_COMMAND(cmd_win_list);
 USER_COMMAND(cmd_win_next);
 USER_COMMAND(cmd_win_prev);
 USER_COMMAND(cmd_win_rename);
-USER_COMMAND(cmd_win_renumber);
 USER_COMMAND(cmd_win_set);
 USER_COMMAND(cmd_win_skip);
 USER_COMMAND(cmd_win_swap);
@@ -352,7 +351,6 @@ static struct command window_command[] = {
 	{ "next",				cmd_win_next		},
 	{ "prev",				cmd_win_prev		},
 	{ "rename",				cmd_win_rename		},
-	{ "renumber",			cmd_win_renumber	},
 	{ "set",				cmd_win_set			},
 	{ "skip",				cmd_win_skip		},
 	{ "swap",				cmd_win_swap		},
@@ -477,22 +475,6 @@ USER_COMMAND(cmd_win_rename) {
 		screen_cmd_output("Window %u has name \"%s\"", win->refnum, win->name);
 	else
 		imwindow_rename(win, args);
-}
-
-USER_COMMAND(cmd_win_renumber) {
-	u_int32_t num;
-
-	if (args == nullptr || blank_str(args)) {
-		screen_cmd_output("This is window %u", cur_window()->refnum);
-		return;
-	}
-
-	if (str_to_uint(args, &num) != 0) {
-		screen_err_msg("Bad window number: %s", args);
-		return;
-	}
-
-	screen_renumber(cur_window(), num);
 }
 
 USER_COMMAND(cmd_win_set) {
