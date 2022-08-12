@@ -210,17 +210,3 @@ int irc_send_quit(irc_session_t *session, const char *reason) {
 	pork_io_del(session);
 	return (irc_send(session, buf, ret));
 }
-
-int irc_send_action(irc_session_t *session, char *dest, char *msg) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-
-	if (dest == nullptr || msg == nullptr)
-		return (-1);
-
-	ret = snprintf(buf, sizeof(buf), "ACTION %s", msg);
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
-}
