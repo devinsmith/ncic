@@ -217,7 +217,7 @@ size_t wputncstr(WINDOW *win, char *str, size_t n) {
 		if (iscntrl(*str))
 			waddch(win, chtype_ctrl(*str));
 		else
-			waddch(win, *str);
+			waddch(win, (unsigned char)*str);
 
 		str++;
 	}
