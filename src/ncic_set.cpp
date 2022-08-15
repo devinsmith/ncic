@@ -17,12 +17,10 @@
 #include <cctype>
 #include "ncic.h"
 #include "ncic_util.h"
-#include "ncic_list.h"
 #include "ncic_color.h"
 #include "ncic_set.h"
 #include "ncic_imwindow.h"
 #include "ncic_acct.h"
-#include "ncic_cstr.h"
 #include "ncic_misc.h"
 #include "ncic_screen.h"
 #include "ncic_screen_io.h"
