@@ -20,6 +20,7 @@
 #include <cerrno>
 #include <regex.h>
 #include <sys/uio.h>
+#include <algorithm>
 
 #include "ncic.h"
 #include "ncic_util.h"
@@ -112,7 +113,7 @@ static int swindow_print_msg(	struct swindow *swindow,
 	msg = imsg_partial(swindow, imsg, firstline);
 
 	mvwputnstr(swindow->win, y, x, msg,
-		min(swindow->rows * swindow->cols,
+		std::min(swindow->rows * swindow->cols,
 			(lastline - firstline + 1) * swindow->cols));
 
 	return (0);

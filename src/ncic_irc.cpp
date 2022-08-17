@@ -46,7 +46,7 @@ static void irc_event(int sock, u_int32_t cond, void *data) {
 			struct pork_acct *acct = static_cast<struct pork_acct *>(session->data);
 
 			pork_sock_err(acct, sock);
-			pork_io_del(data);
+      IoManager::instance().delete_key(data);
 			int ret = pork_acct_disconnected(acct);
       log_tmsg(0, "Acct disconnected: %d", ret);
 
@@ -61,7 +61,7 @@ static void irc_connected(int sock, u_int32_t cond, void *data) {
 	int ret;
     irc_session_t *session = static_cast<irc_session_t *>(data);
 
-	pork_io_del(data);
+  IoManager::instance().delete_key(data);
 
 	ret = sock_is_error(sock);
 	if (ret != 0) {
@@ -130,7 +130,7 @@ static void irc_connected(int sock, u_int32_t cond, void *data) {
 
 		/* enable keep alive */
 		sock_setkeepalive(sock);
-		pork_io_add(sock, IO_COND_READ, data, data, irc_event);
+    IoManager::instance().add(sock, IO_COND_READ, data, data, irc_event);
 		irc_send_login(session);
 	}
 }
@@ -170,7 +170,7 @@ static int irc_free(struct pork_acct *acct) {
 	queue_destroy(session->inq, free);
 	queue_destroy(session->outq, free);
 
-	pork_io_del(session);
+  IoManager::instance().delete_key(session);
 	free(session);
 	return (0);
 }
@@ -226,7 +226,7 @@ static int irc_do_connect(struct pork_acct *acct, char *args) {
 	if (ret == 0)
 		irc_connected(sock, 0, session);
 	else if (ret == -EINPROGRESS)
-		pork_io_add(sock, IO_COND_WRITE, session, session, irc_connected);
+    IoManager::instance().add(sock, IO_COND_WRITE, session, session, irc_connected);
 	else
 		return (-1);
 
@@ -237,7 +237,7 @@ static int irc_connect_abort(struct pork_acct *acct) {
     auto *session = acct->data;
 
 	close(session->sock);
-	pork_io_del(session);
+  IoManager::instance().delete_key(session);
 	return (0);
 }
 
@@ -250,7 +250,7 @@ static int irc_reconnect(struct pork_acct *acct, char *args __notused) {
 	if (ret == 0) {
 		irc_connected(sock, 0, session);
 	} else if (ret == -EINPROGRESS)
-		pork_io_add(sock, IO_COND_WRITE, session, session, irc_connected);
+    IoManager::instance().add(sock, IO_COND_WRITE, session, session, irc_connected);
 	else
 		return (-1);
 

@@ -8,243 +8,194 @@
 ** as published by the Free Software Foundation.
 */
 
-#include "config.h"
-
 #include <cstdlib>
-#include <cstring>
 #include <cerrno>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <algorithm>
 
 #include "ncic.h"
-#include "ncic_util.h"
-#include "ncic_list.h"
 #include "ncic_io.h"
 #include "ncic_inet.h"
 #include "ncic_log.h"
 
-static dlist_t *io_list;
-
-static int pork_io_find_cb(void *l, void *r) {
-	struct io_source *io = (struct io_source *) r;
-
-	return l != io->key;
-}
-
-static void pork_io_destroy_cb(void *param __notused, void *data) {
-	free(data);
-}
-
-static void pork_io_remove(dlist_t *node) {
-	pork_io_destroy_cb(nullptr, node->data);
-	io_list = dlist_remove(io_list, node);
-}
-
-int pork_io_init(void) {
-	io_list = nullptr;
-	return (0);
-}
-
-void pork_io_destroy(void) {
-	dlist_destroy(io_list, nullptr, pork_io_destroy_cb);
-	io_list = nullptr;
-}
-
-int pork_io_add(int fd,
-				u_int32_t cond,
-				void *data,
-				void *key,
-				void (*callback)(int fd, u_int32_t cond, void *data))
+void IoManager::destroy()
 {
-	dlist_t *node;
-	struct io_source *io;
-
-  log_tmsg(0, "Adding new condition on fd: %d, key: %p, cond: %d", fd, key, cond);
-
-	/*
-	** If there's already an entry for this key, delete it
-	** and replace it with the new one.
-	*/
-
-	node = dlist_find(io_list, key, pork_io_find_cb);
-	if (node != nullptr)
-		pork_io_remove(node);
-
-	io = (io_source *)xcalloc(1, sizeof(*io));
-	io->fd = fd;
-	io->cond = cond;
-	io->data = data;
-	io->key = key;
-	io->callback = callback;
-
-	io_list = dlist_add_head(io_list, io);
-	return (0);
+  for (auto io_source : io_list) {
+    delete io_source;
+  }
 }
 
-int pork_io_del(void *key) {
-	dlist_t *node;
-	struct io_source *io;
+int IoManager::run() {
+  fd_set rfds;
+  fd_set wfds;
+  fd_set xfds;
+  int max_fd = -1;
+  int ret;
+  struct timeval tv = { 0, 600000 };
+
+  FD_ZERO(&rfds);
+  FD_ZERO(&wfds);
+  FD_ZERO(&xfds);
+
+  for (auto it = io_list.begin(); it != io_list.end(); ++it) {
+    io_source *io = *it;
+
+    if (io->fd >= 0) {
+      if (io->cond & IO_COND_ALWAYS && io->callback != nullptr)
+        io->callback(io->fd, IO_COND_ALWAYS, io->data);
+
+      if (io->cond & IO_COND_READ)
+        FD_SET(io->fd, &rfds);
+
+      if (io->cond & IO_COND_WRITE)
+        FD_SET(io->fd, &wfds);
+
+      if (io->cond & IO_COND_EXCEPTION)
+        FD_SET(io->fd, &xfds);
+
+      if (io->fd > max_fd)
+        max_fd = io->fd;
+    } else {
+      if (io->callback != nullptr)
+        io->callback(io->fd, IO_COND_DEAD, io->data);
+
+      delete io;
+      io_list.erase(it);
+    }
+  }
+
+  if (max_fd < 0)
+    return (-1);
+
+  /*
+  ** If there's a bad fd in the set better find it, otherwise
+  ** we're going to get into an infinite loop.
+  */
+  ret = select(max_fd + 1, &rfds, &wfds, &xfds, &tv);
+  if (ret < 1) {
+    if (ret == -1 && errno == EBADF) {
+      process_dead_fds();
+    }
+
+    return (ret);
+  }
+
+  for (auto io : io_list) {
+    if (io->fd >= 0) {
+      u_int32_t cond = 0;
+
+      if ((io->cond & IO_COND_READ) && FD_ISSET(io->fd, &rfds))
+        cond |= IO_COND_READ;
+
+      if ((io->cond & IO_COND_WRITE) && FD_ISSET(io->fd, &wfds))
+        cond |= IO_COND_WRITE;
+
+      if ((io->cond & IO_COND_EXCEPTION) && FD_ISSET(io->fd, &xfds))
+        cond |= IO_COND_EXCEPTION;
+
+      if (cond != 0 && io->callback != nullptr)
+        io->callback(io->fd, cond, io->data);
+    }
+  }
+
+  return (ret);
+}
+
+int IoManager::process_dead_fds()
+{
+  int bad_fd = 0;
+
+  for (auto it = io_list.begin(); it != io_list.end(); ++it) {
+    io_source *io = *it;
+
+    if (io->fd < 0 || sock_is_error(io->fd)) {
+      debug("fd %d is dead", io->fd);
+      if (io->callback != nullptr)
+        io->callback(io->fd, IO_COND_DEAD, io->data);
+
+      delete io;
+      io_list.erase(it);
+
+      bad_fd++;
+    }
+  }
+
+  return bad_fd;
+}
+
+int IoManager::delete_key(void *key)
+{
+  struct io_source *io;
 
   log_tmsg(0, "Removing io for key: %p", key);
 
-	node = dlist_find(io_list, key, pork_io_find_cb);
-	if (node == nullptr)
-		return (-1);
+  auto result = std::find_if(io_list.begin(), io_list.end(),
+                             [key](const io_source* x) { return x->key == key;});
 
-	io = (io_source *) node->data;
-	io->fd = -2;
-	io->callback = nullptr;
-	return (0);
+  if (result == io_list.end())
+    return (-1);
+
+  io = *result;
+  io->fd = -2;
+  io->callback = nullptr;
+
+  return 0;
 }
 
-int pork_io_dead(void *key) {
-	dlist_t *node;
+int IoManager::add_cond(void *key, u_int32_t new_cond)
+{
+  auto result = std::find_if(io_list.begin(), io_list.end(),
+                             [key](const io_source* x) { return x->key == key;});
 
-	node = dlist_find(io_list, key, pork_io_find_cb);
-	if (node == nullptr)
-		return (-1);
+  if (result == io_list.end())
+    return (-1);
 
-	((struct io_source *) node->data)->fd = -1;
-	return (0);
+  (*result)->cond |= new_cond;
+
+  return 0;
 }
 
-int pork_io_set_cond(void *key, u_int32_t new_cond) {
-	dlist_t *node;
+int IoManager::del_cond(void *key, u_int32_t new_cond)
+{
+  auto result = std::find_if(io_list.begin(), io_list.end(),
+                             [key](const io_source* x) { return x->key == key;});
 
-	node = dlist_find(io_list, key, pork_io_find_cb);
-	if (node == nullptr)
-		return (-1);
+  if (result == io_list.end())
+    return (-1);
 
-	((struct io_source *) node->data)->cond = new_cond;
-	return (0);
+  (*result)->cond &= ~new_cond;
+
+  return 0;
 }
 
-int pork_io_add_cond(void *key, u_int32_t new_cond) {
-	dlist_t *node;
+int IoManager::add(int fd, u_int32_t cond, void *data, void *key, void (*callback)(int, u_int32_t, void *))
+{
+  struct io_source *io;
 
-	node = dlist_find(io_list, key, pork_io_find_cb);
-	if (node == nullptr)
-		return (-1);
+  log_tmsg(0, "Adding new condition on fd: %d, key: %p, cond: %d", fd, key, cond);
 
-	((struct io_source *) node->data)->cond |= new_cond;
-	return (0);
-}
+  /*
+  ** If there's already an entry for this key, delete it
+  ** and replace it with the new one.
+  */
 
-int pork_io_del_cond(void *key, u_int32_t new_cond) {
-	dlist_t *node;
+  auto result = std::find_if(io_list.begin(), io_list.end(),
+                             [key](const io_source* x) { return x->key == key;});
 
-	node = dlist_find(io_list, key, pork_io_find_cb);
-	if (node == nullptr)
-		return (-1);
+  if (result != io_list.end()) {
+    free(*result);
+    io_list.erase(result);
+  }
 
-	((struct io_source *) node->data)->cond &= ~new_cond;
-	return (0);
-}
+  io = new io_source;
+  io->fd = fd;
+  io->cond = cond;
+  io->data = data;
+  io->key = key;
+  io->callback = callback;
 
-static int pork_io_find_dead_fds(dlist_t *io_list) {
-	dlist_t *cur = io_list;
-	int bad_fd = 0;
+  io_list.push_back(io);
 
-	while (cur != nullptr) {
-		struct io_source *io = (struct io_source *)cur->data;
-		dlist_t *next = cur->next;
-
-		if (io->fd < 0 || sock_is_error(io->fd)) {
-			debug("fd %d is dead", io->fd);
-			if (io->callback != nullptr)
-				io->callback(io->fd, IO_COND_DEAD, io->data);
-
-			pork_io_remove(cur);
-			bad_fd++;
-		}
-
-		cur = next;
-	}
-
-	return (bad_fd);
-}
-
-int pork_io_run(void) {
-	fd_set rfds;
-	fd_set wfds;
-	fd_set xfds;
-	int max_fd = -1;
-	int ret;
-	struct timeval tv = { 0, 600000 };
-	dlist_t *cur;
-
-	FD_ZERO(&rfds);
-	FD_ZERO(&wfds);
-	FD_ZERO(&xfds);
-
-	cur = io_list;
-	while (cur != nullptr) {
-		struct io_source *io = (struct io_source *)cur->data;
-		dlist_t *next = cur->next;
-
-		if (io->fd >= 0) {
-			if (io->cond & IO_COND_ALWAYS && io->callback != nullptr)
-				io->callback(io->fd, IO_COND_ALWAYS, io->data);
-
-			if (io->cond & IO_COND_READ)
-				FD_SET(io->fd, &rfds);
-
-			if (io->cond & IO_COND_WRITE)
-				FD_SET(io->fd, &wfds);
-
-			if (io->cond & IO_COND_EXCEPTION)
-				FD_SET(io->fd, &xfds);
-
-			if (io->fd > max_fd)
-				max_fd = io->fd;
-		} else {
-			if (io->callback != nullptr)
-				io->callback(io->fd, IO_COND_DEAD, io->data);
-
-			pork_io_remove(cur);
-		}
-
-		cur = next;
-	}
-
-	if (max_fd < 0)
-		return (-1);
-
-	/*
-	** If there's a bad fd in the set better find it, otherwise
-	** we're going to get into an infinite loop.
-	*/
-	ret = select(max_fd + 1, &rfds, &wfds, &xfds, &tv);
-	if (ret < 1) {
-		if (ret == -1 && errno == EBADF)
-			pork_io_find_dead_fds(io_list);
-
-		return (ret);
-	}
-
-	cur = io_list;
-	while (cur != nullptr) {
-		struct io_source *io = (struct io_source *)cur->data;
-		dlist_t *next = cur->next;
-
-		if (io->fd >= 0) {
-			u_int32_t cond = 0;
-
-			if ((io->cond & IO_COND_READ) && FD_ISSET(io->fd, &rfds))
-				cond |= IO_COND_READ;
-
-			if ((io->cond & IO_COND_WRITE) && FD_ISSET(io->fd, &wfds))
-				cond |= IO_COND_WRITE;
-
-			if ((io->cond & IO_COND_EXCEPTION) && FD_ISSET(io->fd, &xfds))
-				cond |= IO_COND_EXCEPTION;
-
-			if (cond != 0 && io->callback != nullptr)
-				io->callback(io->fd, cond, io->data);
-		}
-
-		cur = next;
-	}
-
-	return (ret);
+  return 0;
 }

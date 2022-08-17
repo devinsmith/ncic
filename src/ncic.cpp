@@ -22,7 +22,7 @@
 #include <csignal>
 #include <sys/ioctl.h>
 #include <ctime>
-#include <locale.h>
+#include <clocale>
 
 #ifdef HAVE_TERMIOS_H
 #	include <termios.h>
@@ -95,7 +95,7 @@ static void resize_display() {
 }
 
 static void sigwinch_handler(int sig __notused) {
-	pork_io_add_cond(&screen, IO_COND_ALWAYS);
+  IoManager::instance().add_cond(&screen, IO_COND_ALWAYS);
 }
 
 static void generic_signal_handler(int sig) {
@@ -114,7 +114,7 @@ keyboard_input(int fd, uint32_t cond, void *data)
 	** The screen can't be resized from inside a signal handler..
 	*/
 	if (cond == IO_COND_ALWAYS) {
-		pork_io_del_cond(&screen, IO_COND_ALWAYS);
+    IoManager::instance().del_cond(&screen, IO_COND_ALWAYS);
 		resize_display();
 		return;
 	}
@@ -178,7 +178,6 @@ int main(int argc, char *argv[])
 
 	proto_init();
 	color_init();
-	pork_io_init();
 
 	if (screen_init(LINES, COLS) == -1)
 		pork_exit(-1, nullptr, "Fatal: Error initializing the terminal.\n");
@@ -209,11 +208,11 @@ int main(int argc, char *argv[])
 	screen_doupdate();
 
 	time(&timer_last_run);
-	while (1) {
+	while (true) {
 		time_t time_now;
 		int dirty = 0;
 
-		pork_io_run();
+		IoManager::instance().run();
 		pork_acct_update();
 
 		/*
@@ -258,7 +257,9 @@ int main(int argc, char *argv[])
 void pork_exit(int status, const char *msg, const char *fmt, ...) {
 	pork_acct_del_all(msg);
 	screen_destroy();
-	pork_io_destroy();
+
+  IoManager::instance().destroy();
+
 	proto_destroy();
 
 	wclear(stdscr);

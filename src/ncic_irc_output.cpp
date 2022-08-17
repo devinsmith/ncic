@@ -200,13 +200,14 @@ naken_send(irc_session_t *session, char *msg)
 }
 
 int irc_send_quit(irc_session_t *session, const char *reason) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
+  char buf[IRC_OUT_BUFLEN];
+  int ret;
 
-	ret = snprintf(buf, sizeof(buf), ".q\r\n");
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
+  ret = snprintf(buf, sizeof(buf), ".q\r\n");
+  if (ret < 0 || (size_t) ret >= sizeof(buf))
+    return (-1);
 
-	pork_io_del(session);
-	return (irc_send(session, buf, ret));
+  IoManager::instance().delete_key(session);
+
+  return (irc_send(session, buf, ret));
 }

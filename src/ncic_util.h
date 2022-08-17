@@ -20,14 +20,6 @@ extern "C" {
 
 #define array_elem(x) (sizeof((x)) / sizeof((x)[0]))
 
-#ifndef min
-#	define min(x,y) ((x) < (y) ? (x) : (y))
-#endif
-
-#ifndef max
-#	define max(x,y) ((x) > (y) ? (x) : (y))
-#endif
-
 char *xstrdup(const char *str);
 void *xmalloc(size_t len);
 void *xcalloc(size_t nmemb, size_t len);

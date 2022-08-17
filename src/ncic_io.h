@@ -8,12 +8,10 @@
 ** as published by the Free Software Foundation.
 */
 
-#ifndef __NCIC_IO_H__
-#define __NCIC_IO_H__
+#ifndef NCIC_IO_H
+#define NCIC_IO_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <list>
 
 #define IO_COND_READ		0x01
 #define IO_COND_WRITE		0x02
@@ -30,24 +28,39 @@ struct io_source {
 	void (*callback)(int fd, u_int32_t condition, void *data);
 };
 
-int pork_io_init(void);
-void pork_io_destroy(void);
-int pork_io_del(void *key);
-int pork_io_run(void);
-int pork_io_dead(void *key);
-int pork_io_add_cond(void *key, u_int32_t new_cond);
-int pork_io_del_cond(void *key, u_int32_t new_cond);
-int pork_io_set_cond(void *key, u_int32_t new_cond);
+// Singleton, for now.
+struct IoManager {
+  IoManager(const IoManager&) = delete;
+  IoManager& operator=(const IoManager &) = delete;
+  IoManager(IoManager &&) = delete;
+  IoManager & operator=(IoManager &&) = delete;
 
-int pork_io_add(int fd,
-				u_int32_t cond,
-				void *data,
-				void *key,
-				void (*callback)(int fd, u_int32_t condition, void *data));
+  static IoManager& instance()
+  {
+    static IoManager manager;
+    return manager;
+  }
 
-#ifdef __cplusplus
-}
-#endif
+  void destroy();
+  int delete_key(void *key);
+  int add_cond(void *key, u_int32_t new_cond);
+  int del_cond(void *key, u_int32_t new_cond);
 
-#endif /* __NCIC_IO_H__ */
+  int add(int fd,
+      u_int32_t cond,
+      void *data,
+      void *key,
+      void (*callback)(int fd, u_int32_t condition, void *data));
+
+  int run();
+
+private:
+  IoManager() = default;
+
+  int process_dead_fds();
+
+  std::list<io_source *> io_list;
+};
+
+#endif // NCIC_IO_H
 

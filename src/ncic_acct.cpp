@@ -14,6 +14,7 @@
 #include <ctime>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <algorithm>
 
 #include "ncic.h"
 #include "ncic_util.h"
@@ -230,7 +231,7 @@ static int pork_acct_connect_fail(struct pork_acct *acct) {
 	}
 
 	acct->reconnect_next_try = time(nullptr) +
-		min(acct->reconnect_tries * connect_interval, connect_interval_max);
+		std::min(acct->reconnect_tries * connect_interval, connect_interval_max);
 	return (0);
 }
 

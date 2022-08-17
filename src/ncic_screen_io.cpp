@@ -19,6 +19,7 @@
 #include <cstring>
 #include <cstdarg>
 #include <sys/types.h>
+#include <algorithm>
 
 #include "ncic.h"
 #include "ncic_util.h"
@@ -64,7 +65,7 @@ int screen_draw_input(void) {
 
 		if (input_line == input->input_buf && input->prompt != nullptr) {
 			wputnstr(screen.status_bar, input->prompt,
-				min(input->width, input->prompt_len));
+				std::min(input->width, (uint32_t)input->prompt_len));
 			len -= input->prompt_len;
 		}
 

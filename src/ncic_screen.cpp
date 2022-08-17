@@ -150,10 +150,10 @@ int screen_init(int rows, int cols) {
 
 	screen.null_acct = acct;
 
-	pork_io_add(STDIN_FILENO, IO_COND_READ, &screen, &screen,
+  IoManager::instance().add(STDIN_FILENO, IO_COND_READ, &screen, &screen,
 		keyboard_input);
 
-	rows = max(1, (int) rows - STATUS_ROWS);
+	rows = std::max(1, (int) rows - STATUS_ROWS);
 
 	imwindow = imwindow_new(rows, cols, 1, WIN_TYPE_STATUS, acct, "Main");
 	if (imwindow == nullptr)
@@ -254,13 +254,13 @@ void screen_resize(u_int32_t rows, u_int32_t cols) {
 		u_int32_t im_cols = cols;
 
 		imwindow_resize(imwindow,
-			max(1, (int) rows - STATUS_ROWS), im_cols);
+			std::max(1, (int) rows - STATUS_ROWS), im_cols);
 		input_resize(imwindow->input, cols);
 
 		cur = cur->next;
 	} while (screen.window_list != cur);
 
-	ret = mvwin(screen.status_bar, max(0, (int) rows - STATUS_ROWS), 0);
+	ret = mvwin(screen.status_bar, std::max(0, (int) rows - STATUS_ROWS), 0);
 	if (ret == -1) {
 		delwin(screen.status_bar);
 		status_init();
