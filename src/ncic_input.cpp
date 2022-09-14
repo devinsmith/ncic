@@ -28,6 +28,27 @@
 #include "ncic_cstr.h"
 #include "ncic_input.h"
 
+// Length of a utf8 character representation
+static const int utfBytesLen[256]={
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+  2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+  3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
+  4,4,4,4,4,4,4,4,5,5,5,5,6,6,1,1
+};
+
+
 static inline void input_free(void *param __notused, void *data);
 
 /*
@@ -87,10 +108,14 @@ void input_insert(struct input *input, int c) {
 	memmove(&input->input_buf[cur + 1], &input->input_buf[cur],
 		input->len - cur + 1);
 
+
 	input->input_buf[cur] = c;
-	input->cur++;
+  input->cur++;
+  if (input->utf8_len == 0) {
+    input->len++;
+  }
 	input->begin_completion = input->cur;
-	input->len++;
+
 	input->dirty = 1;
 }
 
@@ -125,6 +150,7 @@ void input_clear_line(struct input *input) {
 	input->begin_completion = input->cur;
 	input->len = 0;
 	input->dirty = 1;
+  input->utf8_len = 0;
 }
 
 /*
@@ -396,6 +422,7 @@ void input_history_next(struct input *input) {
 		input->cur = input->prompt_len;
 		input->begin_completion = input->cur;
 		input->len = 0;
+    input->utf8_len = 0;
 
 		return;
 	}
@@ -421,6 +448,7 @@ void input_history_clear(struct input *input) {
 	input->history_cur = nullptr;
 	input->history_len = 0;
 
+  input->utf8_len = 0;
 	input->input_buf[0] = '\0';
 	input->cur = input->prompt_len;
 	input->begin_completion = input->cur;

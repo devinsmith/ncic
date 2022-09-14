@@ -63,7 +63,6 @@ struct swindow {
 	uint32_t visible:1;
 	uint32_t dirty:1;
 	uint32_t activity:1;
-	uint32_t beep_on_output:1;
 	uint32_t scroll_on_input:1;
 	uint32_t scroll_on_output:1;
 	uint32_t timestamp:1;

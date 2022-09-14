@@ -18,13 +18,8 @@
 #define DEFAULT_ACTIVITY_TYPES				0xffffffff
 #define DEFAULT_AUTO_RECONNECT				0
 #define DEFAULT_BANNER						"*** "
-#define DEFAULT_BEEP						0
-#define DEFAULT_BEEP_MAX					3
-#define DEFAULT_BEEP_ON_OUTPUT				0
 #define DEFAULT_CMDCHARS					'/'
 #define DEFAULT_CONNECT_TIMEOUT				180
-#define DEFAULT_DOWNLOAD_DIR				""
-#define DEFAULT_DUMP_MSGS_TO_STATUS			0
 #define DEFAULT_FORMAT_ACTION_RECV			"[$T] %c* %W$N%x $M"
 #define DEFAULT_FORMAT_ACTION_RECV_STATUS	"[$T] %C>%c* %W$N%D(%C$h%D)%x $M"
 #define DEFAULT_FORMAT_ACTION_SEND			"[$T] %c* %W$N%x $M"

@@ -35,6 +35,7 @@
 #include "ncic_status.h"
 #include "ncic_screen.h"
 #include "ncic_screen_io.h"
+#include "ncic_log.h"
 
 void screen_doupdate(void) {
 	int cur_old = curs_set(0);
@@ -72,6 +73,7 @@ int screen_draw_input(void) {
 		if (len < 0)
 			return (1);
 
+    log_tmsg(0, "Dumping %d bytes: %s", len, input_line);
 		wputncstr(screen.status_bar, input_line, len);
 
 		/*

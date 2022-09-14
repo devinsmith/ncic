@@ -156,63 +156,6 @@ int pork_change_nick(struct pork_acct *acct, char *nick) {
 	return (-1);
 }
 
-int pork_notice_send(struct pork_acct *acct, char *dest, char *msg) {
-	struct imwindow *win;
-
-	if (acct->proto->send_notice == nullptr)
-		return (-1);
-
-	win = imwindow_find(acct, dest);
-	if (win == nullptr)
-		win = cur_window();
-
-	char buf[4096];
-	int type;
-	int ret;
-
-	if (win == screen.status_win)
-		type = OPT_FORMAT_NOTICE_SEND_STATUS;
-	else
-		type = OPT_FORMAT_NOTICE_SEND;
-
-	ret = fill_format_str(type, buf, sizeof(buf), acct, dest, msg);
-	if (ret < 1)
-		return (-1);
-	screen_print_str(win, buf, (size_t) ret, MSG_TYPE_NOTICE_SEND);
-	imwindow_send_msg(win);
-
-	return (0);
-}
-
-int pork_recv_notice(	struct pork_acct *acct,
-						char *dest,
-						char *sender,
-						char *userhost,
-						char *msg)
-{
-	struct imwindow *win;
-	int type;
-
-	win = imwindow_find(acct, sender);
-	if (win == nullptr) {
-		win = screen.status_win;
-		type = OPT_FORMAT_NOTICE_RECV_STATUS;
-	} else
-		type = OPT_FORMAT_NOTICE_RECV;
-
-	char buf[4096];
-	int ret;
-
-	ret = fill_format_str(type, buf, sizeof(buf), acct,
-			dest, sender, userhost, msg);
-	if (ret < 1)
-		return (-1);
-	screen_print_str(win, buf, (size_t) ret, MSG_TYPE_NOTICE_RECV);
-	imwindow_recv_msg(win);
-
-	return (0);
-}
-
 int pork_signoff(struct pork_acct *acct, const char *msg) {
   if (acct == nullptr) {
     return 0;

@@ -18,7 +18,6 @@
 #include "ncic_util.h"
 #include "ncic_list.h"
 #include "ncic_misc.h"
-#include "ncic_imsg.h"
 #include "ncic_imwindow.h"
 #include "ncic_proto.h"
 #include "ncic_acct.h"
@@ -52,24 +51,6 @@ static dlist_t *screen_find_refnum(u_int32_t refnum) {
 	} while (cur != screen.window_list);
 
 	return (nullptr);
-}
-
-/*
-** Yes, this is pretty slow and stupid, but it'd be pretty
-** unusual (i think) to have even 10 windows open at any one time.
-**
-** It's also only called when creating a new window.
-*/
-
-static inline u_int32_t screen_get_new_refnum() {
-	u_int32_t i;
-
-	for (i = 1 ; i < 0xffffffff ; i++) {
-		if (screen_find_refnum(i) == nullptr)
-			return (i);
-	}
-
-	return (0);
 }
 
 static void screen_window_list_add(dlist_t *new_node) {
@@ -198,47 +179,6 @@ void screen_add_window(struct imwindow *imwindow) {
 		screen_window_swap(new_node);
 }
 
-/*
-** Change the refnum on the currently visible window.
-*/
-
-int screen_renumber(struct imwindow *imwindow, u_int32_t refnum) {
-	dlist_t *node;
-	u_int32_t old_refnum = imwindow->refnum;
-
-	node = screen_find_refnum(old_refnum);
-	if (node == nullptr)
-		return (-1);
-
-	screen_window_list_remove(node);
-	imwindow->refnum = refnum;
-
-	/*
-	** If there's more than one window, check to
-	** make sure that no other window's refnum
-	** is equal to the refnum we just set for 'imwindow'.
-	** If it is, give it 'imwindow's' old refnum.
-	*/
-
-	if (node != node->next || node->next != node->prev) {
-		dlist_t *temp = screen_find_refnum(refnum);
-		if (temp != nullptr) {
-			struct imwindow *imw;
-
-			screen_window_list_remove(temp);
-			imw = (struct imwindow *)temp->data;
-			imw->refnum = old_refnum;
-			screen_window_list_add(temp);
-			screen_win_msg(imw, 0, 1, 1, MSG_TYPE_CMD_OUTPUT,
-				"This is now window %%W%u", old_refnum);
-		}
-	}
-
-	screen_window_list_add(node);
-	screen_cmd_output("This is now window %%W%u", imwindow->refnum);
-	return (0);
-}
-
 void screen_resize(u_int32_t rows, u_int32_t cols) {
 	dlist_t *cur;
 	int ret;
@@ -268,10 +208,9 @@ void screen_resize(u_int32_t rows, u_int32_t cols) {
 }
 
 void screen_window_swap(dlist_t *new_cur) {
-	struct imwindow *imwindow = nullptr;
+	struct imwindow *imwindow;
 	u_int32_t last_own_input = 0;
 	u_int32_t cur_own_input;
-	struct pork_acct *acct;
 
 	if (screen.cur_window != nullptr) {
 		imwindow = cur_window();
@@ -300,8 +239,6 @@ void screen_window_swap(dlist_t *new_cur) {
 	}
 
 	status_draw(imwindow->owner);
-
-	acct = imwindow->owner;
 
 	/*
 	** To force ncurses to redraw it on the physical screen.
@@ -363,7 +300,7 @@ void screen_cycle_bak(void) {
 	screen_window_swap(cur);
 }
 
-void screen_bind_all_unbound(struct pork_acct *acct) {
+void screen_bind_all_unbound() {
 	dlist_t *node;
 
 	node = screen.window_list;
@@ -372,7 +309,7 @@ void screen_bind_all_unbound(struct pork_acct *acct) {
 		struct imwindow *imwindow = (struct imwindow *)node->data;
 
 		if (imwindow->owner == screen.null_acct) {
-			imwindow_bind_acct(imwindow, acct->refnum);
+			imwindow_bind_acct(imwindow);
     }
 
 		node = node->next;

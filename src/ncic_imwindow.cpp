@@ -10,7 +10,6 @@
 
 #include <ncurses.h>
 #include <cstdlib>
-#include <cstring>
 
 #include "ncic.h"
 #include "ncic_util.h"
@@ -26,8 +25,6 @@
 #include "ncic_screen.h"
 #include "ncic_screen_io.h"
 #include "ncic_chat.h"
-
-extern struct screen screen;
 
 struct imwindow *imwindow_new(uint32_t rows,
 								uint32_t cols,
@@ -152,69 +149,6 @@ void imwindow_destroy(struct imwindow *imwindow) {
 	free(imwindow);
 }
 
-struct imwindow *imwindow_find(struct pork_acct *owner, const char *target) {
-	dlist_t *list_start = screen.window_list;
-	dlist_t *cur = list_start;
-	char nname[NUSER_LEN];
-
-	xstrncpy(nname, target, sizeof(nname));
-
-	do {
-		struct imwindow *imwindow = (struct imwindow *)cur->data;
-
-		if (imwindow->owner == owner && imwindow->type == WIN_TYPE_PRIVMSG &&
-			!strcasecmp(imwindow->target, nname))
-		{
-			return (imwindow);
-		}
-
-		cur = cur->next;
-	} while (cur != list_start);
-
-	return (nullptr);
-}
-
-struct imwindow *imwindow_find_chat_target(	struct pork_acct *owner,
-											const char *target)
-{
-	dlist_t *list_start = screen.window_list;
-	dlist_t *cur = list_start;
-	char nname[NUSER_LEN];
-
-	xstrncpy(nname, target, sizeof(nname));
-
-	do {
-		struct imwindow *imwindow = (struct imwindow *)cur->data;
-
-		if (imwindow->owner == owner &&
-			imwindow->type == WIN_TYPE_CHAT &&
-			!strcasecmp(imwindow->target, nname))
-		{
-			return (imwindow);
-		}
-
-		cur = cur->next;
-	} while (cur != list_start);
-
-	return (nullptr);
-}
-
-struct imwindow *imwindow_find_name(struct pork_acct *owner, const char *name) {
-	dlist_t *list_start = screen.window_list;
-	dlist_t *cur = list_start;
-
-	do {
-		struct imwindow *imwindow = (struct imwindow *)cur->data;
-
-		if (imwindow->owner == owner && !strcasecmp(imwindow->name, name))
-			return (imwindow);
-
-		cur = cur->next;
-	} while (cur != list_start);
-
-	return (nullptr);
-}
-
 struct imwindow *imwindow_find_refnum(uint32_t refnum) {
 	dlist_t *cur = screen.window_list;
 
@@ -240,11 +174,10 @@ void imwindow_recv_msg(struct imwindow *win) {
 }
 
 /*
-** Bind the account whose reference number is "refnum" to the window
+** Bind the account to the window
 ** "imwindow".
 */
-
-int imwindow_bind_acct(struct imwindow *imwindow, uint32_t refnum) {
+int imwindow_bind_acct(struct imwindow *imwindow) {
 	struct pork_acct *owner;
 	struct pork_acct *old_acct = imwindow->owner;
 
@@ -254,7 +187,7 @@ int imwindow_bind_acct(struct imwindow *imwindow, uint32_t refnum) {
 		return (-1);
 	}
 
-	owner = pork_acct_get_data(refnum);
+	owner = pork_acct_get_data();
 	if (owner == nullptr)
 		return (-1);
 
@@ -281,7 +214,7 @@ int imwindow_bind_next_acct(struct imwindow *imwindow) {
 	if (pork_acct_next_refnum(imwindow->owner->refnum, &next_refnum) == -1)
 		return (-1);
 
-	return (imwindow_bind_acct(imwindow, next_refnum));
+	return (imwindow_bind_acct(imwindow));
 }
 
 void imwindow_scroll_up(struct imwindow *imwindow) {

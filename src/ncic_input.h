@@ -39,6 +39,7 @@ struct input {
 	dlist_t *history;
 	dlist_t *history_cur;
 	dlist_t *history_end;
+  int utf8_len;
 	char input_buf[INPUT_BUFFER_LEN];
 };
 

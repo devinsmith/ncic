@@ -45,7 +45,7 @@ int get_options(int argc, char *const argv[])
 	  if (!strcmp(p, "-v")) {
       printf("ncic version %s\n", VERSION);
       printf("Written by Devin Smith <devin@devinsmith.net>\n");
-      printf("http://devinsmith.net/programs/ncic.php\n");
+      printf("http://devinsmith.net/programs/ncic.html\n");
       exit(0);
 	  } else if (!strcmp(p, "-h")) {
       print_help_text();

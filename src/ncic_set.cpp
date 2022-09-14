@@ -78,24 +78,6 @@ struct global_pref global_pref[] = {
 		opt_set_str,
 		nullptr,
 		SET_STR(DEFAULT_BANNER)
-	},{	"BEEP",
-		OPT_BOOL,
-		0,
-		opt_set_bool,
-		nullptr,
-		SET_BOOL(DEFAULT_BEEP)
-	},{	"BEEP_MAX",
-		OPT_INT,
-		0,
-		opt_set_int,
-		nullptr,
-		SET_INT(DEFAULT_BEEP_MAX)
-	},{	"BEEP_ON_OUTPUT",
-		OPT_BOOL,
-		0,
-		opt_set_bool,
-		nullptr,
-		SET_BOOL(DEFAULT_BEEP_ON_OUTPUT)
 	},{	"CMDCHARS",
 		OPT_CHAR,
 		0,
@@ -108,18 +90,6 @@ struct global_pref global_pref[] = {
 		opt_set_int,
 		nullptr,
 		SET_INT(DEFAULT_CONNECT_TIMEOUT)
-	},{	"DOWNLOAD_DIR",
-		OPT_STR,
-		0,
-		opt_set_str,
-		nullptr,
-		SET_STR(DEFAULT_DOWNLOAD_DIR),
-	},{	"DUMP_MSGS_TO_STATUS",
-		OPT_BOOL,
-		0,
-		opt_set_bool,
-		nullptr,
-		SET_BOOL(DEFAULT_DUMP_MSGS_TO_STATUS),
 	},{	"FORMAT_ACTION_RECV",
 		OPT_FORMAT,
 		0,
@@ -1054,7 +1024,6 @@ void wopt_init(struct imwindow *imwindow, const char *target) {
 	memset(wopt, 0, sizeof(pref_val_t) * WOPT_NUM_OPTS);
 
 	wopt[WOPT_ACTIVITY_TYPES].i = opt_get_int(OPT_ACTIVITY_TYPES);
-	wopt[WOPT_BEEP_ON_OUTPUT].b = opt_get_bool(OPT_BEEP_ON_OUTPUT);
 	wopt[WOPT_HISTORY_LEN].i = opt_get_int(OPT_HISTORY_LEN);
 	wopt[WOPT_LOG].b = opt_get_bool(OPT_LOG);
 	wopt[WOPT_LOG_TYPES].i = opt_get_int(OPT_LOG_TYPES);

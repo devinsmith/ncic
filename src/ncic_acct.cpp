@@ -10,7 +10,6 @@
 
 #include <ncurses.h>
 #include <cstdlib>
-#include <cstring>
 #include <ctime>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -28,18 +27,18 @@
 #include "ncic_msg.h"
 #include "ncic_chat.h"
 
-struct pork_acct *pork_acct_find(u_int32_t refnum) {
+struct pork_acct *pork_acct_find() {
   return screen.acct;
 }
 
-struct pork_acct *pork_acct_get_data(u_int32_t refnum) {
+struct pork_acct *pork_acct_get_data() {
   return screen.acct;
 }
 
-int pork_acct_del_refnum(u_int32_t refnum, char *reason) {
+int pork_acct_del_refnum(char *reason) {
 	struct pork_acct *acct;
 
-	acct = pork_acct_find(refnum);
+	acct = pork_acct_find();
 	if (acct == nullptr)
 		return (-1);
 
@@ -77,15 +76,12 @@ void pork_acct_del(struct pork_acct *acct, const char *reason) {
 	}
 
 	/* This must always be the case. */
-	if (acct != nullptr) {
-		delete acct;
-	}
+  delete acct;
+  screen.acct = nullptr;
 }
 
 int pork_acct_next_refnum(u_int32_t cur_refnum, u_int32_t *next) {
-	struct pork_acct *acct = nullptr;
-
-	acct = pork_acct_find(cur_refnum);
+  pork_acct *acct = pork_acct_find();
 	if (acct == nullptr) {
 		debug("current refnum %u doesn't exist", cur_refnum);
 		return (-1);
@@ -117,11 +113,11 @@ int pork_acct_connect(const char *user, char *args, int protocol) {
   }
 
   screen.acct = acct;
-  screen_bind_all_unbound(acct);
+  screen_bind_all_unbound();
 
   if (acct->proto->connect(acct, args) == -1) {
     screen_err_msg("Unable to login as %s", acct->username);
-    pork_acct_del_refnum(acct->refnum, nullptr);
+    pork_acct_del_refnum(nullptr);
     return (-1);
   }
 
@@ -159,7 +155,7 @@ static inline u_int32_t pork_acct_get_new_refnum() {
 	u_int32_t i;
 
 	for (i = 0 ; i < 0xffffffff ; i++) {
-		if (pork_acct_find(i) == nullptr)
+		if (pork_acct_find() == nullptr)
 			return (i);
 	}
 
@@ -226,7 +222,7 @@ static int pork_acct_connect_fail(struct pork_acct *acct) {
 		screen_err_msg("Failed to reconnect %s after %u tries. Giving up.",
 			acct->username, max_reconnect_tries);
 
-		pork_acct_del_refnum(acct->refnum, nullptr);
+		pork_acct_del_refnum(nullptr);
 		return (-1);
 	}
 
@@ -237,7 +233,7 @@ static int pork_acct_connect_fail(struct pork_acct *acct) {
 
 int pork_acct_disconnected(struct pork_acct *acct) {
 	if (!acct->successful_connect || !opt_get_bool(OPT_AUTO_RECONNECT)) {
-		pork_acct_del_refnum(acct->refnum, nullptr);
+		pork_acct_del_refnum(nullptr);
 		return (0);
 	}
 

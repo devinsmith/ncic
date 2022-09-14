@@ -53,7 +53,7 @@ void imwindow_resize(	struct imwindow *imwindow,
 int imwindow_set_priv_input(struct imwindow *imwindow, int val);
 void imwindow_send_msg(struct imwindow *win);
 void imwindow_recv_msg(struct imwindow *win);
-int imwindow_bind_acct(struct imwindow *imwindow, uint32_t refnum);
+int imwindow_bind_acct(struct imwindow *imwindow);
 int imwindow_bind_next_acct(struct imwindow *imwindow);
 int imwindow_refresh(struct imwindow *imwindow);
 void imwindow_destroy(struct imwindow *imwindow);

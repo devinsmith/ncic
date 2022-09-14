@@ -34,10 +34,6 @@
 #include "ncic_irc.h"
 #include "ncic_naken.h"
 
-#define HIGHLIGHT_BOLD			0x01
-#define HIGHLIGHT_UNDERLINE		0x02
-#define HIGHLIGHT_INVERSE		0x04
-
 static void irc_event(int sock, u_int32_t cond, void *data) {
     irc_session_t *session = static_cast<irc_session_t *>(data);
 
@@ -49,6 +45,7 @@ static void irc_event(int sock, u_int32_t cond, void *data) {
       IoManager::instance().delete_key(data);
 			int ret = pork_acct_disconnected(acct);
       log_tmsg(0, "Acct disconnected: %d", ret);
+      session->data = nullptr;
 
 			return;
 		}

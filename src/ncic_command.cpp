@@ -34,7 +34,6 @@
 #include "ncic_msg.h"
 #include "ncic_command.h"
 #include "ncic_help.h"
-#include "ncic_log.h"
 
 USER_COMMAND(cmd_acct);
 USER_COMMAND(cmd_alias);
@@ -378,7 +377,7 @@ USER_COMMAND(cmd_win_bind) {
 		return;
 	}
 
-	ret = imwindow_bind_acct(imwindow, refnum);
+	ret = imwindow_bind_acct(imwindow);
 	if (ret == -1) {
 		if (imwindow->type == WIN_TYPE_CHAT)
 			screen_err_msg("You can't rebind chat windows");
@@ -787,7 +786,7 @@ static void cmd_disconnect(char *args) {
 			args = nullptr;
 	}
 
-	acct = pork_acct_find(dest);
+	acct = pork_acct_find();
 	if (acct == nullptr) {
 		screen_err_msg("Account refnum %u is not logged in", dest);
 		return;
@@ -1009,25 +1008,6 @@ USER_COMMAND(cmd_nick) {
 		return;
 
 	pork_change_nick(cur_window()->owner, args);
-}
-
-USER_COMMAND(cmd_notice) {
-	struct pork_acct *acct = cur_window()->owner;
-	char *target;
-	struct chatroom *chat;
-
-	if (args == nullptr || !acct->connected)
-		return;
-
-	target = strsep(&args, " ");
-	if (target == nullptr || args == nullptr)
-		return;
-
-	chat = chat_find(acct, target);
-	if (chat != nullptr)
-		chat_send_notice(acct, chat, target, args);
-	else
-		pork_notice_send(acct, target, args);
 }
 
 USER_COMMAND(cmd_win) {

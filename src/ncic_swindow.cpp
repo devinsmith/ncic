@@ -23,7 +23,6 @@
 #include <algorithm>
 
 #include "ncic.h"
-#include "ncic_util.h"
 #include "ncic_list.h"
 #include "ncic_set.h"
 #include "ncic_swindow.h"
@@ -187,7 +186,7 @@ void swindow_prune(struct swindow *swindow) {
 	serial_top = ((struct imsg *) swindow->scrollbuf_top->data)->serial;
 	serial_bot = ((struct imsg *) swindow->scrollbuf_bot->data)->serial;
 
-	while (cur != NULL && num > 0) {
+	while (cur != nullptr && num > 0) {
 		struct imsg *imsg = (struct imsg *)cur->data;
 		dlist_t *next = cur->prev;
 

@@ -123,6 +123,8 @@ keyboard_input(int fd, uint32_t cond, void *data)
 	if (key == -1)
 		return;
 
+  log_tmsg(0, "Key is: %d", key);
+
 	time(&acct->last_input);
 	bind_exec(imwindow->active_binds, key);
 

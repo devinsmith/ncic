@@ -45,15 +45,12 @@ struct screen {
 int screen_init(int rows, int cols);
 void screen_destroy(void);
 
-int screen_renumber(struct imwindow *imwindow, u_int32_t refnum);
 void screen_add_window(struct imwindow *imwindow);
 void screen_resize(u_int32_t rows, u_int32_t cols);
 void screen_window_swap(dlist_t *new_cur);
 int screen_goto_window(u_int32_t refnum);
 void screen_refresh(void);
-void screen_bind_all_unbound(struct pork_acct *acct);
-struct imwindow *screen_new_window(struct pork_acct *o, char *dest, char *name);
-struct imwindow *screen_new_chat_window(struct pork_acct *acct, char *name);
+void screen_bind_all_unbound();
 int screen_close_window(struct imwindow *imwindow);
 void screen_cycle_fwd(void);
 void screen_cycle_bak(void);

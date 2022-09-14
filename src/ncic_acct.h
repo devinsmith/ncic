@@ -82,11 +82,11 @@ public:
 	irc_session_t *data{};
 };
 
-int pork_acct_del_refnum(u_int32_t refnum, char *reason);
+int pork_acct_del_refnum(char *reason);
 void pork_acct_del(struct pork_acct *acct, const char *reason);
 void pork_acct_del_all(const char *reason);
-struct pork_acct *pork_acct_find(u_int32_t refnum);
-struct pork_acct *pork_acct_get_data(u_int32_t refnum);
+struct pork_acct *pork_acct_find();
+struct pork_acct *pork_acct_get_data();
 void pork_acct_update(void);
 int pork_acct_disconnected(struct pork_acct *acct);
 void pork_acct_reconnect_all(void);
