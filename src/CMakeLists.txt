@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.13.4)
 
 project(ncic)
 set(TARGET_NAME ncic)
