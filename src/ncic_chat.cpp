@@ -37,9 +37,9 @@ static void chat_destroy_user_list_cb(void *param, void *data) {
 	free(chat_user);
 }
 
-struct chatroom *chat_new(	struct pork_acct *acct,
-                            char *chat_title,
-							char *chat_title_full,
+struct chatroom *chat_new(struct pork_acct *acct,
+                            const char *chat_title,
+							const char *chat_title_full,
 							struct imwindow *win)
 {
 	struct chatroom *chat;

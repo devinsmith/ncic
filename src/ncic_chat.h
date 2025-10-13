@@ -45,8 +45,8 @@ struct chat_user {
 };
 
 struct chatroom *chat_new(	struct pork_acct *acct,
-							char *chat_title,
-							char *chat_title_full,
+							const char *chat_title,
+							const char *chat_title_full,
 							struct imwindow *win);
 
 int chat_send_msg(struct pork_acct *acct, struct chatroom *chat, const char *target, char *msg);

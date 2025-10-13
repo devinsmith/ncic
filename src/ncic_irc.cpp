@@ -283,7 +283,7 @@ static int irc_back(struct pork_acct *acct) {
 	return (naken_set_back(session, nullptr));
 }
 
-char *irc_text_filter(char *str) {
+char *irc_text_filter(const char *str) {
   if (str == nullptr)
     return (xstrdup(""));
 

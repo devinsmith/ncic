@@ -184,7 +184,7 @@ int IoManager::add(int fd, u_int32_t cond, void *data, void *key, void (*callbac
                              [key](const io_source* x) { return x->key == key;});
 
   if (result != io_list.end()) {
-    free(*result);
+    delete *result;
     io_list.erase(result);
   }
 

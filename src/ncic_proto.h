@@ -33,7 +33,7 @@ struct pork_proto {
 	int (*free)(struct pork_acct *);
 	int (*update)(struct pork_acct *);
 	int (*user_compare)(const char *u1, const char *u2);
-	char *(*filter_text)(char *);
+	char *(*filter_text)(const char *);
 
 	int (*connect)(struct pork_acct *, char *);
 	int (*connect_abort)(struct pork_acct *acct);
