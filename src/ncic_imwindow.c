@@ -9,7 +9,8 @@
 */
 
 #include <ncurses.h>
-#include <cstdlib>
+#include <stdlib.h>
+#include <string.h>
 
 #include "ncic.h"
 #include "ncic_util.h"
@@ -26,6 +27,8 @@
 #include "ncic_screen_io.h"
 #include "ncic_chat.h"
 
+extern struct screen screen;
+
 struct imwindow *imwindow_new(uint32_t rows,
 								uint32_t cols,
 								uint32_t refnum,
@@ -39,14 +42,14 @@ struct imwindow *imwindow_new(uint32_t rows,
 	char nname[NUSER_LEN];
 
 	swin = newwin(rows, cols, 0, 0);
-	if (swin == nullptr) {
+	if (swin == NULL) {
 		debug("Unable to create %ux%u window", rows, cols);
-		return (nullptr);
+		return (NULL);
 	}
 
 	xstrncpy(nname, target, sizeof(nname));
 
-	imwindow = (struct imwindow *)xcalloc(1, sizeof(*imwindow));
+	imwindow = xcalloc(1, sizeof(*imwindow));
 	imwindow->refnum = refnum;
 	imwindow->type = type;
 	imwindow->target = xstrdup(nname);
@@ -65,7 +68,7 @@ struct imwindow *imwindow_new(uint32_t rows,
 	*/
 
 	if (wopt_get_bool(imwindow->opts, WOPT_PRIVATE_INPUT)) {
-		input = (struct input *)xmalloc(sizeof(*input));
+		input = xmalloc(sizeof(*input));
 		input_init(input, cols);
 	} else
 		input = &screen.input;
@@ -100,7 +103,7 @@ int imwindow_set_priv_input(struct imwindow *imwindow, int val) {
 	** Give this imwindow its own input buffer and history.
 	*/
 	if (val == 1) {
-		struct input *input = (struct input *)xmalloc(sizeof(*input));
+		struct input *input = xmalloc(sizeof(*input));
 
 		input_init(input, imwindow->swindow.cols);
 		imwindow->input = input;
@@ -140,7 +143,7 @@ void imwindow_destroy(struct imwindow *imwindow) {
 		free(imwindow->input);
 	}
 
-	if (imwindow->owner != nullptr)
+	if (imwindow->owner != NULL)
 		imwindow->owner->ref_count--;
 
 	wopt_destroy(imwindow);
@@ -153,7 +156,7 @@ struct imwindow *imwindow_find_refnum(uint32_t refnum) {
 	dlist_t *cur = screen.window_list;
 
 	do {
-		struct imwindow *imwindow = (struct imwindow *)cur->data;
+		struct imwindow *imwindow = cur->data;
 
 		if (imwindow->refnum == refnum)
 			return (imwindow);
@@ -161,7 +164,7 @@ struct imwindow *imwindow_find_refnum(uint32_t refnum) {
 		cur = cur->next;
 	} while (cur != screen.window_list);
 
-	return (nullptr);
+	return (NULL);
 }
 
 void imwindow_send_msg(struct imwindow *win) {
@@ -188,7 +191,7 @@ int imwindow_bind_acct(struct imwindow *imwindow) {
 	}
 
 	owner = pork_acct_get_data();
-	if (owner == nullptr)
+	if (owner == NULL)
 		return (-1);
 
 	if (old_acct != owner) {

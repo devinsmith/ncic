@@ -18,7 +18,7 @@ extern "C" {
 extern struct screen screen;
 
 struct imwindow;
-class pork_acct;
+struct pork_acct;
 
 #include "ncic_input.h"
 #include "ncic_bind.h"
@@ -30,11 +30,11 @@ struct screen {
 	dlist_t *window_list;
 	struct imwindow *status_win;
 
-  pork_acct *acct;
+  struct pork_acct *acct;
 	WINDOW *status_bar;
 	u_int32_t quiet:1;
 
-	pork_acct *null_acct;
+	struct pork_acct *null_acct;
 	struct input input;
 	struct binds binds;
 	hash_t alias_hash;

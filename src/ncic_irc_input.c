@@ -10,10 +10,10 @@
 
 #include <unistd.h>
 #include <ncurses.h>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <cerrno>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
 
 #include "ncic.h"
 #include "ncic_util.h"
@@ -30,23 +30,25 @@
 #include "ncic_irc.h"
 #include "ncic_naken.h"
 
-static int naken_process_input(irc_session_t *session, char *input, int len);
-static struct naken_input *naken_tokenize(irc_session_t *session, char *input);
+static int naken_process_input(struct irc_session_t *session, char *input, int len);
+static struct naken_input *naken_tokenize(struct irc_session_t *session, char *input);
 static int naken_handler_nick(struct pork_acct *acct, struct naken_input *in,
     char *old_name);
 
-static int naken_process_input(irc_session_t *session, char *input, int len)
+static int naken_process_input(struct irc_session_t *session, char *input, int len)
 {
-	struct pork_acct *acct = (struct pork_acct *)session->data;
+	struct pork_acct *acct = session->data;
 	struct naken_input *in;
 	char *tmp;
 	int number;
 
 	if (input[0] == '@') {
-		acct->state = STATE_READY;
-    acct->set_connected();
+		struct chatroom *chat;
 
-		chat_new(acct, "main", "main", screen.status_win);
+		acct->state = STATE_READY;
+		pork_acct_connected(acct);
+
+		chat = chat_new(acct, "main", "main", screen.status_win);
 		return 0;
 	}
 
@@ -106,13 +108,13 @@ static int naken_process_input(irc_session_t *session, char *input, int len)
 	return 0;
 }
 
-static struct naken_input *naken_tokenize(irc_session_t *session, char *input)
+static struct naken_input *naken_tokenize(struct irc_session_t *session, char *input)
 {
-	struct naken_input *in = (struct naken_input *)xcalloc(1, sizeof(*in));
+	struct naken_input *in = xcalloc(1, sizeof(*in));
 	char *sender;
 	char *message;
 	char *tmp;
-	struct pork_acct *acct = (struct pork_acct *)session->data;
+	struct pork_acct *acct = session->data;
 
 	in->orig = xstrdup(input);
 
@@ -122,7 +124,7 @@ static struct naken_input *naken_tokenize(irc_session_t *session, char *input)
 	if (input[0] == '>') {
 		in->msg_type = MSG_SYSTEM_ALERT;
 		/* Process system messages. They all start with >> */
-		if (strstr(input, ">> Your name is") != nullptr) {
+		if (strstr(input, ">> Your name is") != NULL) {
 			char *old_name;
 
 			/* Handle name change */
@@ -133,7 +135,7 @@ static struct naken_input *naken_tokenize(irc_session_t *session, char *input)
 			in->args = tmp;
 			naken_handler_nick(acct, in, old_name);
 			free(old_name);
-		} else if (strstr(input, ">> You just logged on line") != nullptr) {
+		} else if (strstr(input, ">> You just logged on line") != NULL) {
 		  sscanf(input, "%*c%*c %*s %*s %*s %*s %*s %d", &acct->id);
 		}
 		return (in);
@@ -150,12 +152,12 @@ static struct naken_input *naken_tokenize(irc_session_t *session, char *input)
 	/* Now we will get the sender, the number, and the message, using
 	 * strchr and strstr processing. */
 	message = strchr(input, ':');
-	if (message != nullptr) {
+	if (message != NULL) {
 		*message = '\0';
 		message += 2; /* Go past the NULL and the space */
 	} else {
 		in->msg_type = MSG_SYSTEM_NORMAL;
-		in->message = nullptr;
+		in->message = NULL;
 		return (in);
 	}
 	sender = input;
@@ -168,10 +170,10 @@ static struct naken_input *naken_tokenize(irc_session_t *session, char *input)
 		tmp = strchr(tmp + 1, '#');
 	} else {
 		tmp = strchr(sender, ']');
-		if (tmp != nullptr) {
+		if (tmp != NULL) {
 			in->msg_type = MSG_NORMAL;
 		} else {
-			in->message = nullptr;
+			in->message = NULL;
 			return (in);
 		}
 	}
@@ -186,16 +188,12 @@ static struct naken_input *naken_tokenize(irc_session_t *session, char *input)
   return (in);
 }
 
-static ssize_t irc_read_data(irc_session_t *session, char *buf, size_t len) {
+static ssize_t irc_read_data(struct irc_session_t *session, char *buf, size_t len) {
 	int i;
 	ssize_t ret = 0;
 
 	for (i = 0 ; i < 5 ; i++) {
-    if (session->use_ssl) {
-      ret = SSL_read(session->sslHandle, buf, len - 1);
-    } else {
-      ret = read(session->sock, buf, len - 1);
-    }
+		ret = SSL_read(session->sslHandle, buf, len - 1);
 		if (ret == -1) {
 			if (errno == EINTR)
 				continue;
@@ -219,13 +217,13 @@ static ssize_t irc_read_data(irc_session_t *session, char *buf, size_t len) {
 /*
 ** Returns -1 if the connection died, 0 otherwise.
 */
-int naken_input_dispatch(irc_session_t *session)
+int naken_input_dispatch(struct irc_session_t *session)
 {
   ssize_t i, nbytes;
   size_t j;
   char *p;
   char *cur;
-  struct pork_acct *acct = (struct pork_acct *)session->data;
+  struct pork_acct *acct = session->data;
   char input[2048];
 
   nbytes = irc_read_data(session,
@@ -272,7 +270,7 @@ int naken_input_dispatch(irc_session_t *session)
 static int
 naken_handler_nick(struct pork_acct *acct, struct naken_input *in, char *old_name)
 {
-	if (in->args == nullptr) {
+	if (in->args == NULL) {
 		debug("invalid input from server: %s", in->orig);
 		return (-1);
 	}

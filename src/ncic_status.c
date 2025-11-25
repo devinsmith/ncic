@@ -9,9 +9,11 @@
 */
 
 #include <ncurses.h>
-#include <cstring>
+#include <string.h>
 
+#include "ncic.h"
 #include "ncic_util.h"
+#include "ncic_list.h"
 #include "ncic_misc.h"
 #include "ncic_set.h"
 #include "ncic_cstr.h"
@@ -26,7 +28,7 @@ int status_init(void) {
 	WINDOW *win;
 
 	win = newwin(STATUS_ROWS, screen.cols, screen.rows - STATUS_ROWS, 0);
-	if (win == nullptr)
+	if (win == NULL)
 		return (-1);
 
 	set_default_win_opts(win);
@@ -41,7 +43,7 @@ int status_init(void) {
 ** and the status bar isn't redrawn all that much anyway.
 */
 
-void status_draw(pork_acct *acct) {
+void status_draw(struct pork_acct *acct) {
 	char buf[1024];
 	chtype status_bar[screen.cols + 1];
 	struct imwindow *win = cur_window();

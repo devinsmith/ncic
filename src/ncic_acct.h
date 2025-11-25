@@ -33,15 +33,7 @@ enum {
 
 struct pork_proto;
 
-class pork_acct {
-public:
-  pork_acct();
-  ~pork_acct();
-
-  // Set an account as connected.
-  void set_connected();
-
-public:
+struct pork_acct {
 	char *username;
 	char *passwd;
 	char *userhost;
@@ -66,20 +58,20 @@ public:
 	/* presently in the process of reconnecting */
 	bool reconnecting;
 
-	u_int32_t reconnect_tries{};
-	time_t reconnect_next_try{};
+	u_int32_t reconnect_tries;
+	time_t reconnect_next_try;
 
-	u_int32_t ref_count{};
-	u_int32_t refnum{};
+	u_int32_t ref_count;
+	u_int32_t refnum;
 
-	dlist_t *chat_list{};
-	hash_t autoreply{};
+	dlist_t *chat_list;
+	hash_t autoreply;
 
-	char *fport{};
-	char *server{};
+	char *fport;
+	char *server;
 
-	struct pork_proto *proto{};
-	irc_session_t *data{};
+	struct pork_proto *proto;
+	struct irc_session_t *data;
 };
 
 int pork_acct_del_refnum(char *reason);
@@ -90,6 +82,7 @@ struct pork_acct *pork_acct_get_data();
 void pork_acct_update(void);
 int pork_acct_disconnected(struct pork_acct *acct);
 void pork_acct_reconnect_all(void);
+void pork_acct_connected(struct pork_acct *acct);
 int pork_acct_connect(const char *user, char *args, int protocol);
 int pork_acct_next_refnum(u_int32_t cur_refnum, u_int32_t *next);
 struct pork_acct *pork_acct_init(const char *user, int protocol);

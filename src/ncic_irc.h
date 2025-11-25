@@ -28,7 +28,7 @@ extern "C" {
 #include <openssl/err.h>
 
 struct chatroom;
-class pork_acct;
+struct pork_acct;
 
 enum {
 	MODE_PLUS = '+',
@@ -74,17 +74,17 @@ struct callback_handler {
 
 int irc_proto_init(struct pork_proto *proto);
 
-int irc_flush_outq(irc_session_t *session);
+int irc_flush_outq(struct irc_session_t *session);
 int irc_connect(struct pork_acct *a, const char *server, int *sock);
 
-int irc_send_pong(irc_session_t *session, char *dest);
-int irc_send_login(irc_session_t *session);
-int irc_send_quit(irc_session_t *session, const char *reason);
-int irc_set_away(irc_session_t *session, char *msg);
-int irc_send_action(irc_session_t *session, char *dest, char *msg);
+int irc_send_pong(struct irc_session_t *session, char *dest);
+int irc_send_login(struct irc_session_t *session);
+int irc_send_quit(struct irc_session_t *session, const char *reason);
+int irc_set_away(struct irc_session_t *session, char *msg);
+int irc_send_action(struct irc_session_t *session, char *dest, char *msg);
 int irc_chan_free(struct pork_acct *acct, void *data);
 
-int naken_input_dispatch(irc_session_t *session);
+int naken_input_dispatch(struct irc_session_t *session);
 char *irc_text_filter(char *str);
 
 #ifdef __cplusplus
