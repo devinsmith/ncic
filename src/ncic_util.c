@@ -9,10 +9,10 @@
 */
 
 #include <unistd.h>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <cctype>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 #include <pwd.h>
 
 #include "ncic.h"
@@ -24,7 +24,7 @@
 */
 
 void strtoupper(char *s) {
-	if (s == nullptr)
+	if (s == NULL)
 		return;
 
 	for (; *s != '\0' ; s++)
@@ -34,7 +34,7 @@ void strtoupper(char *s) {
 void *xrealloc(void *ptr, size_t size) {
 	void *ret = realloc(ptr, size);
 
-	if (ret == nullptr) {
+	if (ret == NULL) {
 		debug("out of memory: %u", size);
 		exit(-1);
 	}
@@ -45,7 +45,7 @@ void *xrealloc(void *ptr, size_t size) {
 void *xmalloc(size_t len) {
 	void *ret = malloc(len);
 
-	if (ret == nullptr) {
+	if (ret == NULL) {
 		debug("out of memory: %u", len);
 		exit(-1);
 	}
@@ -56,7 +56,7 @@ void *xmalloc(size_t len) {
 void *xcalloc(size_t nmemb, size_t len) {
 	void *ret = calloc(nmemb, len);
 
-	if (ret == nullptr) {
+	if (ret == NULL) {
 		debug("out of memory: %u", len);
 		exit(-1);
 	}
@@ -67,7 +67,7 @@ void *xcalloc(size_t nmemb, size_t len) {
 char *xstrdup(const char *str) {
 	char *ret = strdup(str);
 
-	if (ret == nullptr) {
+	if (ret == NULL) {
 		debug("out of memory: %p", str);
 		exit(-1);
 	}
@@ -76,7 +76,7 @@ char *xstrdup(const char *str) {
 }
 
 void free_str_wipe(char *str) {
-	if (str == nullptr)
+	if (str == NULL)
 		return;
 
 	memset(str, 0, strlen(str));
@@ -135,9 +135,9 @@ char *xstrndup(const char *str, size_t len) {
 	char *ret;
 
 	if (len == 0)
-		return (nullptr);
+		return (NULL);
 
-	dst = (char *)xmalloc(len + 1);
+	dst = xmalloc(len + 1);
 	ret = dst;
 
 	while (*str != '\0' && len > 0) {
@@ -227,26 +227,26 @@ int expand_path(char *path, char *dest, size_t len) {
 		} else {
 			char *p = strchr(path, '/');
 
-			if (p == nullptr) {
+			if (p == NULL) {
 				if (*path == '\0')
 					pw = getpwuid(getuid());
 				else
 					pw = getpwnam(path);
 
-				if (pw != nullptr)
-					path = nullptr;
+				if (pw != NULL)
+					path = NULL;
 			} else {
 				char *user = xstrndup(path, p - path);
 				pw = getpwnam(user);
 				free(user);
 
-				if (pw != nullptr)
+				if (pw != NULL)
 					path = ++p;
 			}
 		}
 
-		if (pw != nullptr) {
-			if (path != nullptr) {
+		if (pw != NULL) {
+			if (path != NULL) {
 				ret = snprintf(dest, len, "%s/%s", pw->pw_dir, path);
 				if (ret < 1 || (size_t) ret >= len)
 					ret = -1;

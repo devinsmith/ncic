@@ -66,7 +66,7 @@ int screen_draw_input(void) {
 
 		if (input_line == input->input_buf && input->prompt != nullptr) {
 			wputnstr(screen.status_bar, input->prompt,
-				std::min(input->width, (uint32_t)input->prompt_len));
+				min(input->width, (uint32_t)input->prompt_len));
 			len -= input->prompt_len;
 		}
 

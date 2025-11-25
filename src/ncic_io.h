@@ -11,8 +11,6 @@
 #ifndef NCIC_IO_H
 #define NCIC_IO_H
 
-#include <list>
-
 #define IO_COND_READ		0x01
 #define IO_COND_WRITE		0x02
 #define IO_COND_EXCEPTION	0x04
@@ -28,39 +26,20 @@ struct io_source {
 	void (*callback)(int fd, u_int32_t condition, void *data);
 };
 
-// Singleton, for now.
-struct IoManager {
-  IoManager(const IoManager&) = delete;
-  IoManager& operator=(const IoManager &) = delete;
-  IoManager(IoManager &&) = delete;
-  IoManager & operator=(IoManager &&) = delete;
+int pork_io_init(void);
+void pork_io_destroy(void);
+int pork_io_del(void *key);
+int pork_io_run(void);
+int pork_io_dead(void *key);
+int pork_io_add_cond(void *key, u_int32_t new_cond);
+int pork_io_del_cond(void *key, u_int32_t new_cond);
+int pork_io_set_cond(void *key, u_int32_t new_cond);
 
-  static IoManager& instance()
-  {
-    static IoManager manager;
-    return manager;
-  }
-
-  void destroy();
-  int delete_key(void *key);
-  int add_cond(void *key, u_int32_t new_cond);
-  int del_cond(void *key, u_int32_t new_cond);
-
-  int add(int fd,
-      u_int32_t cond,
-      void *data,
-      void *key,
-      void (*callback)(int fd, u_int32_t condition, void *data));
-
-  int run();
-
-private:
-  IoManager() = default;
-
-  int process_dead_fds();
-
-  std::list<io_source *> io_list;
-};
+int pork_io_add(int fd,
+				u_int32_t cond,
+				void *data,
+				void *key,
+				void (*callback)(int fd, u_int32_t condition, void *data));
 
 #endif // NCIC_IO_H
 

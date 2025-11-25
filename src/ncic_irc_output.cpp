@@ -207,7 +207,7 @@ int irc_send_quit(irc_session_t *session, const char *reason) {
   if (ret < 0 || (size_t) ret >= sizeof(buf))
     return (-1);
 
-  IoManager::instance().delete_key(session);
+  pork_io_del(session);
 
   return (irc_send(session, buf, ret));
 }

@@ -12,13 +12,21 @@
 #define __NCIC_UTIL_H__
 
 #include <sys/types.h>
-#include <cstdint>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #define array_elem(x) (sizeof((x)) / sizeof((x)[0]))
+
+#ifndef min
+#	define min(x,y) ((x) < (y) ? (x) : (y))
+#endif
+
+#ifndef max
+#	define max(x,y) ((x) > (y) ? (x) : (y))
+#endif
 
 char *xstrdup(const char *str);
 void *xmalloc(size_t len);

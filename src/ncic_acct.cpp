@@ -227,7 +227,7 @@ static int pork_acct_connect_fail(struct pork_acct *acct) {
 	}
 
 	acct->reconnect_next_try = time(nullptr) +
-		std::min(acct->reconnect_tries * connect_interval, connect_interval_max);
+		min(acct->reconnect_tries * connect_interval, connect_interval_max);
 	return (0);
 }
 

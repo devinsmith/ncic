@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2021 Devin Smith <devin@devinsmith.net>
+ * Copyright (c) 2007-2025 Devin Smith <devin@devinsmith.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -87,7 +87,7 @@ static void resize_display() {
 
 	if (ioctl(1, TIOCGWINSZ, &size) != 0) {
 		debug("ioctl: %s", strerror(errno));
-		pork_exit(-1, nullptr, "Fatal error getting screen size\n");
+		pork_exit(-1, NULL, "Fatal error getting screen size\n");
 	}
 
 	screen_resize(size.ws_row, size.ws_col);
@@ -95,11 +95,11 @@ static void resize_display() {
 }
 
 static void sigwinch_handler(int sig __notused) {
-  IoManager::instance().add_cond(&screen, IO_COND_ALWAYS);
+	pork_io_add_cond(&screen, IO_COND_ALWAYS);
 }
 
 static void generic_signal_handler(int sig) {
-	pork_exit(sig, nullptr, "Caught signal %d. Exiting\n", sig);
+	pork_exit(sig, NULL, "Caught signal %d. Exiting\n", sig);
 }
 
 void
@@ -114,7 +114,7 @@ keyboard_input(int fd, uint32_t cond, void *data)
 	** The screen can't be resized from inside a signal handler..
 	*/
 	if (cond == IO_COND_ALWAYS) {
-    IoManager::instance().del_cond(&screen, IO_COND_ALWAYS);
+    pork_io_del_cond(&screen, IO_COND_ALWAYS);
 		resize_display();
 		return;
 	}
@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
 	time_t status_last_update = 0;
 
 	pw = getpwuid(getuid());
-	if (pw == nullptr) {
+	if (pw == NULL) {
 		fprintf(stderr, "Fatal: Can't get your user info.\n");
 		exit(-1);
 	}
@@ -180,9 +180,10 @@ int main(int argc, char *argv[])
 
 	proto_init();
 	color_init();
+	pork_io_init();
 
 	if (screen_init(LINES, COLS) == -1)
-		pork_exit(-1, nullptr, "Fatal: Error initializing the terminal.\n");
+		pork_exit(-1, NULL, "Fatal: Error initializing the terminal.\n");
 
 	signal(SIGWINCH, sigwinch_handler);
 	signal(SIGTERM, generic_signal_handler);
@@ -214,7 +215,7 @@ int main(int argc, char *argv[])
 		time_t time_now;
 		int dirty = 0;
 
-		IoManager::instance().run();
+    pork_io_run();
 		pork_acct_update();
 
 		/*
@@ -260,7 +261,7 @@ void pork_exit(int status, const char *msg, const char *fmt, ...) {
 	pork_acct_del_all(msg);
 	screen_destroy();
 
-  IoManager::instance().destroy();
+  pork_io_destroy();
 
 	proto_destroy();
 
@@ -269,7 +270,7 @@ void pork_exit(int status, const char *msg, const char *fmt, ...) {
 	delwin(stdscr);
 	endwin();
 
-	if (fmt != nullptr) {
+	if (fmt != NULL) {
 		va_list ap;
 
 		va_start(ap, fmt);
