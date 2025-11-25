@@ -12,15 +12,17 @@
 #include "config.h"
 
 #include <ncurses.h>
-#include <cstdlib>
-#include <cstring>
-#include <cctype>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 #include "ncic.h"
 #include "ncic_util.h"
+#include "ncic_list.h"
 #include "ncic_color.h"
 #include "ncic_set.h"
 #include "ncic_imwindow.h"
 #include "ncic_acct.h"
+#include "ncic_cstr.h"
 #include "ncic_misc.h"
 #include "ncic_screen.h"
 #include "ncic_screen_io.h"
@@ -34,9 +36,9 @@ static int wopt_set_str(struct imwindow *imwindow, uint32_t opt, char *args);
 static int wopt_set_char(	struct imwindow *imwindow,
 							uint32_t opt, char *args) __notused;
 
-static void opt_changed_prompt();
+static void opt_changed_prompt(void);
 
-static void scrollbuf_len_update();
+static void scrollbuf_len_update(void);
 
 static void wopt_changed_histlen(struct imwindow *imwindow);
 static void wopt_changed_log(struct imwindow *imwindow);
@@ -64,391 +66,391 @@ struct global_pref global_pref[] = {
 		OPT_INT,
 		0,
 		opt_set_int,
-		nullptr,
+		NULL,
 		SET_INT(DEFAULT_ACTIVITY_TYPES)
 	},{	"AUTO_RECONNECT",
 		OPT_BOOL,
 		0,
 		opt_set_bool,
-		nullptr,
+		NULL,
 		SET_BOOL(DEFAULT_AUTO_RECONNECT)
 	},{	"BANNER",
 		OPT_STR,
 		0,
 		opt_set_str,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_BANNER)
 	},{	"CMDCHARS",
 		OPT_CHAR,
 		0,
 		opt_set_char,
-		nullptr,
+		NULL,
 		SET_CHAR(DEFAULT_CMDCHARS),
 	},{	"CONNECT_TIMEOUT",
 		OPT_INT,
 		0,
 		opt_set_int,
-		nullptr,
+		NULL,
 		SET_INT(DEFAULT_CONNECT_TIMEOUT)
 	},{	"FORMAT_ACTION_RECV",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_ACTION_RECV),
 	},{	"FORMAT_ACTION_RECV_STATUS",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_ACTION_RECV_STATUS),
 	},{	"FORMAT_ACTION_SEND",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_ACTION_SEND),
 	},{	"FORMAT_ACTION_SEND_STATUS",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_ACTION_SEND_STATUS),
 	},{	"FORMAT_CHAT_CREATE",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_CHAT_CREATE),
 	},{	"FORMAT_CHAT_IGNORE",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_CHAT_IGNORE),
 	},{	"FORMAT_CHAT_INVITE",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_CHAT_INVITE),
 	},{	"FORMAT_CHAT_JOIN",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_CHAT_JOIN),
 	},{	"FORMAT_CHAT_KICK",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_CHAT_KICK),
 	},{	"FORMAT_CHAT_LEAVE",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_CHAT_LEAVE),
 	},{	"FORMAT_CHAT_MODE",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_CHAT_MODE),
 	},{	"FORMAT_CHAT_NICK",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_CHAT_NICK),
 	},{	"FORMAT_CHAT_QUIT",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_CHAT_QUIT),
 	},{	"FORMAT_CHAT_RECV",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_CHAT_RECV),
 	},{	"FORMAT_CHAT_RECV_ACTION",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_CHAT_RECV_ACTION),
 	},{	"FORMAT_CHAT_RECV_NOTICE",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_CHAT_RECV_NOTICE),
 	},{	"FORMAT_CHAT_SEND",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_CHAT_SEND),
 	},{	"FORMAT_CHAT_SEND_ACTION",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_CHAT_SEND_ACTION),
 	},{	"FORMAT_CHAT_SEND_NOTICE",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_CHAT_SEND_NOTICE),
 	},{	"FORMAT_CHAT_TOPIC",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_CHAT_TOPIC),
 	},{	"FORMAT_CHAT_UNIGNORE",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_CHAT_UNIGNORE),
 	},{	"FORMAT_HIGHLIGHT",
     OPT_FORMAT,
     0,
     opt_set_format,
-    nullptr,
+    NULL,
     SET_STR(DEFAULT_FORMAT_HIGHLIGHT),
   },{	"FORMAT_IM_RECV",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_IM_RECV),
 	},{	"FORMAT_IM_RECV_AUTO",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_IM_RECV_AUTO),
 	},{	"FORMAT_IM_RECV_STATUS",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_IM_RECV_STATUS),
 	},{	"FORMAT_IM_SEND",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_IM_SEND),
 	},{	"FORMAT_IM_SEND_AUTO",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_IM_SEND_AUTO),
 	},{	"FORMAT_IM_SEND_STATUS",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_IM_SEND_STATUS),
 	},{	"FORMAT_NOTICE_RECV",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_NOTICE_RECV),
 	},{	"FORMAT_NOTICE_RECV_STATUS",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_NOTICE_RECV_STATUS),
 	},{	"FORMAT_NOTICE_SEND",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_NOTICE_SEND),
 	},{	"FORMAT_NOTICE_SEND_STATUS",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_NOTICE_SEND_STATUS),
 	},{	"FORMAT_STATUS",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_STATUS),
 	},{	"FORMAT_STATUS_ACTIVITY",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_STATUS_ACTIVITY),
 	},{	"FORMAT_STATUS_CHAT",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_STATUS_CHAT),
 	},{	"FORMAT_STATUS_HELD",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_STATUS_HELD),
 	},{	"FORMAT_STATUS_IDLE",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_STATUS_IDLE),
 	},{	"FORMAT_STATUS_TIMESTAMP",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_STATUS_TIMESTAMP),
 	},{	"FORMAT_STATUS_TYPING",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_STATUS_TYPING),
 	},{	"FORMAT_SYSTEM_ALERT",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_SYSTEM_ALERT),
 	},{	"FORMAT_TIMESTAMP",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_TIMESTAMP),
 	},{	"FORMAT_WARN",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_WARN),
 	},{	"FORMAT_WHOIS_AWAY",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_WHOIS_AWAY),
 	},{ "FORMAT_WHOIS_IDLE",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_WHOIS_IDLE),
 	},{ "FORMAT_WHOIS_MEMBER",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_WHOIS_MEMBER),
 	},{ "FORMAT_WHOIS_NAME",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_WHOIS_NAME),
 	},{ "FORMAT_WHOIS_SIGNON",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_WHOIS_SIGNON),
 	},{	"FORMAT_WHOIS_USERINFO",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_WHOIS_USERINFO),
 	},{	"FORMAT_WHOIS_WARNLEVEL",
 		OPT_FORMAT,
 		0,
 		opt_set_format,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_FORMAT_WHOIS_WARNLEVEL),
 	},{	"HISTORY_LEN",
 		OPT_INT,
 		0,
 		opt_set_int,
-		nullptr,
+		NULL,
 		SET_INT(DEFAULT_HISTORY_LEN),
 	},{	"IDLE_AFTER",
 		OPT_INT,
 		0,
 		opt_set_int,
-		nullptr,
+		NULL,
 		SET_INT(DEFAULT_IDLE_AFTER),
 	},{	"LOG",
 		OPT_BOOL,
 		0,
 		opt_set_bool,
-		nullptr,
+		NULL,
 		SET_BOOL(DEFAULT_LOG),
 	},{	"LOG_TYPES",
 		OPT_INT,
 		0,
 		opt_set_int,
-		nullptr,
+		NULL,
 		SET_INT(DEFAULT_LOG_TYPES)
 	},{	"LOGIN_ON_STARTUP",
 		OPT_BOOL,
 		0,
 		opt_set_bool,
-		nullptr,
+		NULL,
 		SET_BOOL(DEFAULT_LOGIN_ON_STARTUP),
 	},{ "OUTGOING_MSG_FONT",
 		OPT_STR,
 		0,
 		opt_set_str,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_OUTGOING_MSG_FONT),
 	},{ "OUTGOING_MSG_FONT_BGCOLOR",
 		OPT_STR,
 		0,
 		opt_set_str,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_OUTGOING_MSG_FONT_BGCOLOR),
 	},{ "OUTGOING_MSG_FONT_FGCOLOR",
 		OPT_STR,
 		0,
 		opt_set_str,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_OUTGOING_MSG_FONT_FGCOLOR),
 	},{ "OUTGOING_MSG_FONT_SIZE",
 		OPT_STR,
 		0,
 		opt_set_str,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_OUTGOING_MSG_FONT_SIZE),
 	},{	"PORK_DIR",
 		OPT_STR,
 		0,
 		opt_set_str,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_NCIC_DIR),
 	},{	"PRIVATE_INPUT",
 		OPT_BOOL,
 		0,
 		opt_set_bool,
-		nullptr,
+		NULL,
 		SET_BOOL(DEFAULT_PRIVATE_INPUT),
 	},{	"PROMPT",
 		OPT_FORMAT,
@@ -460,49 +462,49 @@ struct global_pref global_pref[] = {
 		OPT_INT,
 		0,
 		opt_set_int,
-		nullptr,
+		NULL,
 		SET_INT(DEFAULT_RECONNECT_INTERVAL),
 	},{	"RECONNECT_MAX_INTERVAL",
 		OPT_INT,
 		0,
 		opt_set_int,
-		nullptr,
+		NULL,
 		SET_INT(DEFAULT_RECONNECT_MAX_INTERVAL),
 	},{	"RECONNECT_TRIES",
 		OPT_INT,
 		0,
 		opt_set_int,
-		nullptr,
+		NULL,
 		SET_INT(DEFAULT_RECONNECT_TRIES),
 	},{	"RECURSIVE_EVENTS",
 		OPT_BOOL,
 		0,
 		opt_set_bool,
-		nullptr,
+		NULL,
 		SET_BOOL(DEFAULT_RECURSIVE_EVENTS),
 	},{	"REPORT_IDLE",
 		OPT_BOOL,
 		0,
 		opt_set_bool,
-		nullptr,
+		NULL,
 		SET_BOOL(DEFAULT_REPORT_IDLE),
 	},{	"SAVE_PASSWD",
 		OPT_BOOL,
 		0,
 		opt_set_bool,
-		nullptr,
+		NULL,
 		SET_BOOL(DEFAULT_SAVE_PASSWD),
 	},{	"SCROLL_ON_INPUT",
 		OPT_BOOL,
 		0,
 		opt_set_bool,
-		nullptr,
+		NULL,
 		SET_BOOL(DEFAULT_SCROLL_ON_INPUT),
 	},{	"SCROLL_ON_OUTPUT",
 		OPT_BOOL,
 		0,
 		opt_set_bool,
-		nullptr,
+		NULL,
 		SET_BOOL(DEFAULT_SCROLL_ON_OUTPUT),
 	},{	"SCROLLBUF_LEN",
 		OPT_INT,
@@ -514,85 +516,85 @@ struct global_pref global_pref[] = {
 		OPT_BOOL,
 		0,
 		opt_set_bool,
-		nullptr,
+		NULL,
 		SET_BOOL(DEFAULT_SEND_REMOVES_AWAY),
 	},{	"SHOW_BUDDY_AWAY",
 		OPT_BOOL,
 		0,
 		opt_set_bool,
-		nullptr,
+		NULL,
 		SET_BOOL(DEFAULT_SHOW_BUDDY_AWAY),
 	},{	"SHOW_BUDDY_IDLE",
 		OPT_BOOL,
 		0,
 		opt_set_bool,
-		nullptr,
+		NULL,
 		SET_BOOL(DEFAULT_SHOW_BUDDY_IDLE),
 	},{	"SHOW_BUDDY_SIGNOFF",
 		OPT_BOOL,
 		0,
 		opt_set_bool,
-		nullptr,
+		NULL,
 		SET_BOOL(DEFAULT_SHOW_BUDDY_SIGNOFF),
 	},{	"TEXT_NO_NAME",
 		OPT_STR,
 		0,
 		opt_set_str,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_TEXT_NO_NAME),
 	},{	"TEXT_NO_ROOM",
 		OPT_STR,
 		0,
 		opt_set_str,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_TEXT_NO_ROOM),
 	},{	"TEXT_TYPING",
 		OPT_STR,
 		0,
 		opt_set_str,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_TEXT_TYPING),
 	},{	"TEXT_TYPING_PAUSED",
 		OPT_STR,
 		0,
 		opt_set_str,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_TEXT_TYPING_PAUSED),
 	},{	"TEXT_WARN_ANONYMOUS",
 		OPT_STR,
 		0,
 		opt_set_str,
-		nullptr,
+		NULL,
 		SET_STR(DEFAULT_TEXT_WARN_ANONYMOUS),
 	},{	"TIMESTAMP",
 		OPT_BOOL,
 		0,
 		opt_set_bool,
-		nullptr,
+		NULL,
 		SET_BOOL(DEFAULT_TIMESTAMP),
 	},{	"TRANSFER_PORT_MAX",
 		OPT_INT,
 		0,
 		opt_set_int,
-		nullptr,
+		NULL,
 		SET_INT(DEFAULT_TRANSFER_PORT_MAX),
 	},{	"TRANSFER_PORT_MIN",
 		OPT_INT,
 		0,
 		opt_set_int,
-		nullptr,
+		NULL,
 		SET_INT(DEFAULT_TRANSFER_PORT_MIN),
 	},{	"WORDWRAP",
 		OPT_BOOL,
 		0,
 		opt_set_bool,
-		nullptr,
+		NULL,
 		SET_BOOL(DEFAULT_WORDWRAP),
 	},{	"WORDWRAP_CHAR",
 		OPT_CHAR,
 		0,
 		opt_set_char,
-		nullptr,
+		NULL,
 		SET_CHAR(DEFAULT_WORDWRAP_CHAR),
 	}
 };
@@ -608,11 +610,11 @@ static struct window_var window_var[] = {
 	{	"ACTIVITY_TYPES",
 		OPT_INT,
 		wopt_set_int,
-		nullptr
+		NULL
 	},{	"BEEP_ON_OUTPUT",
 		OPT_BOOL,
 		wopt_set_bool,
-		nullptr
+		NULL
 	},{	"HISTORY_LEN",
 		OPT_INT,
 		wopt_set_int,
@@ -624,7 +626,7 @@ static struct window_var window_var[] = {
 	},{	"LOG_TYPES",
 		OPT_INT,
 		wopt_set_int,
-		nullptr
+		NULL
 	},{	"LOGFILE",
 		OPT_STR,
 		wopt_set_str,
@@ -672,7 +674,7 @@ void wopt_print_var(struct imwindow *imwindow, int i, const char *text) {
 			break;
 
 		case OPT_STR:
-			if (imwindow->opts[i].s != nullptr &&
+			if (imwindow->opts[i].s != NULL &&
 				imwindow->opts[i].s[0] != '\0')
 			{
 				screen_nocolor_msg("%s %s \"%s\"", window_var[i].name,
@@ -710,7 +712,7 @@ int opt_get_val(const char *opt_name, char *buf, size_t len) {
 			break;
 
 		case OPT_STR:
-			if (global_pref[i].val.s == nullptr)
+			if (global_pref[i].val.s == NULL)
 				return (-1);
 			xstrncpy(buf, global_pref[i].val.s, len);
 			break;
@@ -749,7 +751,7 @@ int wopt_get_val(	struct imwindow *imwindow,
 			break;
 
 		case OPT_STR:
-			if (imwindow->opts[i].s == nullptr)
+			if (imwindow->opts[i].s == NULL)
 				return (-1);
 			xstrncpy(buf, imwindow->opts[i].s, len);
 			break;
@@ -789,7 +791,7 @@ void opt_print_var(int i, const char *text) {
 			break;
 
 		case OPT_STR:
-			if (global_pref[i].val.s != nullptr &&
+			if (global_pref[i].val.s != NULL &&
 				global_pref[i].val.s[0] != '\0')
 			{
 				screen_nocolor_msg("%s %s \"%s\"", global_pref[i].name,
@@ -854,7 +856,7 @@ void opt_write(FILE *fp) {
 				break;
 
 			case OPT_STR:
-				if (global_pref[i].val.s != nullptr &&
+				if (global_pref[i].val.s != NULL &&
 					global_pref[i].val.s[0] != '\0')
 				{
 					fprintf(fp, "set %s %s\n", global_pref[i].name,
@@ -889,15 +891,15 @@ void opt_write(FILE *fp) {
 }
 
 static int opt_compare(const void *l, const void *r) {
-	const char *str = (const char *)l;
-	const struct global_pref *gvar = (const struct global_pref *)r;
+	const char *str = l;
+	const struct global_pref *gvar = r;
 
 	return (strcasecmp(str, gvar->name));
 }
 
 static int wopt_compare(const void *l, const void *r) {
-	const char *str = (const char *)l;
-	const struct window_var *wvar = (const struct window_var *)r;
+	const char *str = l;
+	const struct window_var *wvar = r;
 
 	return (strcasecmp(str, wvar->name));
 }
@@ -911,10 +913,10 @@ int opt_find(const char *name) {
 	struct global_pref *gvar;
 	uint32_t offset;
 
-	gvar = (struct global_pref *)bsearch(name, global_pref, array_elem(global_pref),
+	gvar = bsearch(name, global_pref, array_elem(global_pref),
 				sizeof(struct global_pref), opt_compare);
 
-	if (gvar == nullptr)
+	if (gvar == NULL)
 		return (-1);
 
 	offset = (long) gvar - (long) &global_pref[0];
@@ -929,17 +931,17 @@ int wopt_find(const char *name) {
 	struct window_var *wvar;
 	uint32_t offset;
 
-	wvar = (struct window_var *)bsearch(name, window_var, array_elem(window_var),
+	wvar = bsearch(name, window_var, array_elem(window_var),
 				sizeof(struct window_var), wopt_compare);
 
-	if (wvar == nullptr)
+	if (wvar == NULL)
 		return (-1);
 
 	offset = (long) wvar - (long) &window_var[0];
 	return (offset / sizeof(struct window_var));
 }
 
-static void opt_changed_prompt() {
+static void opt_changed_prompt(void) {
 	input_set_prompt(&screen.input, opt_get_str(OPT_PROMPT));
 }
 
@@ -1036,7 +1038,7 @@ void wopt_init(struct imwindow *imwindow, const char *target) {
 	wopt[WOPT_WORDWRAP_CHAR].c = opt_get_char(OPT_WORDWRAP_CHAR);
 
 	normalize(nnick, target, sizeof(nnick));
-	while ((p = strchr(nnick, '/')) != nullptr)
+	while ((p = strchr(nnick, '/')) != NULL)
 		*p = '_';
 
 	pork_dir = opt_get_str(OPT_NCIC_DIR);
@@ -1053,7 +1055,7 @@ void wopt_init(struct imwindow *imwindow, const char *target) {
 */
 
 static int opt_tristate(char *args) {
-	if (args == nullptr)
+	if (args == NULL)
 		return (-1);
 
 	if (!strcasecmp(args, "ON") ||
@@ -1087,14 +1089,14 @@ int opt_set_bool(uint32_t opt, char *args) {
 	else
 		global_pref[opt].val.b = !global_pref[opt].val.b;
 
-	if (global_pref[opt].updated != nullptr)
+	if (global_pref[opt].updated != NULL)
 		global_pref[opt].updated();
 
 	return (0);
 }
 
 int opt_set_char(uint32_t opt, char *args) {
-	if (args == nullptr || *args == '\0')
+	if (args == NULL || *args == '\0')
 		return (-1);
 
 	if (!strncasecmp(args, "0x", 2)) {
@@ -1107,7 +1109,7 @@ int opt_set_char(uint32_t opt, char *args) {
 	} else
 		global_pref[opt].val.c = *args;
 
-	if (global_pref[opt].updated != nullptr)
+	if (global_pref[opt].updated != NULL)
 		global_pref[opt].updated();
 
 	return (0);
@@ -1116,7 +1118,7 @@ int opt_set_char(uint32_t opt, char *args) {
 int opt_set_int(uint32_t opt, char *args) {
 	uint32_t num;
 
-	if (args == nullptr)
+	if (args == NULL)
 		return (-1);
 
 	if (str_to_uint(args, &num) != 0)
@@ -1124,7 +1126,7 @@ int opt_set_int(uint32_t opt, char *args) {
 
 	global_pref[opt].val.i = num;
 
-	if (global_pref[opt].updated != nullptr)
+	if (global_pref[opt].updated != NULL)
 		global_pref[opt].updated();
 
 	return (0);
@@ -1134,15 +1136,15 @@ int opt_set_str(uint32_t opt, char *args) {
 	if (global_pref[opt].dynamic == 1)
 		free(global_pref[opt].val.s);
 
-	if (args != nullptr) {
+	if (args != NULL) {
 		global_pref[opt].val.s = xstrdup(args);
 		global_pref[opt].dynamic = 1;
 	} else {
-		global_pref[opt].val.s = nullptr;
+		global_pref[opt].val.s = NULL;
 		global_pref[opt].dynamic = 0;
 	}
 
-	if (global_pref[opt].updated != nullptr)
+	if (global_pref[opt].updated != NULL)
 		global_pref[opt].updated();
 
 	return (0);
@@ -1165,14 +1167,14 @@ static int wopt_set_bool(struct imwindow *imwindow, uint32_t opt, char *args) {
 	else
 		imwindow->opts[opt].b = !imwindow->opts[opt].b;
 
-	if (window_var[opt].updated != nullptr)
+	if (window_var[opt].updated != NULL)
 		window_var[opt].updated(imwindow);
 
 	return (0);
 }
 
 static int wopt_set_char(struct imwindow *imwindow, uint32_t opt, char *args) {
-	if (args == nullptr || *args == '\0')
+	if (args == NULL || *args == '\0')
 		return (-1);
 
 	if (!strncasecmp(args, "0x", 2)) {
@@ -1185,7 +1187,7 @@ static int wopt_set_char(struct imwindow *imwindow, uint32_t opt, char *args) {
 	} else
 		imwindow->opts[opt].c = *args;
 
-	if (window_var[opt].updated != nullptr)
+	if (window_var[opt].updated != NULL)
 		window_var[opt].updated(imwindow);
 
 	return (0);
@@ -1194,7 +1196,7 @@ static int wopt_set_char(struct imwindow *imwindow, uint32_t opt, char *args) {
 static int wopt_set_int(struct imwindow *imwindow, uint32_t opt, char *args) {
 	uint32_t num;
 
-	if (args == nullptr)
+	if (args == NULL)
 		return (-1);
 
 	if (str_to_uint(args, &num) != 0)
@@ -1202,7 +1204,7 @@ static int wopt_set_int(struct imwindow *imwindow, uint32_t opt, char *args) {
 
 	imwindow->opts[opt].i = num;
 
-	if (window_var[opt].updated != nullptr)
+	if (window_var[opt].updated != NULL)
 		window_var[opt].updated(imwindow);
 
 	return (0);
@@ -1211,12 +1213,12 @@ static int wopt_set_int(struct imwindow *imwindow, uint32_t opt, char *args) {
 static int wopt_set_str(struct imwindow *imwindow, uint32_t opt, char *args) {
 	free(imwindow->opts[opt].s);
 
-	if (args != nullptr)
+	if (args != NULL)
 		imwindow->opts[opt].s = xstrdup(args);
 	else
-		imwindow->opts[opt].s = nullptr;
+		imwindow->opts[opt].s = NULL;
 
-	if (window_var[opt].updated != nullptr)
+	if (window_var[opt].updated != NULL)
 		window_var[opt].updated(imwindow);
 
 	return (0);
