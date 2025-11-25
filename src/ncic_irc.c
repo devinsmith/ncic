@@ -8,16 +8,18 @@
 ** as published by the Free Software Foundation.
 */
 
+#include "config.h"
+
 #include <unistd.h>
 #include <ncurses.h>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <cctype>
-#include <ctime>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <time.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#include <cerrno>
+#include <errno.h>
 
 #include "ncic.h"
 #include "ncic_util.h"
@@ -35,17 +37,17 @@
 #include "ncic_naken.h"
 
 static void irc_event(int sock, u_int32_t cond, void *data) {
-    irc_session_t *session = static_cast<irc_session_t *>(data);
+    struct irc_session_t *session = data;
 
 	if (cond & IO_COND_READ) {
 		if (naken_input_dispatch(session) == -1) {
-			struct pork_acct *acct = static_cast<struct pork_acct *>(session->data);
+			struct pork_acct *acct = session->data;
 
 			pork_sock_err(acct, sock);
       pork_io_del(data);
 			int ret = pork_acct_disconnected(acct);
       log_tmsg(0, "Acct disconnected: %d", ret);
-      session->data = nullptr;
+      session->data = NULL;
 
 			return;
 		}
@@ -56,13 +58,13 @@ static void irc_event(int sock, u_int32_t cond, void *data) {
 
 static void irc_connected(int sock, u_int32_t cond, void *data) {
 	int ret;
-    irc_session_t *session = static_cast<irc_session_t *>(data);
+  struct irc_session_t *session = data;
 
   pork_io_del(data);
 
 	ret = sock_is_error(sock);
 	if (ret != 0) {
-		struct pork_acct *acct = (struct pork_acct *)session->data;
+		struct pork_acct *acct = session->data;
 		char *errstr = strerror(ret);
 
 		screen_err_msg("network error: %s: %s", acct->username, errstr);
@@ -82,17 +84,17 @@ static void irc_connected(int sock, u_int32_t cond, void *data) {
 
       // New context saying we are a client, and using SSL 2 or 3
       session->sslContext = SSL_CTX_new(TLS_client_method());
-      if (session->sslContext == nullptr) // Dumps to stderr, yuck
+      if (session->sslContext == NULL) // Dumps to stderr, yuck
         ERR_print_errors_fp(stderr);
 
-      SSL_CTX_set_verify(session->sslContext, SSL_VERIFY_NONE, nullptr);
+      SSL_CTX_set_verify(session->sslContext, SSL_VERIFY_NONE, NULL);
       SSL_CTX_set_verify_depth(session->sslContext, 0);
       SSL_CTX_set_mode(session->sslContext, SSL_MODE_AUTO_RETRY);
       SSL_CTX_set_session_cache_mode(session->sslContext, SSL_SESS_CACHE_CLIENT);
 
       // Create an SSL struct for the connection
       session->sslHandle = SSL_new(session->sslContext);
-      if (session->sslHandle == nullptr)
+      if (session->sslHandle == NULL)
         ERR_print_errors_fp(stderr);
 
       // Connect the SSL struct to our connection
@@ -109,10 +111,10 @@ static void irc_connected(int sock, u_int32_t cond, void *data) {
 
         switch (ssl_err = SSL_get_error(session->sslHandle, ret)) {
           case SSL_ERROR_WANT_READ:
-            select(session->sock + 1, &fds, nullptr, nullptr, nullptr);
+            select(session->sock + 1, &fds, NULL, NULL, NULL);
             break;
           case SSL_ERROR_WANT_WRITE:
-            select(session->sock + 1, nullptr, &fds, nullptr, nullptr);
+            select(session->sock + 1, NULL, &fds, NULL, NULL);
             break;
           default:
             screen_err_msg("network error: %s: could not connect %d",
@@ -133,13 +135,13 @@ static void irc_connected(int sock, u_int32_t cond, void *data) {
 }
 
 static int irc_init(struct pork_acct *acct) {
-	irc_session_t *session = (irc_session_t *)xcalloc(1, sizeof(*session));
+	struct irc_session_t *session = xcalloc(1, sizeof(*session));
 
 	session->outq = queue_new(0);
 	session->inq = queue_new(0);
 	session->sock = -1;
-	session->sslHandle = nullptr;
-	session->sslContext = nullptr;
+	session->sslHandle = NULL;
+	session->sslContext = NULL;
   session->use_ssl = true;
 
 	session->data = acct;
@@ -148,19 +150,19 @@ static int irc_init(struct pork_acct *acct) {
 }
 
 static int irc_free(struct pork_acct *acct) {
-	irc_session_t *session = acct->data;
+	struct irc_session_t *session = acct->data;
 	u_int32_t i;
 
-	if (session->sslHandle != nullptr) {
+	if (session->sslHandle != NULL) {
 		SSL_shutdown(session->sslHandle);
 		SSL_free(session->sslHandle);
 	}
 
-	if (session->sslContext != nullptr) {
+	if (session->sslContext != NULL) {
 		SSL_CTX_free(session->sslContext);
   }
 
-  if (session->server != nullptr) {
+  if (session->server != NULL) {
     free_str_wipe(session->server);
   }
 
@@ -173,10 +175,10 @@ static int irc_free(struct pork_acct *acct) {
 }
 
 static int irc_update(struct pork_acct *acct) {
-	irc_session_t *session = (irc_session_t *)acct->data;
+	struct irc_session_t *session = acct->data;
 	time_t time_now;
 
-	if (session == nullptr)
+	if (session == NULL)
 		return (-1);
 
 	time(&time_now);
@@ -189,13 +191,13 @@ static int irc_update(struct pork_acct *acct) {
 }
 
 static u_int32_t irc_add_servers(struct pork_acct *acct, char *str) {
-	irc_session_t *session = acct->data;
+	struct irc_session_t *session = acct->data;
 
   if (blank_str(str)) {
     return 0;
   }
 
-  if (strstr(str, "--no-ssl") != nullptr) {
+  if (strstr(str, "--no-ssl") != NULL) {
     session->use_ssl = false;
   }
 
@@ -204,11 +206,11 @@ static u_int32_t irc_add_servers(struct pork_acct *acct, char *str) {
 }
 
 static int irc_do_connect(struct pork_acct *acct, char *args) {
-  irc_session_t *session = acct->data;
+  struct irc_session_t *session = acct->data;
 	int sock;
 	int ret;
 
-	if (args == nullptr) {
+	if (args == NULL) {
 		screen_err_msg("Error: Syntax is /connect <nick>[=passwd] <server>[:<port>]");
 		return (-1);
 	}
@@ -231,17 +233,17 @@ static int irc_do_connect(struct pork_acct *acct, char *args) {
 }
 
 static int irc_connect_abort(struct pork_acct *acct) {
-    auto *session = acct->data;
+  struct irc_session_t *session = acct->data;
 
-	close(session->sock);
+  close(session->sock);
   pork_io_del(session);
-	return (0);
+  return (0);
 }
 
 static int irc_reconnect(struct pork_acct *acct, char *args __notused) {
 	int sock;
 	int ret;
-  irc_session_t *session = acct->data;
+  struct irc_session_t *session = acct->data;
 
 	ret = irc_connect(acct, session->server, &sock);
 	if (ret == 0) {
@@ -259,14 +261,14 @@ static int irc_chan_send(struct pork_acct *acct,
 			const char *target,
 			char *msg)
 {
-    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
+    struct irc_session_t *session = acct->data;
 
     return (naken_send(session, msg));
 }
 
 static int irc_quit(struct pork_acct *acct, const char *reason) {
 	if (acct->connected) {
-        irc_session_t *session = static_cast<irc_session_t *>(acct->data);
+        struct irc_session_t *session = acct->data;
         return (irc_send_quit(session, reason));
     }
 
@@ -274,17 +276,17 @@ static int irc_quit(struct pork_acct *acct, const char *reason) {
 }
 
 static int irc_away(struct pork_acct *acct, char *msg) {
-    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
-	return (irc_set_away(session, msg));
+  struct irc_session_t *session = acct->data;
+  return (irc_set_away(session, msg));
 }
 
 static int irc_back(struct pork_acct *acct) {
-    irc_session_t *session = static_cast<irc_session_t *>(acct->data);
-	return (naken_set_back(session, nullptr));
+  struct irc_session_t *session = acct->data;
+  return (naken_set_back(session, NULL));
 }
 
 char *irc_text_filter(const char *str) {
-  if (str == nullptr)
+  if (str == NULL)
     return (xstrdup(""));
 
   return xstrdup(str);
@@ -309,7 +311,7 @@ int irc_proto_init(struct pork_proto *proto) {
 	proto->signoff = irc_quit;
 	proto->update = irc_update;
 	proto->user_compare = strcasecmp;
-	proto->change_nick = nullptr;
+	proto->change_nick = NULL;
 	proto->filter_text = irc_text_filter;
 	proto->set_away = irc_away;
 	proto->set_back = irc_back;

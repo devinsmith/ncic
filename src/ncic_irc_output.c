@@ -8,9 +8,9 @@
 ** as published by the Free Software Foundation.
 */
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/time.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -26,18 +26,15 @@
 #include "ncic_irc.h"
 #include "ncic_naken.h"
 
-static int irc_send_server(irc_session_t *session, char *cmd, size_t len) {
-  if (session->use_ssl) {
-    return SSL_write(session->sslHandle, cmd, len);
-  }
-  return sock_write(session->sock, cmd, len);
+static int irc_send_server(struct irc_session_t *session, char *cmd, size_t len) {
+  return SSL_write(session->sslHandle, cmd, len);
 }
 
-int irc_send(irc_session_t *session, char *command, size_t len) {
+int irc_send(struct irc_session_t *session, char *command, size_t len) {
 	int ret;
 
 	if (session->sock < 0) {
-		struct irc_cmd_q *cmd = (struct irc_cmd_q *)xmalloc(sizeof(*cmd));
+		struct irc_cmd_q *cmd = xmalloc(sizeof(*cmd));
 
 		cmd->cmd = xstrdup(command);
 		cmd->len = len;
@@ -61,11 +58,11 @@ int irc_send(irc_session_t *session, char *command, size_t len) {
 	return (ret);
 }
 
-int irc_flush_outq(irc_session_t *session) {
+int irc_flush_outq(struct irc_session_t *session) {
 	struct irc_cmd_q *cmd;
 	int ret = 0;
 
-	while ((cmd = (struct irc_cmd_q *)queue_get((pork_queue_t *)session->outq)) != nullptr) {
+	while ((cmd = queue_get(session->outq)) != NULL) {
 		if (irc_send_server(session, cmd->cmd, cmd->len) > 0) {
 			ret++;
 			free(cmd->cmd);
@@ -88,16 +85,16 @@ int irc_connect(struct pork_acct *acct,
 	in_port_t port_num;
 	char *port;
 	char buf[IRC_OUT_BUFLEN];
-	char *passwd = nullptr;
+	char *passwd = NULL;
 
-	if (server == nullptr || xstrncpy(buf, server, sizeof(buf)) == -1)
+	if (server == NULL || xstrncpy(buf, server, sizeof(buf)) == -1)
 		return (-1);
 
 	memset(&ss, 0, sizeof(ss));
 	memset(&local, 0, sizeof(local));
 
 	port = strchr(buf, ':');
-	if (port != nullptr) {
+	if (port != NULL) {
 		*port++ = '\0';
 
     if (get_port(port, &port_num) != 0) {
@@ -108,7 +105,7 @@ int irc_connect(struct pork_acct *acct,
     }
 
     passwd = strchr(port, ':');
-		if (passwd != nullptr) {
+		if (passwd != NULL) {
 			*passwd++ = '\0';
 		}
 	} else {
@@ -123,15 +120,15 @@ int irc_connect(struct pork_acct *acct,
 	}
 
 	free(acct->fport);
-  acct->fport = nullptr;
-  if (port != nullptr) {
+  acct->fport = NULL;
+  if (port != NULL) {
     acct->fport = xstrdup(port);
   }
 
 	free(acct->server);
 	acct->server = xstrdup(buf);
 
-	if (passwd != nullptr && passwd[0] != '\0') {
+	if (passwd != NULL && passwd[0] != '\0') {
 		free_str_wipe(acct->passwd);
 		acct->passwd = xstrdup(passwd);
 	}
@@ -140,7 +137,7 @@ int irc_connect(struct pork_acct *acct,
 	return (nb_connect(&ss, port_num, sock));
 }
 
-int irc_send_pong(irc_session_t *session, char *dest) {
+int irc_send_pong(struct irc_session_t *session, char *dest) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 
@@ -151,11 +148,11 @@ int irc_send_pong(irc_session_t *session, char *dest) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_set_away(irc_session_t *session, char *msg) {
+int irc_set_away(struct irc_session_t *session, char *msg) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 
-	if (msg != nullptr)
+	if (msg != NULL)
 		ret = snprintf(buf, sizeof(buf), "%% is now away (%s)\r\n", msg);
 	else
 		ret = snprintf(buf, sizeof(buf), "%% is now away\r\n");
@@ -166,9 +163,9 @@ int irc_set_away(irc_session_t *session, char *msg) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_login(irc_session_t *session) {
+int irc_send_login(struct irc_session_t *session) {
 	char buf[IRC_OUT_BUFLEN];
-	struct pork_acct *acct = static_cast<struct pork_acct *>(session->data);
+	struct pork_acct *acct = session->data;
 	int ret;
 
 	ret = snprintf(buf, sizeof(buf), ".n%s\r\n", acct->username);
@@ -187,7 +184,7 @@ int irc_send_login(irc_session_t *session) {
 }
 
 int
-naken_send(irc_session_t *session, char *msg)
+naken_send(struct irc_session_t *session, char *msg)
 {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
@@ -199,7 +196,7 @@ naken_send(irc_session_t *session, char *msg)
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_quit(irc_session_t *session, const char *reason) {
+int irc_send_quit(struct irc_session_t *session, const char *reason) {
   char buf[IRC_OUT_BUFLEN];
   int ret;
 

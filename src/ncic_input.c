@@ -15,10 +15,10 @@
 
 #include <unistd.h>
 #include <ncurses.h>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <cctype>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 #include <sys/types.h>
 
 #include "ncic.h"
@@ -342,7 +342,7 @@ void input_clear_next_word(struct input *input) {
 void input_history_prune(struct input *input) {
 	dlist_t *cur = input->history_end;
 
-	while (input->history_len > input->max_history_len && cur != nullptr) {
+	while (input->history_len > input->max_history_len && cur != NULL) {
 		dlist_t *prev = cur->prev;
 
 		free(cur->data);
@@ -360,10 +360,10 @@ void input_history_prune(struct input *input) {
 
 void input_history_add(struct input *input) {
 	input->history = dlist_add_head(input->history, xstrdup(input->input_buf));
-	input->history_cur = nullptr;
+	input->history_cur = NULL;
 	input->history_len++;
 
-	if (input->history_end == nullptr)
+	if (input->history_end == NULL)
 		input->history_end = input->history;
 
 	if (input->history_len > input->max_history_len)
@@ -376,17 +376,17 @@ void input_history_add(struct input *input) {
 */
 
 void input_history_prev(struct input *input) {
-	if (input->history == nullptr)
+	if (input->history == NULL)
 		return;
 
-	if (input->history_cur == nullptr) {
+	if (input->history_cur == NULL) {
 		dlist_t *cur = input->history;
 
 		if (input->len != 0)
 			input_history_add(input);
 
 		input->history_cur = cur;
-	} else if (input->history_cur->next != nullptr)
+	} else if (input->history_cur->next != NULL)
 		input->history_cur = input->history_cur->next;
 	else
 		return;
@@ -406,7 +406,7 @@ void input_history_prev(struct input *input) {
 */
 
 void input_history_next(struct input *input) {
-	if (input->history_cur == nullptr)
+	if (input->history_cur == NULL)
 		return;
 
 	input->dirty = 1;
@@ -416,8 +416,8 @@ void input_history_next(struct input *input) {
 	** of the history list, clear the line.
 	*/
 
-	if (input->history_cur->prev == nullptr) {
-		input->history_cur = nullptr;
+	if (input->history_cur->prev == NULL) {
+		input->history_cur = NULL;
 		input->input_buf[0] = '\0';
 		input->cur = input->prompt_len;
 		input->begin_completion = input->cur;
@@ -442,10 +442,10 @@ void input_history_next(struct input *input) {
 */
 
 void input_history_clear(struct input *input) {
-	dlist_destroy(input->history, nullptr, input_free);
-	input->history = nullptr;
-	input->history_end = nullptr;
-	input->history_cur = nullptr;
+	dlist_destroy(input->history, NULL, input_free);
+	input->history = NULL;
+	input->history_end = NULL;
+	input->history_cur = NULL;
 	input->history_len = 0;
 
   input->utf8_len = 0;
@@ -470,7 +470,7 @@ void input_init(struct input *input, u_int32_t width) {
 	input->dirty = 1;
 
 	prompt = opt_get_str(OPT_PROMPT);
-	if (prompt != nullptr)
+	if (prompt != NULL)
 		input_set_prompt(input, prompt);
 }
 
@@ -480,7 +480,7 @@ static inline void input_free(void *param __notused, void *data) {
 
 void input_destroy(struct input *input) {
 	free(input->prompt);
-	dlist_destroy(input->history, nullptr, input_free);
+	dlist_destroy(input->history, NULL, input_free);
 }
 
 void input_resize(struct input *input, u_int32_t width) {
@@ -492,7 +492,7 @@ char *input_partial(struct input *input) {
 	u_int32_t offset;
 
 	if (input->prompt_len >= input->width)
-		return (nullptr);
+		return (NULL);
 
 	if (input->cur >= input->width)
 		offset = (input->cur / input->width) * input->width - input->prompt_len;
@@ -517,14 +517,14 @@ u_int32_t input_get_cursor_pos(struct input *input) {
 int input_set_prompt(struct input *input, char *prompt) {
 	u_int32_t cur;
 
-	if (prompt != nullptr && strlen(prompt) >= input->width)
+	if (prompt != NULL && strlen(prompt) >= input->width)
 		return (-1);
 
 	cur = input->cur - input->prompt_len;
 	free(input->prompt);
 
-	if (prompt == nullptr) {
-		input->prompt = nullptr;
+	if (prompt == NULL) {
+		input->prompt = NULL;
 		input->prompt_len = 0;
 	} else {
 		size_t tmp_len = strlen(prompt) + 1;
@@ -556,7 +556,7 @@ char *input_get_buf_str(struct input *input) {
 int input_set_buf(struct input *input, char *str) {
 	size_t len = strlen(str);
 
-	if (str == nullptr || len >= sizeof(input->input_buf) - 1)
+	if (str == NULL || len >= sizeof(input->input_buf) - 1)
 		return (-1);
 
 	if (xstrncpy(input->input_buf, str, sizeof(input->input_buf)) == -1) {

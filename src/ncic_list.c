@@ -9,7 +9,7 @@
 */
 
 #include <unistd.h>
-#include <cstdlib>
+#include <stdlib.h>
 
 #include "ncic_util.h"
 #include "ncic_list.h"
@@ -20,7 +20,7 @@
 */
 
 dlist_t *dlist_add_head(dlist_t *head, void *data) {
-	dlist_t *new_node = (dlist_t *)xmalloc(sizeof(dlist_t));
+	dlist_t *new_node = xmalloc(sizeof(dlist_t));
 
 	new_node->data = data;
 	new_node->prev = NULL;
@@ -39,12 +39,12 @@ dlist_t *dlist_add_head(dlist_t *head, void *data) {
 dlist_t *dlist_remove(dlist_t *head, dlist_t *node) {
 	dlist_t *ret = head;
 
-	if (node->prev != nullptr)
+	if (node->prev != NULL)
 		node->prev->next = node->next;
 	else
 		ret = node->next;
 
-	if (node->next != nullptr)
+	if (node->next != NULL)
 		node->next->prev = node->prev;
 
 	free(node);
@@ -62,10 +62,10 @@ void dlist_destroy(	dlist_t *head,
 {
 	dlist_t *cur = head;
 
-	while (cur != nullptr) {
+	while (cur != NULL) {
 		dlist_t *next = cur->next;
 
-		if (cleanup != nullptr)
+		if (cleanup != NULL)
 			cleanup(param, cur->data);
 
 		free(cur);
@@ -90,15 +90,15 @@ static int dlist_default_compare(void *l, void *r) {
 dlist_t *dlist_find(dlist_t *head, void *data, int (*comp)(void *, void *)) {
 	dlist_t *cur;
 
-	if (comp == nullptr)
+	if (comp == NULL)
 		comp = dlist_default_compare;
 
-	for (cur = head ; cur != nullptr ; cur = cur->next) {
+	for (cur = head ; cur != NULL ; cur = cur->next) {
 		if (comp(data, cur->data) == 0)
 			return (cur);
 	}
 
-	return (nullptr);
+	return (NULL);
 }
 
 /*
@@ -109,7 +109,7 @@ dlist_t *dlist_find(dlist_t *head, void *data, int (*comp)(void *, void *)) {
 void dlist_iterate(dlist_t *head, void (*func)(void *, void *), void *data) {
 	dlist_t *cur;
 
-	for (cur = head ; cur != nullptr ; cur = cur->next)
+	for (cur = head ; cur != NULL ; cur = cur->next)
 		func(cur->data, data);
 }
 
@@ -118,7 +118,7 @@ int hash_init(	hash_t *hash,
 				int (*compare)(void *, void *),
 				void (*rem)(void *param, void *data))
 {
-	if (compare == nullptr)
+	if (compare == NULL)
 		return (-1);
 
 	if (order > sizeof(long) * 4)
@@ -127,7 +127,7 @@ int hash_init(	hash_t *hash,
 	hash->order = order;
 	hash->compare = compare;
 	hash->remove = rem;
-	hash->map = (dlist_t **)xcalloc((uint32_t) (1 << order), sizeof(dlist_t *));
+	hash->map = xcalloc((uint32_t) (1 << order), sizeof(dlist_t *));
 
 	return (0);
 }
@@ -143,11 +143,11 @@ void hash_add(hash_t *hash, void *data, uint32_t cur_hash) {
 int hash_remove(hash_t *hash, void *data, uint32_t cur_hash) {
 	dlist_t *node = hash_find(hash, data, cur_hash);
 
-	if (node == nullptr)
+	if (node == NULL)
 		return (-1);
 
-	if (hash->remove != nullptr)
-		hash->remove(nullptr, node->data);
+	if (hash->remove != NULL)
+		hash->remove(NULL, node->data);
 
 	hash->map[cur_hash] = dlist_remove(hash->map[cur_hash], node);
 	return (0);
@@ -158,8 +158,8 @@ void hash_clear(hash_t *hash) {
 		uint32_t i;
 
 		for (i = 0 ; i < (uint32_t) (1 << hash->order) ; i++) {
-			dlist_destroy(hash->map[i], nullptr, hash->remove);
-			hash->map[i] = nullptr;
+			dlist_destroy(hash->map[i], NULL, hash->remove);
+			hash->map[i] = NULL;
 		}
 	}
 }

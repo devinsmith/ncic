@@ -14,11 +14,11 @@ SET(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 set(SOURCES ncic.cpp ncic_acct.c ncic_alias.cpp ncic_bind.cpp
        ncic_chat.cpp ncic_color.cpp ncic_command.cpp ncic_conf.cpp
        ncic_cstr.cpp ncic_format.cpp ncic_help.cpp ncic_imsg.cpp
-       ncic_imwindow.c ncic_inet.cpp ncic_input.cpp ncic_io.cpp
-       ncic_list.cpp ncic_misc.cpp ncic_msg.c ncic_opt.c ncic_proto.c
+       ncic_imwindow.c ncic_inet.cpp ncic_input.c ncic_io.c
+       ncic_list.c ncic_misc.c ncic_msg.c ncic_opt.c ncic_proto.c
        ncic_queue.c ncic_screen.c ncic_screen_io.c ncic_set.c
        ncic_status.c ncic_swindow.c
-       ncic_util.c ncic_irc.cpp ncic_irc_input.c ncic_irc_output.cpp
+       ncic_util.c ncic_irc.c ncic_irc_input.c ncic_irc_output.c
        ncic_naken.c ncic_log.c
 )
 

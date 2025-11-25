@@ -85,7 +85,7 @@ int irc_send_action(struct irc_session_t *session, char *dest, char *msg);
 int irc_chan_free(struct pork_acct *acct, void *data);
 
 int naken_input_dispatch(struct irc_session_t *session);
-char *irc_text_filter(char *str);
+char *irc_text_filter(const char *str);
 
 #ifdef __cplusplus
 }
