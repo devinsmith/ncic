@@ -31,19 +31,84 @@
 #include "ncic_alias.h"
 #include "ncic_chat.h"
 #include "ncic_conf.h"
-#include "ncic_timer.h"
 #include "ncic_msg.h"
 #include "ncic_command.h"
-#include "ncic_command_defs.h"
 #include "ncic_help.h"
 
-extern struct sockaddr_storage local_addr;
-extern in_port_t local_port;
+USER_COMMAND(cmd_acct);
+USER_COMMAND(cmd_alias);
+USER_COMMAND(cmd_away);
+USER_COMMAND(cmd_bind);
+USER_COMMAND(cmd_compose);
+USER_COMMAND(cmd_connect);
+USER_COMMAND(cmd_disconnect);
+USER_COMMAND(cmd_help);
+USER_COMMAND(cmd_load);
+USER_COMMAND(cmd_msg);
+USER_COMMAND(cmd_nick);
+USER_COMMAND(cmd_quit);
+USER_COMMAND(cmd_refresh);
+USER_COMMAND(cmd_save);
+USER_COMMAND(cmd_send);
+USER_COMMAND(cmd_set);
+USER_COMMAND(cmd_unbind);
+USER_COMMAND(cmd_unalias);
+
+USER_COMMAND(cmd_win);
+USER_COMMAND(cmd_win_bind);
+USER_COMMAND(cmd_win_bind_next);
+USER_COMMAND(cmd_win_clear);
+USER_COMMAND(cmd_win_close);
+USER_COMMAND(cmd_win_dump);
+USER_COMMAND(cmd_win_erase);
+USER_COMMAND(cmd_win_ignore);
+USER_COMMAND(cmd_win_list);
+USER_COMMAND(cmd_win_next);
+USER_COMMAND(cmd_win_prev);
+USER_COMMAND(cmd_win_rename);
+USER_COMMAND(cmd_win_set);
+USER_COMMAND(cmd_win_skip);
+USER_COMMAND(cmd_win_swap);
+USER_COMMAND(cmd_win_unignore);
+USER_COMMAND(cmd_win_unskip);
+
+USER_COMMAND(cmd_scroll);
+USER_COMMAND(cmd_scroll_by);
+USER_COMMAND(cmd_scroll_down);
+USER_COMMAND(cmd_scroll_end);
+USER_COMMAND(cmd_scroll_pgdown);
+USER_COMMAND(cmd_scroll_pgup);
+USER_COMMAND(cmd_scroll_start);
+USER_COMMAND(cmd_scroll_up);
+
+USER_COMMAND(cmd_input);
+USER_COMMAND(cmd_input_bkspace);
+USER_COMMAND(cmd_input_clear);
+USER_COMMAND(cmd_input_clear_prev);
+USER_COMMAND(cmd_input_clear_next);
+USER_COMMAND(cmd_input_clear_to_end);
+USER_COMMAND(cmd_input_clear_to_start);
+USER_COMMAND(cmd_input_delete);
+USER_COMMAND(cmd_input_end);
+USER_COMMAND(cmd_input_find_next_cmd);
+USER_COMMAND(cmd_input_insert);
+USER_COMMAND(cmd_input_left);
+USER_COMMAND(cmd_input_prev_word);
+USER_COMMAND(cmd_input_prompt);
+USER_COMMAND(cmd_input_next_word);
+USER_COMMAND(cmd_input_right);
+USER_COMMAND(cmd_input_send);
+USER_COMMAND(cmd_input_start);
+
+USER_COMMAND(cmd_history);
+USER_COMMAND(cmd_history_clear);
+USER_COMMAND(cmd_history_list);
+USER_COMMAND(cmd_history_next);
+USER_COMMAND(cmd_history_prev);
 
 static void print_binding(void *data, void *nothing);
 static void print_alias(void *data, void *nothing);
 static int cmd_compare(const void *l, const void *r);
-static void print_timer(void *data, void *nothing);
 static int run_one_command(char *str, u_int32_t set);
 
 enum {
@@ -52,13 +117,6 @@ enum {
   CMDSET_HISTORY,
   CMDSET_INPUT,
   CMDSET_SCROLL,
-  CMDSET_BUDDY,
-  CMDSET_BLIST,
-  CMDSET_TIMER,
-  CMDSET_CHAT,
-  CMDSET_FILE,
-  CMDSET_ACCT,
-  CMDSET_PROTO,
 };
 
 /*
@@ -72,42 +130,24 @@ enum {
 
 static struct command command[] = {
 	{ "",			cmd_send			},
-	{ "acct",		cmd_acct			},
 	{ "alias",		cmd_alias			},
-	{ "auto",		cmd_auto			},
 	{ "away",		cmd_away			},
 	{ "bind",		cmd_bind			},
-	{ "chat",		cmd_chat			},
 	{ "connect",	cmd_connect			},
-	{ "ctcp",		cmd_ctcp			},
 	{ "disconnect", cmd_disconnect		},
-	{ "echo",		cmd_echo			},
-	{ "file",		cmd_file			},
 	{ "help",		cmd_help			},
 	{ "history",	cmd_history			},
-	{ "idle",		cmd_idle			},
 	{ "input",		cmd_input			},
-	{ "laddr",		cmd_laddr			},
-	{ "lastlog",	cmd_lastlog			},
 	{ "load",		cmd_load			},
-	{ "lport",		cmd_lport			},
-	{ "me",			cmd_me				},
-	{ "mode",		cmd_mode			},
 	{ "msg",		cmd_msg				},
 	{ "nick",		cmd_nick			},
-	{ "notice",		cmd_notice			},
-	{ "ping",		cmd_ping			},
-	{ "profile",	cmd_profile,		},
-	{ "query",		cmd_query			},
 	{ "quit",		cmd_quit			},
 	{ "refresh",	cmd_refresh			},
 	{ "save",		cmd_save			},
 	{ "scroll",		cmd_scroll			},
 	{ "set",		cmd_set				},
-	{ "timer",		cmd_timer			},
 	{ "unalias",	cmd_unalias			},
 	{ "unbind",		cmd_unbind			},
-	{ "whowas",		cmd_whowas			},
 	{ "win",		cmd_win				},
 };
 
@@ -125,7 +165,6 @@ static struct command input_command[] = {
 	{ "delete",					cmd_input_delete			},
 	{ "end",					cmd_input_end				},
 	{ "find_next_cmd",			cmd_input_find_next_cmd		},
-	{ "focus_next",				cmd_input_focus_next		},
 	{ "insert",					cmd_input_insert			},
 	{ "left",					cmd_input_left				},
 	{ "next_word",				cmd_input_next_word			},
@@ -154,12 +193,6 @@ USER_COMMAND(cmd_input_clear_next) {
 
 USER_COMMAND(cmd_input_clear_to_end) {
 	input_clear_to_end(cur_window()->input);
-}
-
-USER_COMMAND(cmd_input_focus_next) {
-	struct imwindow *win = cur_window();
-
-	imwindow_switch_focus(win);
 }
 
 USER_COMMAND(cmd_input_clear_to_start) {
@@ -317,7 +350,6 @@ static struct command window_command[] = {
 	{ "next",				cmd_win_next		},
 	{ "prev",				cmd_win_prev		},
 	{ "rename",				cmd_win_rename		},
-	{ "renumber",			cmd_win_renumber	},
 	{ "set",				cmd_win_set			},
 	{ "skip",				cmd_win_skip		},
 	{ "swap",				cmd_win_swap		},
@@ -345,7 +377,7 @@ USER_COMMAND(cmd_win_bind) {
 		return;
 	}
 
-	ret = imwindow_bind_acct(imwindow, refnum);
+	ret = imwindow_bind_acct(imwindow);
 	if (ret == -1) {
 		if (imwindow->type == WIN_TYPE_CHAT)
 			screen_err_msg("You can't rebind chat windows");
@@ -358,6 +390,7 @@ USER_COMMAND(cmd_win_bind) {
 }
 
 USER_COMMAND(cmd_win_bind_next) {
+
 	if (imwindow_bind_next_acct(cur_window()) != -1)
 		screen_refresh();
 }
@@ -416,7 +449,7 @@ USER_COMMAND(cmd_win_list) {
 	screen_cmd_output("REFNUM\t\tNAME\t\tTYPE\t\tTARGET");
 	cur = screen.window_list;
 	do {
-		struct imwindow *imwindow = cur->data;
+		struct imwindow *imwindow = (struct imwindow *)cur->data;
 
 		screen_cmd_output("%u\t\t\t%s\t\t%s\t\t%s",
 			imwindow->refnum, imwindow->name,
@@ -441,22 +474,6 @@ USER_COMMAND(cmd_win_rename) {
 		screen_cmd_output("Window %u has name \"%s\"", win->refnum, win->name);
 	else
 		imwindow_rename(win, args);
-}
-
-USER_COMMAND(cmd_win_renumber) {
-	u_int32_t num;
-
-	if (args == NULL || blank_str(args)) {
-		screen_cmd_output("This is window %u", cur_window()->refnum);
-		return;
-	}
-
-	if (str_to_uint(args, &num) != 0) {
-		screen_err_msg("Bad window number: %s", args);
-		return;
-	}
-
-	screen_renumber(cur_window(), num);
 }
 
 USER_COMMAND(cmd_win_set) {
@@ -611,474 +628,16 @@ USER_COMMAND(cmd_history_prev) {
 	input_history_prev(cur_window()->input);
 }
 
-/*
-** /buddy commands
-*/
-
-
-USER_COMMAND(cmd_buddy_awaymsg) {
-	struct imwindow *win = cur_window();
-	struct pork_acct *acct = win->owner;
-
-	if (acct->proto->get_away_msg == NULL)
-		return;
-
-	if (args == NULL || blank_str(args)) {
-		if (win->type == WIN_TYPE_PRIVMSG)
-			args = win->target;
-		else
-			args = acct->username;
-	}
-
-	acct->proto->get_away_msg(acct, args);
-}
-
-USER_COMMAND(cmd_buddy_privacy_mode) {
-	struct pork_acct *acct = cur_window()->owner;
-	int mode = -1;
-
-	if (acct->proto->set_privacy_mode == NULL)
-		return;
-
-	if (args != NULL)
-		str_to_int(args, &mode);
-
-	mode = acct->proto->set_privacy_mode(acct, mode);
-	screen_cmd_output("Privacy mode for %s is %d", acct->username, mode);
-}
-
-
-
-USER_COMMAND(cmd_buddy_profile) {
-	struct imwindow *win = cur_window();
-	struct pork_acct *acct = win->owner;
-
-	if (acct->proto->get_profile == NULL)
-		return;
-
-	if (args == NULL || blank_str(args)) {
-		if (win->type == WIN_TYPE_PRIVMSG)
-			args = win->target;
-		else
-			args = acct->username;
-	}
-
-	acct->proto->get_profile(acct, args);
-}
-
-USER_COMMAND(cmd_buddy_report_idle) {
-	struct pork_acct *acct = cur_window()->owner;
-
-	if (acct->proto->set_report_idle == NULL)
-		return;
-
-	if (args != NULL && !blank_str(args)) {
-		u_int32_t mode;
-
-		if (str_to_uint(args, &mode) != 0) {
-			screen_err_msg("Invalid number: %s", args);
-			return;
-		}
-
-		acct->proto->set_report_idle(acct, mode);
-	}
-
-	screen_cmd_output("The reporting of idle time for %s is %s",
-		acct->username, (acct->report_idle ? "enabled" : "disabled"));
-}
-
-USER_COMMAND(cmd_buddy_warn) {
-	struct imwindow *win = cur_window();
-	struct pork_acct *acct = win->owner;
-
-	if (acct->proto->warn == NULL)
-		return;
-
-	if (args == NULL || blank_str(args)) {
-		if (win->type == WIN_TYPE_PRIVMSG)
-			args = win->target;
-		else
-			return;
-	}
-
-	pork_send_warn(acct, args);
-}
-
-USER_COMMAND(cmd_buddy_warn_anon) {
-	struct imwindow *win = cur_window();
-	struct pork_acct *acct = win->owner;
-
-	if (acct->proto->warn_anon == NULL)
-		return;
-
-	if (args == NULL || blank_str(args)) {
-		if (win->type == WIN_TYPE_PRIVMSG)
-			args = win->target;
-		else
-			return;
-	}
-
-	pork_send_warn_anon(acct, args);
-}
-
-/*
-** /timer commands
-*/
-
-static struct command timer_command[] = {
-	{ "add",			cmd_timer_add			},
-	{ "del",			cmd_timer_del			},
-	{ "del_refnum",		cmd_timer_del_refnum	},
-	{ "list",			cmd_timer_list			},
-	{ "purge",			cmd_timer_purge			},
-};
-
-USER_COMMAND(cmd_timer_add) {
-	char *p;
-	u_int32_t interval;
-	u_int32_t times;
-
-	if (args == NULL)
-		return;
-
-	p = strsep(&args, " ");
-	if (p == NULL)
-		return;
-
-	if (str_to_uint(p, &interval) != 0) {
-		screen_err_msg("Invalid timer interval: %s", p);
-		return;
-	}
-
-	p = strsep(&args, " ");
-	if (p == NULL)
-		return;
-
-	if (str_to_uint(p, &times) != 0) {
-		screen_err_msg("Invalid number of times to run: %s", p);
-		return;
-	}
-
-	if (args == NULL || blank_str(args))
-		return;
-
-	timer_add(&screen.timer_list, args, interval, times);
-}
-
-USER_COMMAND(cmd_timer_del) {
-	int ret;
-
-	if (args == NULL)
-		return;
-
-	ret = timer_del(&screen.timer_list, args);
-	if (ret == -1)
-		screen_err_msg("No timer for \"%s\" was found", args);
-	else
-		screen_cmd_output("Timer for \"%s\" was removed", args);
-}
-
-USER_COMMAND(cmd_timer_del_refnum) {
-	u_int32_t refnum;
-	int ret;
-
-	if (args == NULL)
-		return;
-
-	if (str_to_uint(args, &refnum) != 0) {
-		screen_err_msg("Bad timer refnum: %s", args);
-		return;
-	}
-
-	ret = timer_del_refnum(&screen.timer_list, refnum);
-	if (ret == -1)
-		screen_err_msg("No timer with refnum %u was found", refnum);
-	else
-		screen_cmd_output("Timer with refnum %u was removed", refnum);
-}
-
-USER_COMMAND(cmd_timer_list) {
-	dlist_iterate(screen.timer_list, print_timer, NULL);
-}
-
-USER_COMMAND(cmd_timer_purge) {
-	if (screen.timer_list != NULL) {
-		timer_destroy(&screen.timer_list);
-		screen_cmd_output("All timers have been removed");
-	}
-}
-
-/*
-** acct commands
-*/
-
-static struct command acct_command[] = {
-	{ "save",	cmd_acct_save		},
-	{ "set",	cmd_acct_set		},
-};
-
-USER_COMMAND(cmd_acct_save) {
-	pork_acct_save(cur_window()->owner);
-}
-
-USER_COMMAND(cmd_acct_set) {
-}
-
-/*
-** /chat commands
-*/
-
-static struct command chat_command[] = {
-	{ "ban",				cmd_chat_ban			},
-	{ "ignore",				cmd_chat_ignore			},
-	{ "invite",				cmd_chat_invite			},
-	{ "join",				cmd_chat_join			},
-	{ "kick",				cmd_chat_kick			},
-	{ "leave",				cmd_chat_leave			},
-	{ "list",				cmd_chat_list			},
-	{ "send",				cmd_chat_send			},
-	{ "topic",				cmd_chat_topic			},
-	{ "unignore",			cmd_chat_unignore		},
-};
-
-USER_COMMAND(cmd_chat_ban) {
-	struct imwindow *win = cur_window();
-	struct pork_acct *acct = win->owner;
-	struct chatroom *chat;
-	char *arg1;
-	char *arg2;
-
-	if (args == NULL)
-		return;
-
-	arg1 = strsep(&args, " ");
-
-	chat = chat_find(acct, arg1);
-	if (chat == NULL) {
-		if (win->type == WIN_TYPE_CHAT && win->data != NULL)
-			chat_ban(acct, win->data, arg1);
-		else
-			screen_err_msg("%s is not a member of %s", acct->username, arg1);
-
-		return;
-	}
-
-	arg2 = strsep(&args, " ");
-	if (arg2 != NULL)
-		chat_ban(acct, chat, arg2);
-}
-
-USER_COMMAND(cmd_chat_ignore) {
-	struct imwindow *imwindow = cur_window();
-	struct pork_acct *acct = imwindow->owner;
-	char *chat_name;
-	char *user_name;
-
-	if (args == NULL)
-		return;
-
-	chat_name = strsep(&args, " ");
-	user_name = args;
-
-	if (user_name == NULL) {
-		struct chatroom *chat = imwindow->data;
-
-		if (imwindow->type != WIN_TYPE_CHAT || chat == NULL) {
-			screen_err_msg("You must specify a chat room if the current window is not a chat window");
-			return;
-		}
-
-		user_name = chat_name;
-		chat_name = chat->title;
-	}
-
-	chat_ignore(acct, chat_name, user_name);
-}
-
-USER_COMMAND(cmd_chat_invite) {
-	struct imwindow *imwindow = cur_window();
-	struct pork_acct *acct = imwindow->owner;
-	char *chat_name;
-	char *user_name;
-	char *invite_msg;
-
-	if (args == NULL)
-		return;
-
-	chat_name = strsep(&args, " ");
-	user_name = strsep(&args, " ");
-	invite_msg = args;
-
-	if (user_name == NULL) {
-		struct chatroom *chat = imwindow->data;
-
-		if (imwindow->type != WIN_TYPE_CHAT || chat == NULL) {
-			screen_err_msg("You must specify a chat room if the current window is not a chat window");
-			return;
-		}
-
-		user_name = chat_name;
-		chat_name = chat->title;
-	}
-
-	chat_invite(acct, chat_name, user_name, invite_msg);
-}
-
-USER_COMMAND(cmd_chat_join) {
-	screen_err_msg("cmd_chat_join");
-	chat_join(cur_window()->owner, args);
-}
-
-USER_COMMAND(cmd_chat_kick) {
-	struct imwindow *win = cur_window();
-	struct pork_acct *acct = win->owner;
-	struct chatroom *chat;
-	char *arg1;
-	char *arg2;
-
-	if (args == NULL)
-		return;
-
-	arg1 = strsep(&args, " ");
-
-	chat = chat_find(acct, arg1);
-	if (chat == NULL) {
-		if (win->type == WIN_TYPE_CHAT && win->data != NULL)
-			chat_kick(acct, win->data, arg1, args);
-		else
-			screen_err_msg("%s is not a member of %s", acct->username, arg1);
-
-		return;
-	}
-
-	arg2 = strsep(&args, " ");
-	if (arg2 != NULL)
-		chat_kick(acct, chat, arg2, args);
-}
-
-USER_COMMAND(cmd_chat_leave) {
-	struct imwindow *win = cur_window();
-	char *name = args;
-
-	if (name == NULL || blank_str(name)) {
-		struct chatroom *chat;
-
-		if (win->type != WIN_TYPE_CHAT) {
-			screen_err_msg("You must specify a chat room if the current window is not a chat window");
-			return;
-		}
-
-		if (win->data == NULL)
-			return;
-
-		chat = win->data;
-		name = chat->title;
-	}
-
-	chat_leave(win->owner, name, 1);
-}
-
-USER_COMMAND(cmd_chat_list) {
-	chat_list(cur_window()->owner);
-}
-
-USER_COMMAND(cmd_chat_send) {
-	struct pork_acct *acct = cur_window()->owner;
-	struct imwindow *win;
-	char *chat_name;
-
-	if (args == NULL)
-		return;
-
-	chat_name = strsep(&args, " ");
-	if (chat_name == NULL || args == NULL) {
-		screen_err_msg("You must specify a chatroom and a message");
-		return;
-	}
-
-	win = imwindow_find_chat_target(acct, chat_name);
-	if (win == NULL || win->data == NULL) {
-		screen_err_msg("%s is not joined to %s", acct->username, chat_name);
-		return;
-	}
-
-	chat_send_msg(acct, win->data, chat_name, args);
-}
-
-USER_COMMAND(cmd_chat_topic) {
-	struct imwindow *win = cur_window();
-	struct pork_acct *acct = win->owner;
-	char *topic = NULL;
-	struct chatroom *chat = NULL;
-
-	if (acct->proto->chat_set_topic == NULL)
-		return;
-
-	if (args != NULL) {
-		topic = strchr(args, ' ');
-		if (topic != NULL)
-			*topic++ = '\0';
-
-		chat = chat_find(acct, args);
-	}
-
-	if (chat == NULL) {
-		if (topic != NULL)
-			topic[-1] = ' ';
-
-		topic = args;
-
-		if (win->type == WIN_TYPE_CHAT)
-			chat = win->data;
-		else {
-			screen_err_msg("You must specify a chat room if the current window isn't a chat window");
-			return;
-		}
-	}
-
-	acct->proto->chat_set_topic(acct, chat, topic);
-}
-
-USER_COMMAND(cmd_chat_unignore) {
-	struct imwindow *imwindow = cur_window();
-	struct pork_acct *acct = imwindow->owner;
-	char *chat_name;
-	char *user_name;
-
-	if (args == NULL)
-		return;
-
-	chat_name = strsep(&args, " ");
-	user_name = args;
-
-	if (user_name == NULL) {
-		struct chatroom *chat = imwindow->data;
-
-		if (imwindow->type != WIN_TYPE_CHAT || chat == NULL) {
-			screen_err_msg("You must specify a chat room if the current window is not a chat window");
-			return;
-		}
-
-		user_name = chat_name;
-		chat_name = chat->title;
-	}
-
-	chat_unignore(acct, chat_name, user_name);
-}
-
 static struct command_set {
 	struct command *set;
 	size_t elem;
-	char *type;
+	const char *type;
 } command_set[] = {
 	{	command,			array_elem(command),			"" 			},
 	{	window_command,		array_elem(window_command),		"win "		},
 	{	history_command,	array_elem(history_command),	"history "	},
 	{	input_command,		array_elem(input_command),		"input "	},
 	{	scroll_command,		array_elem(scroll_command),		"scroll "	},
-	{	timer_command,		array_elem(timer_command),		"timer "	},
-	{	chat_command,		array_elem(chat_command),		"chat "		},
-	{	acct_command,		array_elem(acct_command),		"acct "		},
 };
 
 /*
@@ -1124,20 +683,6 @@ USER_COMMAND(cmd_alias) {
 	screen_err_msg("Error adding alias for %s", alias);
 }
 
-USER_COMMAND(cmd_auto) {
-	struct pork_acct *acct = cur_window()->owner;
-	char *target;
-
-	if (args == NULL || !acct->connected)
-		return;
-
-	target = strsep(&args, " ");
-	if (target == NULL || args == NULL)
-		return;
-
-	pork_msg_autoreply(acct, target, args);
-}
-
 USER_COMMAND(cmd_away) {
 	struct pork_acct *acct = cur_window()->owner;
 
@@ -1161,9 +706,7 @@ USER_COMMAND(cmd_bind) {
 	}
 
 	if (key_str[0] == '-' && key_str[1] != '\0') {
-		if (!strcasecmp(key_str, "-b") || !strcasecmp(key_str, "-buddy"))
-			target_binds = &screen.binds.blist;
-		else if (!strcasecmp(key_str, "-m") || !strcasecmp(key_str, "-main"))
+		if (!strcasecmp(key_str, "-m") || !strcasecmp(key_str, "-main"))
 			target_binds = &screen.binds.main;
 		else {
 			screen_err_msg("Bad bind flag: %s", key_str);
@@ -1212,55 +755,19 @@ USER_COMMAND(cmd_bind) {
 	screen_err_msg("Error binding %s", key_str);
 }
 
-USER_COMMAND(cmd_connect) {
-	int protocol = PROTO_IRC;
+static void cmd_connect(char *args) {
 	char *user;
 
 	if (args == NULL || blank_str(args))
 		return;
 
-	if (*args == '-') {
-		char *p = strchr(++args, ' ');
-
-		if (p != NULL)
-			*p++ = '\0';
-
-		protocol = proto_get_num(args);
-		if (protocol == -1) {
-			screen_err_msg("Invalid protocol: %s", args);
-			return;
-		}
-
-		args = p;
-	}
-
 	user = strsep(&args, " ");
-	pork_acct_connect(user, args, protocol);
+	pork_acct_connect(user, args, PROTO_IRC);
 }
 
-USER_COMMAND(cmd_ctcp) {
-	struct pork_acct *acct = cur_window()->owner;
-	char *dest;
-
-	if (acct->proto->ctcp == NULL)
-		return;
-
-	dest = strsep(&args, " ");
-	if (dest == NULL || args == NULL)
-		return;
-
-	acct->proto->ctcp(acct, dest, args);
-}
-
-USER_COMMAND(cmd_echo) {
-	if (args != NULL)
-		screen_win_msg(cur_window(), 0, 0, 1, MSG_TYPE_CMD_OUTPUT, args);
-}
-
-USER_COMMAND(cmd_disconnect) {
+static void cmd_disconnect(char *args) {
 	struct pork_acct *acct = cur_window()->owner;
 	u_int32_t dest;
-	dlist_t *node;
 
 	if (!acct->can_connect)
 		return;
@@ -1279,14 +786,9 @@ USER_COMMAND(cmd_disconnect) {
 			args = NULL;
 	}
 
-	acct = pork_acct_find(dest);
+	acct = pork_acct_find();
 	if (acct == NULL) {
 		screen_err_msg("Account refnum %u is not logged in", dest);
-		return;
-	}
-
-	if (!acct->can_connect) {
-		screen_err_msg("You cannot sign %s off", acct->username);
 		return;
 	}
 
@@ -1344,38 +846,6 @@ USER_COMMAND(cmd_help) {
 	}
 }
 
-USER_COMMAND(cmd_idle) {
-	u_int32_t idle_secs = 0;
-
-	if (args != NULL && !blank_str(args)) {
-		if (str_to_uint(args, &idle_secs) != 0) {
-			screen_err_msg("Invalid time specification: %s", args);
-			return;
-		}
-	}
-
-	pork_set_idle_time(cur_window()->owner, idle_secs);
-}
-
-USER_COMMAND(cmd_laddr) {
-	if (args == NULL) {
-		char buf[2048];
-
-		if (get_hostname(&local_addr, buf, sizeof(buf)) != 0)
-			xstrncpy(buf, "0.0.0.0", sizeof(buf));
-
-		screen_cmd_output("New connections will use the local address %s", buf);
-		return;
-	}
-
-	if (get_addr(args, &local_addr) != 0) {
-		screen_err_msg("Invalid local address: %s", args);
-		return;
-	}
-
-	screen_cmd_output("New connections will use the local address %s", args);
-}
-
 USER_COMMAND(cmd_lastlog) {
 	int opts = 0;
 
@@ -1431,39 +901,6 @@ USER_COMMAND(cmd_load) {
 	screen_set_quiet(quiet);
 }
 
-USER_COMMAND(cmd_lport) {
-	if (args == NULL) {
-		screen_cmd_output("New connections will use local port %u",
-			ntohs(local_port));
-		return;
-	}
-
-	if (get_port(args, &local_port) != 0) {
-		screen_err_msg("Error: Invalid local port: %s", args);
-		return;
-	}
-
-	local_port = htons(local_port);
-	screen_cmd_output("New connections will use local port %s", args);
-}
-
-USER_COMMAND(cmd_me) {
-	struct imwindow *win = cur_window();
-
-	if (args == NULL)
-		return;
-
-	if (win->type == WIN_TYPE_PRIVMSG)
-		pork_action_send(win->owner, cur_window()->target, args);
-	else if (win->type == WIN_TYPE_CHAT) {
-		struct chatroom *chat;
-
-		chat = win->data;
-		if (chat != NULL)
-			chat_send_action(win->owner, win->data, chat->title, args);
-	}
-}
-
 USER_COMMAND(cmd_msg) {
 	struct pork_acct *acct = cur_window()->owner;
 	char *target;
@@ -1481,28 +918,6 @@ USER_COMMAND(cmd_msg) {
 		chat_send_msg(acct, chat, target, args);
 	else
 		pork_msg_send(acct, target, args);
-}
-
-USER_COMMAND(cmd_mode) {
-	struct pork_acct *acct = cur_window()->owner;
-
-	if (args == NULL || !acct->connected)
-		return;
-
-	if (acct->proto->mode != NULL)
-		acct->proto->mode(acct, args);
-}
-
-USER_COMMAND(cmd_query) {
-	struct imwindow *imwindow = cur_window();
-
-	if (args != NULL && !blank_str(args)) {
-		struct imwindow *conv_window;
-
-		screen_make_query_window(imwindow->owner, args, &conv_window);
-		screen_goto_window(conv_window->refnum);
-	} else
-		screen_close_window(imwindow);
 }
 
 USER_COMMAND(cmd_quit) {
@@ -1553,9 +968,7 @@ USER_COMMAND(cmd_unbind) {
 		return;
 
 	if (binding[0] == '-' && binding[1] != '\0') {
-		if (!strcasecmp(binding, "-b") || !strcasecmp(binding, "-buddy"))
-			target_binds = &screen.binds.blist;
-		else if (!strcasecmp(binding, "-m") || !strcasecmp(binding, "-main"))
+		if (!strcasecmp(binding, "-m") || !strcasecmp(binding, "-main"))
 			target_binds = &screen.binds.main;
 		else {
 			screen_err_msg("Bad unbind flag: %s", binding);
@@ -1597,86 +1010,11 @@ USER_COMMAND(cmd_nick) {
 	pork_change_nick(cur_window()->owner, args);
 }
 
-USER_COMMAND(cmd_notice) {
-	struct pork_acct *acct = cur_window()->owner;
-	char *target;
-	struct chatroom *chat;
-
-	if (args == NULL || !acct->connected)
-		return;
-
-	target = strsep(&args, " ");
-	if (target == NULL || args == NULL)
-		return;
-
-	chat = chat_find(acct, target);
-	if (chat != NULL)
-		chat_send_notice(acct, chat, target, args);
-	else
-		pork_notice_send(acct, target, args);
-}
-
-USER_COMMAND(cmd_whowas) {
-	struct pork_acct *acct = cur_window()->owner;
-
-	if (acct->proto->whowas != NULL && args != NULL)
-		acct->proto->whowas(acct, args);
-}
-
-USER_COMMAND(cmd_ping) {
-	struct imwindow *win = cur_window();
-	struct pork_acct *acct = win->owner;
-
-	if (acct->proto->ping != NULL)
-		acct->proto->ping(acct, args);
-}
-
-USER_COMMAND(cmd_profile) {
-	pork_set_profile(cur_window()->owner, args);
-}
-
-USER_COMMAND(cmd_acct) {
-	if (args != NULL)
-		run_one_command(args, CMDSET_ACCT);
-	else
-		run_one_command("list", CMDSET_ACCT);
-}
-
-USER_COMMAND(cmd_chat) {
-	if (!cur_window()->owner->connected)
-		return;
-
-	if (args != NULL)
-		run_one_command(args, CMDSET_CHAT);
-	else
-		run_one_command("list", CMDSET_CHAT);
-}
-
 USER_COMMAND(cmd_win) {
 	if (args != NULL)
 		run_one_command(args, CMDSET_WIN);
 	else
 		run_one_command("list", CMDSET_WIN);
-}
-
-USER_COMMAND(cmd_file) {
-	if (!cur_window()->owner->can_connect)
-		return;
-
-	if (args != NULL)
-		run_one_command(args, CMDSET_FILE);
-	else
-		run_one_command("list", CMDSET_FILE);
-}
-
-USER_COMMAND(cmd_buddy) {
-	if (!cur_window()->owner->connected)
-		return;
-
-	if (args != NULL)
-		run_one_command(args, CMDSET_BUDDY);
-	else
-		run_one_command("list", CMDSET_BUDDY);
 }
 
 USER_COMMAND(cmd_input) {
@@ -1694,13 +1032,6 @@ USER_COMMAND(cmd_history) {
 USER_COMMAND(cmd_scroll) {
 	if (args != NULL)
 		run_one_command(args, CMDSET_SCROLL);
-}
-
-USER_COMMAND(cmd_timer) {
-	if (args != NULL)
-		run_one_command(args, CMDSET_TIMER);
-	else
-		run_one_command("list", CMDSET_TIMER);
 }
 
 USER_COMMAND(cmd_set) {
@@ -1785,24 +1116,12 @@ static int run_one_command(char *str, u_int32_t set) {
 
 	cmd_str = strsep(&str, " \t");
 
-	cmd = bsearch(cmd_str, command_set[set].set, command_set[set].elem,
+	cmd = (struct command *)bsearch(cmd_str, command_set[set].set, command_set[set].elem,
 			sizeof(struct command), cmd_compare);
 
 	if (cmd == NULL) {
-		struct pork_proto *proto;
-
-		if (set == CMDSET_MAIN && (proto = proto_get_name(cmd_str)) != NULL) {
-			cmd_str = strsep(&str, " \t");
-
-			cmd = bsearch(cmd_str, proto->cmd, proto->num_cmds,
-					sizeof(struct command), cmd_compare);
-
-			if (cmd == NULL)
-				screen_err_msg("Unknown %s command: %s", proto->name, cmd_str);
-		} else {
-			screen_err_msg("Unknown %scommand: %s",
-				command_set[set].type, cmd_str);
-		}
+    screen_err_msg("Unknown %scommand: %s",
+      command_set[set].type, cmd_str);
 
 		return (-1);
 	}
@@ -1831,13 +1150,6 @@ static int cmd_compare(const void *l, const void *r) {
 	struct command *cmd = (struct command *) r;
 
 	return (strcasecmp(key, cmd->name));
-}
-
-static void print_timer(void *data, void *nothing __notused) {
-	struct timer_entry *timer = data;
-
-	screen_cmd_output("[refnum: %u] %d %u %s", timer->refnum,
-		(int) timer->interval, timer->times, timer->command);
 }
 
 USER_COMMAND(cmd_input_find_next_cmd) {
@@ -1892,14 +1204,7 @@ USER_COMMAND(cmd_input_find_next_cmd) {
 		}
 
 		if (word_begin == 0) {
-			struct pork_proto *proto = cur_window()->owner->proto;
-
-			if (!strncasecmp(proto->name, &input_buf[1], end_word)) {
-				elements = proto->num_cmds;
-				cmd = proto->cmd;
-				word_begin = end_word;
-			} else
-				return;
+      return;
 		}
 
 		while (	input_buf[word_begin] == ' ' ||

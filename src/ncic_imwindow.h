@@ -36,8 +36,6 @@ struct imwindow {
 	uint32_t refnum;
 	uint32_t type:2;
 	uint32_t typing:2;
-	uint32_t blist_visible:1;
-	uint32_t input_focus:1;
 	uint32_t ignore_activity:1;
 	uint32_t skip:1;
 	pref_val_t opts[WOPT_NUM_OPTS];
@@ -48,32 +46,23 @@ struct imwindow *imwindow_new(	uint32_t rows,
 								uint32_t refnum,
 								uint32_t type,
 								struct pork_acct *owner,
-								char *target);
+								const char *target);
 
 void imwindow_resize(	struct imwindow *imwindow,
 						uint32_t rows,
 						uint32_t cols);
 
 int imwindow_set_priv_input(struct imwindow *imwindow, int val);
-int imwindow_blist_refresh(struct imwindow *imwindow);
-void imwindow_blist_show(struct imwindow *imwindow);
-void imwindow_blist_hide(struct imwindow *imwindow);
-void imwindow_blist_toggle(struct imwindow *imwindow);
-void imwindow_blist_draw(struct imwindow *imwindow);
 void imwindow_send_msg(struct imwindow *win);
 void imwindow_recv_msg(struct imwindow *win);
-int imwindow_bind_acct(struct imwindow *imwindow, uint32_t refnum);
+int imwindow_bind_acct(struct imwindow *imwindow);
 int imwindow_bind_next_acct(struct imwindow *imwindow);
 int imwindow_refresh(struct imwindow *imwindow);
 void imwindow_destroy(struct imwindow *imwindow);
-void imwindow_switch_focus(struct imwindow *imwindow);
 void imwindow_buffer_find(struct imwindow *imwindow, char *str, uint32_t opt);
 
 struct imwindow *imwindow_find_refnum(uint32_t refnum);
 struct imwindow *imwindow_find(struct pork_acct *owner, const char *target);
-struct imwindow *imwindow_find_name(struct pork_acct *owner, const char *name);
-struct imwindow *imwindow_find_chat_target(	struct pork_acct *owner,
-											const char *target);
 
 int imwindow_add(struct imwindow *imwindow,
 						struct imsg *imsg,

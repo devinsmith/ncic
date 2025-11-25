@@ -1,2 +1,0 @@
-SYNTAX: file list
-	Lists all active file transfers and all pending file transfer requests.

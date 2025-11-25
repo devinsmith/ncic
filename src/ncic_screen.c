@@ -29,6 +29,7 @@
 #include "ncic_screen_io.h"
 #include "ncic_io.h"
 #include "ncic_status.h"
+#include "ncic_log.h"
 
 /*
 ** Find the window having the specified refnum, and return
@@ -53,24 +54,6 @@ static dlist_t *screen_find_refnum(u_int32_t refnum) {
 	} while (cur != screen.window_list);
 
 	return (NULL);
-}
-
-/*
-** Yes, this is pretty slow and stupid, but it'd be pretty
-** unusual (i think) to have even 10 windows open at any one time.
-**
-** It's also only called when creating a new window.
-*/
-
-static inline u_int32_t screen_get_new_refnum(void) {
-	u_int32_t i;
-
-	for (i = 1 ; i < 0xffffffff ; i++) {
-		if (screen_find_refnum(i) == NULL)
-			return (i);
-	}
-
-	return (0);
 }
 
 static void screen_window_list_add(dlist_t *new_node) {
@@ -127,7 +110,7 @@ static void screen_window_list_remove(dlist_t *node) {
 ** list visible in it by default.
 */
 
-int screen_init(u_int32_t rows, u_int32_t cols) {
+int screen_init(int rows, int cols) {
 	struct imwindow *imwindow;
 	struct pork_acct *acct;
 
@@ -141,6 +124,8 @@ int screen_init(u_int32_t rows, u_int32_t cols) {
 
 	if (status_init() == -1)
 		return (-1);
+
+  log_tmsg(0, "Setting up NULL account");
 
 	acct = pork_acct_init(opt_get_str(OPT_TEXT_NO_NAME), PROTO_NULL);
 	if (acct == NULL)
@@ -158,7 +143,6 @@ int screen_init(u_int32_t rows, u_int32_t cols) {
 	if (imwindow == NULL)
 		return (-1);
 
-	wopt_set(imwindow, WOPT_SHOW_BLIST, "1");
 	screen_add_window(imwindow);
 	screen.status_win = imwindow;
 	return (0);
@@ -198,47 +182,6 @@ void screen_add_window(struct imwindow *imwindow) {
 		screen_window_swap(new_node);
 }
 
-/*
-** Change the refnum on the currently visible window.
-*/
-
-int screen_renumber(struct imwindow *imwindow, u_int32_t refnum) {
-	dlist_t *node;
-	u_int32_t old_refnum = imwindow->refnum;
-
-	node = screen_find_refnum(old_refnum);
-	if (node == NULL)
-		return (-1);
-
-	screen_window_list_remove(node);
-	imwindow->refnum = refnum;
-
-	/*
-	** If there's more than one window, check to
-	** make sure that no other window's refnum
-	** is equal to the refnum we just set for 'imwindow'.
-	** If it is, give it 'imwindow's' old refnum.
-	*/
-
-	if (node != node->next || node->next != node->prev) {
-		dlist_t *temp = screen_find_refnum(refnum);
-		if (temp != NULL) {
-			struct imwindow *imw;
-
-			screen_window_list_remove(temp);
-			imw = temp->data;
-			imw->refnum = old_refnum;
-			screen_window_list_add(temp);
-			screen_win_msg(imw, 0, 1, 1, MSG_TYPE_CMD_OUTPUT,
-				"This is now window %%W%u", old_refnum);
-		}
-	}
-
-	screen_window_list_add(node);
-	screen_cmd_output("This is now window %%W%u", imwindow->refnum);
-	return (0);
-}
-
 void screen_resize(u_int32_t rows, u_int32_t cols) {
 	dlist_t *cur;
 	int ret;
@@ -271,7 +214,6 @@ void screen_window_swap(dlist_t *new_cur) {
 	struct imwindow *imwindow = NULL;
 	u_int32_t last_own_input = 0;
 	u_int32_t cur_own_input;
-	struct pork_acct *acct;
 
 	if (screen.cur_window != NULL) {
 		imwindow = cur_window();
@@ -301,8 +243,6 @@ void screen_window_swap(dlist_t *new_cur) {
 
 	status_draw(imwindow->owner);
 
-	acct = imwindow->owner;
-
 	/*
 	** To force ncurses to redraw it on the physical screen.
 	*/
@@ -310,7 +250,7 @@ void screen_window_swap(dlist_t *new_cur) {
 	imwindow->swindow.dirty = 1;
 }
 
-inline int screen_goto_window(u_int32_t refnum) {
+int screen_goto_window(u_int32_t refnum) {
 	dlist_t *cur = screen_find_refnum(refnum);
 
 	if (cur == NULL)
@@ -335,90 +275,9 @@ void screen_refresh(void) {
 	screen_doupdate();
 }
 
-struct imwindow *screen_new_window(	struct pork_acct *acct,
-									char *target,
-									char *name)
-{
-	u_int32_t refnum = screen_get_new_refnum();
-	struct imwindow *imwindow;
-	u_int32_t rows;
-
-	rows = max(1, (int) screen.rows - STATUS_ROWS);
-
-	imwindow = imwindow_new(rows, screen.cols,
-		refnum, WIN_TYPE_PRIVMSG, acct, target);
-	if (imwindow == NULL)
-		return (NULL);
-
-	if (name != NULL)
-		imwindow_rename(imwindow, name);
-
-	screen_add_window(imwindow);
-	status_draw(imwindow->owner);
-
-	return (imwindow);
-}
-
-struct imwindow *screen_new_chat_window(struct pork_acct *acct, char *name) {
-	u_int32_t refnum = screen_get_new_refnum();
-	struct imwindow *imwindow;
-	u_int32_t rows;
-
-	rows = max(1, (int) screen.rows - STATUS_ROWS);
-	imwindow = imwindow_new(rows, screen.cols,
-		refnum, WIN_TYPE_CHAT, acct, name);
-	if (imwindow == NULL)
-		return (NULL);
-
-	imwindow->data = NULL;
-
-	screen_add_window(imwindow);
-	status_draw(imwindow->owner);
-
-	return (imwindow);
-}
-
-int screen_get_query_window(struct pork_acct *acct,
-							char *name,
-							struct imwindow **winr)
-{
-	struct imwindow *win;
-	int new = 0;
-
-	win = imwindow_find(acct, name);
-	if (win == NULL || win->type != WIN_TYPE_PRIVMSG) {
-		if (opt_get_bool(OPT_DUMP_MSGS_TO_STATUS))
-			win = screen.status_win;
-		else {
-			win = screen_new_window(acct, name, name);
-			new++;
-		}
-	}
-
-	*winr = win;
-	return (new);
-}
-
 /*
 ** When we really want a query window.
 */
-
-int screen_make_query_window(struct pork_acct *acct,
-							char *name,
-							struct imwindow **winr)
-{
-	struct imwindow *win;
-	int new = 0;
-
-	win = imwindow_find(acct, name);
-	if (win == NULL || win->type != WIN_TYPE_PRIVMSG) {
-		win = screen_new_window(acct, name, name);
-		new++;
-	}
-
-	*winr = win;
-	return (new);
-}
 
 void screen_cycle_fwd(void) {
 	dlist_t *cur = screen.cur_window;
@@ -444,7 +303,7 @@ void screen_cycle_bak(void) {
 	screen_window_swap(cur);
 }
 
-void screen_bind_all_unbound(struct pork_acct *acct) {
+void screen_bind_all_unbound() {
 	dlist_t *node;
 
 	node = screen.window_list;
@@ -453,13 +312,8 @@ void screen_bind_all_unbound(struct pork_acct *acct) {
 		struct imwindow *imwindow = node->data;
 
 		if (imwindow->owner == screen.null_acct) {
-			imwindow_bind_acct(imwindow, acct->refnum);
-
-			if (!imwindow->blist_visible) {
-				if (wopt_get_bool(imwindow->opts, WOPT_SHOW_BLIST))
-					wopt_set(imwindow, WOPT_SHOW_BLIST, "1");
-				}
-			}
+			imwindow_bind_acct(imwindow);
+    }
 
 		node = node->next;
 	} while (node != screen.window_list);

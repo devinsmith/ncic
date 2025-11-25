@@ -35,6 +35,7 @@ struct input {
 	dlist_t *history;
 	dlist_t *history_cur;
 	dlist_t *history_end;
+  int utf8_len;
 	char input_buf[INPUT_BUFFER_LEN];
 };
 
@@ -46,7 +47,7 @@ void input_init(struct input *input, uint32_t width);
 void input_delete(struct input *input);
 void input_bkspace(struct input *input);
 void input_insert(struct input *input, int c);
-void input_insert_str(struct input *input, char *str);
+void input_insert_str(struct input *input, const char *str);
 void input_clear_line(struct input *input);
 void input_clear_to_end(struct input *input);
 void input_clear_to_start(struct input *input);

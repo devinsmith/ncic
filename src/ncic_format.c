@@ -14,7 +14,6 @@
 #include <string.h>
 #include <time.h>
 #include <ctype.h>
-#include <sys/time.h>
 #include <sys/types.h>
 
 #include "ncic.h"
@@ -110,7 +109,7 @@ static int format_status_activity(	char opt,
 			size_t n = 0;
 
 			do {
-				struct imwindow *imwindow = cur->data;
+				struct imwindow *imwindow = (struct imwindow *)cur->data;
 
 				if (imwindow->swindow.activity &&
 					!imwindow->ignore_activity &&
@@ -276,42 +275,6 @@ static int format_status(char opt, char *buf, size_t len, va_list ap) {
 			}
 			break;
 
-		/* Chat mode, if applicable; M includes arguments, m doesn't. */
-		case 'M':
-		case 'm':
-			if (imwindow->type == WIN_TYPE_CHAT && imwindow->data != NULL) {
-				struct chatroom *chat = imwindow->data;
-
-				ret = xstrncpy(buf, chat->mode, len);
-				if (opt == 'm') {
-					char *p;
-
-					p = strchr(buf, ' ');
-					if (p != NULL)
-						*p = '\0';
-				}
-			}
-			break;
-
-		/* Chat status, if applicable */
-		case '@':
-			if (imwindow->type == WIN_TYPE_CHAT && imwindow->data != NULL) {
-				struct chatroom *chat = imwindow->data;
-				struct chat_user *user;
-
-				user = chat_find_user(acct, chat, acct->username);
-				if (user == NULL)
-					break;
-
-				if (user->status & CHAT_STATUS_OP)
-					ret = xstrncpy(buf, "@", len);
-				else if (user->status & CHAT_STATUS_HALFOP)
-					ret = xstrncpy(buf, "%%", len);
-				else if (user->status & CHAT_STATUS_VOICE)
-					ret = xstrncpy(buf, "+", len);
-			}
-			break;
-
 		/* User status */
 		case '!':
 			if (acct->disconnected) {
@@ -333,12 +296,6 @@ static int format_status(char opt, char *buf, size_t len, va_list ap) {
 			ret = xstrncpy(buf, acct->proto->name, len);
 			break;
 
-		/* User mode */
-		case 'u':
-		case 'U':
-			ret = xstrncpy(buf, acct->umode, len);
-			break;
-
 		/* Timestamp */
 		case 't':
 		case 'T':
@@ -349,12 +306,6 @@ static int format_status(char opt, char *buf, size_t len, va_list ap) {
 		case 'a':
 		case 'A':
 			ret = fill_format_str(OPT_FORMAT_STATUS_ACTIVITY, buf, len);
-			break;
-
-		/* Typing */
-		case 'y':
-		case 'Y':
-			ret = fill_format_str(OPT_FORMAT_STATUS_TYPING, buf, len, imwindow);
 			break;
 
 		/* Held Messages */

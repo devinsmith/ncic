@@ -11,6 +11,8 @@
 #ifndef __NCIC_QUEUE_H__
 #define __NCIC_QUEUE_H__
 
+#include "ncic_list.h"
+
 typedef struct {
 	dlist_t *head;
 	dlist_t *tail;

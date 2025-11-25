@@ -15,22 +15,6 @@
 #include "ncic_list.h"
 
 /*
-** Returns the length of the list whose head
-** node is passed in.
-*/
-
-size_t dlist_len(dlist_t *head) {
-	size_t len = 0;
-
-	while (head != NULL) {
-		++len;
-		head = head->next;
-	}
-
-	return (len);
-}
-
-/*
 ** Add a node containing the data specified in "data"
 ** to the head of the list specified by "head"
 */
@@ -46,76 +30,6 @@ dlist_t *dlist_add_head(dlist_t *head, void *data) {
 		head->prev = new_node;
 
 	return (new_node);
-}
-
-/*
-** Add a node containing the data specified in "data"
-** to the list specified by "head" after the node "node"
-*/
-
-dlist_t *dlist_add_after(dlist_t *head, dlist_t *node, void *data) {
-	dlist_t *new_node = xmalloc(sizeof(dlist_t));
-
-	new_node->data = data;
-	new_node->prev = node;
-	new_node->next = node->next;
-
-	if (node->next != NULL)
-		node->next->prev = new_node;
-
-	node->next = new_node;
-
-	return (head);
-}
-
-/*
-** Return the last node in the list
-** specified by "head"
-*/
-
-dlist_t *dlist_tail(dlist_t *head) {
-	dlist_t *cur = head;
-
-	if (cur == NULL)
-		return (head);
-
-	while (cur->next != NULL)
-		cur = cur->next;
-
-	return (cur);
-}
-
-/*
-** Add a node containing the data specified in "data"
-** to the tail of the list specified by "head"
-*/
-
-dlist_t *dlist_add_tail(dlist_t *head, void *data) {
-	dlist_t *tail = dlist_tail(head);
-
-	if (tail == NULL)
-		return (dlist_add_head(head, data));
-
-	return (dlist_add_after(head, tail, data));
-}
-
-/*
-** Remove the node that's at the head of the list
-** and adjust the pointer to the the head of the list
-** to point to the node after the one we removed.
-*/
-
-void *dlist_remove_head(dlist_t **list_head) {
-	dlist_t *next_node = (*list_head)->next;
-	void *ret = (*list_head)->data;
-
-	free(*list_head);
-
-	*list_head = next_node;
-	if (next_node != NULL)
-		next_node->prev = NULL;
-
-	return (ret);
 }
 
 /*
@@ -218,11 +132,11 @@ int hash_init(	hash_t *hash,
 	return (0);
 }
 
-inline dlist_t *hash_find(hash_t *hash, void *data, uint32_t cur_hash) {
+dlist_t *hash_find(hash_t *hash, void *data, uint32_t cur_hash) {
 	return (dlist_find(hash->map[cur_hash], data, hash->compare));
 }
 
-inline void hash_add(hash_t *hash, void *data, uint32_t cur_hash) {
+void hash_add(hash_t *hash, void *data, uint32_t cur_hash) {
 	hash->map[cur_hash] = dlist_add_head(hash->map[cur_hash], data);
 }
 
@@ -260,10 +174,4 @@ void hash_iterate(hash_t *hash, void (*func)(void *, void *), void *data) {
 
 	for (i = 0 ; i < (uint32_t) (1 << hash->order) ; i++)
 		dlist_iterate(hash->map[i], func, data);
-}
-
-inline int hash_exists(hash_t *hash, void *data, uint32_t cur_hash) {
-	dlist_t *ret = hash_find(hash, data, cur_hash);
-
-	return (ret != NULL);
 }

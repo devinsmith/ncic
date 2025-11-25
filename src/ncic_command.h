@@ -11,10 +11,10 @@
 #ifndef __NCIC_COMMAND_H__
 #define __NCIC_COMMAND_H__
 
-#define USER_COMMAND(x)	void x (char *args __notused)
+#define USER_COMMAND(x)	static void x (char *args __notused)
 
 struct command {
-	char *name;
+	const char *name;
 	void (*cmd)(char *);
 };
 

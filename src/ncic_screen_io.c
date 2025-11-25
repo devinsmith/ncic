@@ -34,8 +34,9 @@
 #include "ncic_status.h"
 #include "ncic_screen.h"
 #include "ncic_screen_io.h"
+#include "ncic_log.h"
 
-inline void screen_doupdate(void) {
+void screen_doupdate(void) {
 	int cur_old = curs_set(0);
 
 	wmove(screen.status_bar, STATUS_ROWS - 1,
@@ -71,6 +72,7 @@ int screen_draw_input(void) {
 		if (len < 0)
 			return (1);
 
+    log_tmsg(0, "Dumping %d bytes: %s", len, input_line);
 		wputncstr(screen.status_bar, input_line, len);
 
 		/*
@@ -87,7 +89,7 @@ int screen_draw_input(void) {
 	return (0);
 }
 
-inline int screen_set_quiet(int status) {
+int screen_set_quiet(int status) {
 	int ret = screen.quiet;
 
 	screen.quiet = status;
@@ -114,7 +116,7 @@ int screen_prompt_user(char *prompt, char *buf, size_t len) {
 static void int_screen_win_msg(	struct imwindow *win,
 								u_int32_t opt,
 								u_int32_t msgtype,
-								char *fmt,
+								const char *fmt,
 								va_list ap)
 {
 	char buf[8192];
@@ -122,7 +124,7 @@ static void int_screen_win_msg(	struct imwindow *win,
 	size_t chlen = 0;
 	int (*cstr_conv)(chtype *, size_t, ...) = plaintext_to_cstr;
 	char tstxt[128];
-	char *banner_txt = "\0";
+	const char *banner_txt = "\0";
 	char *p;
 	int ret;
 
@@ -233,12 +235,12 @@ void screen_print_str(struct imwindow *win, char *buf, size_t chlen, int type) {
 	}
 }
 
-inline void screen_win_msg(	struct imwindow *win,
+void screen_win_msg(	struct imwindow *win,
 							int ts,
 							int banner,
 							int color,
 							int type,
-							char *fmt,
+							const char *fmt,
 							...)
 {
 	va_list ap;
@@ -250,7 +252,7 @@ inline void screen_win_msg(	struct imwindow *win,
 	va_end(ap);
 }
 
-void screen_err_msg(char *fmt, ...) {
+void screen_err_msg(const char *fmt, ...) {
 	va_list ap;
 
 	va_start(ap, fmt);
@@ -260,7 +262,7 @@ void screen_err_msg(char *fmt, ...) {
 	va_end(ap);
 }
 
-void screen_cmd_output(char *fmt, ...) {
+void screen_cmd_output(const char *fmt, ...) {
 	va_list ap;
 
 	va_start(ap, fmt);
@@ -271,7 +273,7 @@ void screen_cmd_output(char *fmt, ...) {
 	va_end(ap);
 }
 
-void screen_nocolor_msg(char *fmt, ...) {
+void screen_nocolor_msg(const char *fmt, ...) {
 	va_list ap;
 
 	va_start(ap, fmt);

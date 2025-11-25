@@ -148,9 +148,6 @@ static int read_acct_conf(struct pork_acct *acct, const char *filename) {
 			}
 
 			acct->passwd = xstrdup(p);
-		} else if (!strcasecmp(buf, "profile")) {
-			free(acct->profile);
-			acct->profile = xstrdup(p);
 		} else {
 			screen_err_msg("Error: account config line %d: bad setting: %s",
 				line, buf);
@@ -208,8 +205,6 @@ static int save_acct_conf(struct pork_acct *acct, char *filename) {
 
 	if (acct->username != NULL)
 		fprintf(fp, "username: %s\n", acct->username);
-	if (acct->profile != NULL)
-		fprintf(fp, "profile: %s\n", acct->profile);
 	if (opt_get_bool(OPT_SAVE_PASSWD) && acct->passwd != NULL)
 		fprintf(fp, "password: %s\n", acct->passwd);
 
@@ -294,7 +289,7 @@ static void write_alias_line(void *data, void *filep) {
 
 static void write_bind_line(void *data, void *filep) {
 	struct binding *binding = data;
-	FILE *fp = filep;
+  FILE *fp = filep;
 	char key_name[32];
 
 	bind_get_keyname(binding->key, key_name, sizeof(key_name));
@@ -302,8 +297,8 @@ static void write_bind_line(void *data, void *filep) {
 }
 
 static void write_bind_blist_line(void *data, void *filep) {
-	struct binding *binding = data;
-	FILE *fp = filep;
+  struct binding *binding = data;
+  FILE *fp = filep;
 	char key_name[32];
 
 	bind_get_keyname(binding->key, key_name, sizeof(key_name));
@@ -337,8 +332,6 @@ int save_global_config(void) {
 	hash_iterate(&screen.alias_hash, write_alias_line, fp);
 	fprintf(fp, "\n");
 	hash_iterate(&screen.binds.main.hash, write_bind_line, fp);
-	fprintf(fp, "\n");
-	hash_iterate(&screen.binds.blist.hash, write_bind_blist_line, fp);
 
 	fclose(fp);
 

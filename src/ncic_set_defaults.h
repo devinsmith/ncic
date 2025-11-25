@@ -17,26 +17,13 @@
 
 #define DEFAULT_ACTIVITY_TYPES				0xffffffff
 #define DEFAULT_AUTO_RECONNECT				0
-#define DEFAULT_AUTO_REJOIN					0
-#define DEFAULT_AUTOSEND_AWAY				0
 #define DEFAULT_BANNER						"*** "
-#define DEFAULT_BEEP						0
-#define DEFAULT_BEEP_MAX					3
-#define DEFAULT_BEEP_ON_OUTPUT				0
 #define DEFAULT_CMDCHARS					'/'
-#define DEFAULT_COLOR_BLIST_FOCUS			0x200400
-#define DEFAULT_COLOR_BLIST_NOFOCUS			0x200500
-#define DEFAULT_COLOR_BLIST_SELECTOR		0x202400
 #define DEFAULT_CONNECT_TIMEOUT				180
-#define DEFAULT_DOWNLOAD_DIR				""
-#define DEFAULT_DUMP_MSGS_TO_STATUS			0
 #define DEFAULT_FORMAT_ACTION_RECV			"[$T] %c* %W$N%x $M"
 #define DEFAULT_FORMAT_ACTION_RECV_STATUS	"[$T] %C>%c* %W$N%D(%C$h%D)%x $M"
 #define DEFAULT_FORMAT_ACTION_SEND			"[$T] %c* %W$N%x $M"
 #define DEFAULT_FORMAT_ACTION_SEND_STATUS	"[$T] %D-> %m$R %c* %W$N%x $M"
-#define DEFAULT_FORMAT_BLIST				" $B [$d]$N$>$i"
-#define DEFAULT_FORMAT_BLIST_GROUP			"($E) $N ($T)"
-#define DEFAULT_FORMAT_BLIST_IDLE			"%B$I"
 #define DEFAULT_FORMAT_CHAT_CREATE			"[$T] %W$N%x has %Gcreated %c$R %D(%x$U%D)"
 #define DEFAULT_FORMAT_CHAT_IGNORE			"[$T] %W$N%x has %Gignored%x $D in %c$R"
 #define DEFAULT_FORMAT_CHAT_INVITE			"[$T] %W$N%x has %Ginvited%x $D to %c$R%x %D(%x$M%D)"
@@ -65,9 +52,9 @@
 #define DEFAULT_FORMAT_NOTICE_RECV_STATUS	"[$T] %D-%B$N%D(%c$h%D)-%x $M"
 #define DEFAULT_FORMAT_NOTICE_SEND			"[$T] %D-> -%c$R%D-%x $M"
 #define DEFAULT_FORMAT_NOTICE_SEND_STATUS	"[$T] %D-> -%c$R%D-%x $M"
-#define DEFAULT_FORMAT_STATUS				"%d,w$T$n [$z$c]$A$Y$H $>$I%d,w$S [$!]"
+#define DEFAULT_FORMAT_STATUS				"%d,w$T$n [$z$c]$A$H $>$I%d,w$S [$!]"
 #define DEFAULT_FORMAT_STATUS_ACTIVITY		" %w,d{$A}%d,w"
-#define DEFAULT_FORMAT_STATUS_CHAT			"%d,w$T$@$n (+$u) [$z$c (+$M)]$A$Y$H $>$I$W%d,w$S [$!]"
+#define DEFAULT_FORMAT_STATUS_CHAT			"%d,w$T$@$n (+$u) [$z$c (+$M)]$A$H $>$I$W%d,w$S [$!]"
 #define DEFAULT_FORMAT_STATUS_HELD			" <%g,w$H%d,w>"
 #define DEFAULT_FORMAT_STATUS_IDLE			"%d,w (%D,widle: $i%d,w)"
 #define DEFAULT_FORMAT_STATUS_TIMESTAMP		"[$H:$M] "
@@ -104,15 +91,9 @@
 #define DEFAULT_SCROLL_ON_OUTPUT			0
 #define DEFAULT_SCROLLBUF_LEN				5000
 #define DEFAULT_SEND_REMOVES_AWAY			1
-#define DEFAULT_SHOW_BLIST					0
 #define DEFAULT_SHOW_BUDDY_AWAY				1
 #define DEFAULT_SHOW_BUDDY_IDLE				0
 #define DEFAULT_SHOW_BUDDY_SIGNOFF			1
-#define DEFAULT_TEXT_BLIST_GROUP_EXPANDED	"%B+%x"
-#define DEFAULT_TEXT_BLIST_GROUP_COLLAPSED	"%R-%x"
-#define	DEFAULT_TEXT_BUDDY_ACTIVE			"%G*%x"
-#define DEFAULT_TEXT_BUDDY_AWAY				"%r*%x"
-#define DEFAULT_TEXT_BUDDY_IDLE				"%Y*%x"
 #define DEFAULT_TEXT_NO_NAME				"<not specified>"
 #define DEFAULT_TEXT_NO_ROOM				":(not joined)"
 #define DEFAULT_TEXT_TYPING					"Typing"

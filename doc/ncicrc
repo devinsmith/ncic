@@ -10,14 +10,12 @@
 bind RETURN input send
 bind BACKSPACE input backspace
 bind DELETE input delete
-bind TAB input focus_next
 bind 0x7f input backspace
 bind META-^H input clear_prev_word
 bind META-0x7f input clear_prev_word
 bind META-BACKSPACE input clear_prev_word
 bind META-/ input find_next_cmd
 bind META-^X win bind_next
-bind META-TAB blist toggle
 
 bind ^A input start
 bind ^B input prev_word
@@ -41,47 +39,6 @@ bind END scroll end
 bind PAGE_DOWN scroll page_down
 bind PAGE_UP scroll page_up
 
-bind META-1 win swap 1
-bind META-2 win swap 2
-bind META-3 win swap 3
-bind META-4 win swap 4
-bind META-5 win swap 5
-bind META-6 win swap 6
-bind META-7 win swap 7
-bind META-8 win swap 8
-bind META-9 win swap 9
-bind META-0 win swap 10
-bind META2-1 win swap 11
-
-bind META-w chat who
-
-##
-## Bindings for the buddy input set.
-##
-
-
-bind -buddy META-b blist remove_block
-bind -buddy META-B blist add_block
-bind -buddy META-P blist add_permit
-bind -buddy META-p blist remove_permit
-bind -buddy META-W blist warn_anon
-bind -buddy META-w blist warn
-
-bind -buddy a blist away
-bind -buddy i blist profile
-bind -buddy ^L blist refresh
-
-bind -buddy TAB input focus_next
-bind -buddy RETURN blist select
-bind -buddy PAGE_UP blist page_up
-bind -buddy PAGE_DOWN blist page_down
-bind -buddy UP_ARROW blist up
-bind -buddy DOWN_ARROW blist down
-bind -buddy END blist end
-bind -buddy HOME blist start
-
-bind -buddy ^X win next
-bind -buddy ^Y win prev
 
 ##
 ## Aliases that make things more pleasant.
@@ -92,21 +49,6 @@ alias clear win clear
 alias erase win erase
 alias close win close
 alias ws win swap
-
-alias add buddy add
-alias warn buddy warn
-alias block buddy block
-alias unblock buddy unblock
-alias permit buddy permit
-alias whois buddy profile
-alias seen buddy seen
-
-alias invite chat invite
-alias join chat join
-alias part chat leave
-alias leave chat leave
-alias ignore chat ignore
-alias unignore chat unignore
 
 alias signon connect
 alias signoff disconnect

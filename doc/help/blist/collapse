@@ -1,6 +1,0 @@
-SYNTAX: blist collapse [<group name>]
-	"Collapses" the display of a group in the current account's buddy list. Collapsing a group amounts to hiding all the members of a group from the buddy list display. If the specified group is already collapsed, it will be uncollapsed, which is to say all its cells that were hidden when it was collapsed will be shown.
-
-PARAMETERS
-	<group name>: (Optional) The group to collapse. If this parameter is not specified, the group that the buddy list's cursor is on will be collapsed. If the cursor is not on a group, no action will be taken.
-	

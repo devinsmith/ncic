@@ -1,5 +1,0 @@
-SYNTAX: buddy warn_anon <screen name>
-	Warns a user anonymously.
-
-PARAMETERS
-	<screen name>: The screen name to warn anonymously.

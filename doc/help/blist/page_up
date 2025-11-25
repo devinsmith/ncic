@@ -1,2 +1,0 @@
-SYNTAX: blist page_up
-	Moves the buddy list's cursor up one "screenful" down, if possible. A screenful here is defined as the number of buddy list lines that are visible on the buddy list's display.

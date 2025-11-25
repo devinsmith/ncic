@@ -8,8 +8,8 @@
 ** as published by the Free Software Foundation.
 */
 
-#ifndef __NCIC_IO_H__
-#define __NCIC_IO_H__
+#ifndef NCIC_IO_H
+#define NCIC_IO_H
 
 #define IO_COND_READ		0x01
 #define IO_COND_WRITE		0x02
@@ -41,5 +41,5 @@ int pork_io_add(int fd,
 				void *key,
 				void (*callback)(int fd, u_int32_t condition, void *data));
 
-#endif /* __NCIC_IO_H__ */
+#endif // NCIC_IO_H
 

@@ -12,8 +12,7 @@
 #define __NCIC_BIND_H__
 
 enum {
-	BINDS_MAIN,
-	BINDS_BUDDY
+	BINDS_MAIN
 };
 
 struct binding {
@@ -29,7 +28,6 @@ struct key_binds {
 
 struct binds {
 	struct key_binds main;
-	struct key_binds blist;
 };
 
 int bind_init(struct binds *binds);
@@ -37,7 +35,7 @@ void bind_destroy(struct binds *binds);
 int bind_remove(struct key_binds *bind_set, int c);
 int bind_exec(struct key_binds *bind_set, int c);
 struct binding *bind_find(struct key_binds *bind_set, int c);
-void bind_add(struct key_binds *bind_set, int c, char *command);
+void bind_add(struct key_binds *bind_set, int c, const char *command);
 void bind_set_handlers(	struct key_binds *bind_set,
 						void (*success)(struct binding *binding),
 						void (*failure)(int key));

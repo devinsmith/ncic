@@ -16,10 +16,6 @@
 
 #define array_elem(x) (sizeof((x)) / sizeof((x)[0]))
 
-/* Needs special care */
-#define POINTER_TO_UINT(p)	((uintptr_t) (p))
-#define UINT_TO_POINTER(u)	((void *) (uintptr_t) (u))
-
 #ifndef min
 #	define min(x,y) ((x) < (y) ? (x) : (y))
 #endif

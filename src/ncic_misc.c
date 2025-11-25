@@ -12,7 +12,6 @@
 #include <ctype.h>
 #include <string.h>
 #include <time.h>
-#include <sys/time.h>
 
 #include "ncic_util.h"
 #include "ncic_input.h"

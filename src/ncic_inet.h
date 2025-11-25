@@ -21,14 +21,11 @@
 #	define MAX_IPLEN	46
 #endif
 
-#define MAX_HOSTLEN		256
-
 #define SIN4(x) ((struct sockaddr_in *) (x))
 #define SIN6(x) ((struct sockaddr_in6 *) (x))
 #define VALID_PORT(x) ((((x) & 0xffff) == (x)) && ((x) != 0))
 
-int nb_connect(	struct sockaddr_storage *ss,
-				struct sockaddr_storage *local,
+int nb_connect(struct sockaddr_storage *ss,
 				in_port_t port,
 				int *dsock);
 
@@ -40,10 +37,5 @@ void sin_set_port(struct sockaddr_storage *ss, in_port_t port);
 int sock_setflags(int sock, u_int32_t flags);
 void sock_setkeepalive(int sock);
 int sock_is_error(int sock);
-int sock_listen(struct sockaddr_storage *ss, in_port_t port);
-
-int get_hostname(struct sockaddr_storage *addr,
-						char *hostbuf,
-						size_t len);
 
 #endif /* __NCIC_INET_H__ */

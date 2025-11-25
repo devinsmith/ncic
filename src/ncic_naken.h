@@ -36,8 +36,8 @@ struct naken_input {
   char *args;
 };
 
-int naken_send(irc_session_t *session, char *msg);
-int naken_set_back(irc_session_t *session, char *msg);
-int irc_send(irc_session_t *session, char *command, size_t len);
+int naken_send(struct irc_session_t *session, char *msg);
+int naken_set_back(struct irc_session_t *session, char *msg);
+int irc_send(struct irc_session_t *session, char *command, size_t len);
 
 #endif /* NCIC_NAKEN_H */

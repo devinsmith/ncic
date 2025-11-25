@@ -29,16 +29,9 @@ enum {
 enum {
 	OPT_ACTIVITY_TYPES = 0,
 	OPT_AUTO_RECONNECT,
-	OPT_AUTO_REJOIN,
-	OPT_AUTOSEND_AWAY,
 	OPT_BANNER,
-	OPT_BEEP,
-	OPT_BEEP_MAX,
-	OPT_BEEP_ON_OUTPUT,
 	OPT_CMDCHARS,
 	OPT_CONNECT_TIMEOUT,
-	OPT_DOWNLOAD_DIR,
-	OPT_DUMP_MSGS_TO_STATUS,
 	OPT_FORMAT_ACTION_RECV,
 	OPT_FORMAT_ACTION_RECV_STATUS,
 	OPT_FORMAT_ACTION_SEND,
@@ -160,16 +153,16 @@ typedef union {
 } pref_val_t;
 
 struct global_pref {
-	char *name;
+	const char *name;
 	uint32_t type:31;
 	uint32_t dynamic:1;
 	int (*set)(uint32_t, char *);
-	void (*updated)(void);
+	void (*updated)();
 	pref_val_t val;
 };
 
 struct window_var {
-	char *name;
+	const char *name;
 	uint32_t type;
 	int (*set)(struct imwindow *, uint32_t, char *);
 	void (*updated)(struct imwindow *);

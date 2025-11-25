@@ -8,26 +8,24 @@
 ** as published by the Free Software Foundation.
 */
 
-#include "config.h"
-
 #include <stdlib.h>
-#include <string.h>
 #include <errno.h>
 #include <sys/time.h>
 #include <sys/types.h>
 
 #include "ncic.h"
-#include "ncic_util.h"
-#include "ncic_list.h"
 #include "ncic_io.h"
 #include "ncic_inet.h"
+#include "ncic_list.h"
+#include "ncic_log.h"
+#include "ncic_util.h"
 
 static dlist_t *io_list;
 
 static int pork_io_find_cb(void *l, void *r) {
 	struct io_source *io = (struct io_source *) r;
 
-	return (!(l == io->key));
+	return l != io->key;
 }
 
 static void pork_io_destroy_cb(void *param __notused, void *data) {
@@ -58,6 +56,8 @@ int pork_io_add(int fd,
 	dlist_t *node;
 	struct io_source *io;
 
+  log_tmsg(0, "Adding new condition on fd: %d, key: %p, cond: %d", fd, key, cond);
+
 	/*
 	** If there's already an entry for this key, delete it
 	** and replace it with the new one.
@@ -81,6 +81,8 @@ int pork_io_add(int fd,
 int pork_io_del(void *key) {
 	dlist_t *node;
 	struct io_source *io;
+
+  log_tmsg(0, "Removing io for key: %p", key);
 
 	node = dlist_find(io_list, key, pork_io_find_cb);
 	if (node == NULL)
@@ -174,7 +176,7 @@ int pork_io_run(void) {
 
 	cur = io_list;
 	while (cur != NULL) {
-		struct io_source *io = cur->data;
+		struct io_source *io = (struct io_source *)cur->data;
 		dlist_t *next = cur->next;
 
 		if (io->fd >= 0) {
@@ -243,3 +245,4 @@ int pork_io_run(void) {
 
 	return (ret);
 }
+

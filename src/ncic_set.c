@@ -74,42 +74,12 @@ struct global_pref global_pref[] = {
 		opt_set_bool,
 		NULL,
 		SET_BOOL(DEFAULT_AUTO_RECONNECT)
-	},{	"AUTO_REJOIN",
-		OPT_BOOL,
-		0,
-		opt_set_bool,
-		NULL,
-		SET_BOOL(DEFAULT_AUTO_REJOIN)
-	},{	"AUTOSEND_AWAY",
-		OPT_BOOL,
-		0,
-		opt_set_bool,
-		NULL,
-		SET_BOOL(DEFAULT_AUTOSEND_AWAY)
 	},{	"BANNER",
 		OPT_STR,
 		0,
 		opt_set_str,
 		NULL,
 		SET_STR(DEFAULT_BANNER)
-	},{	"BEEP",
-		OPT_BOOL,
-		0,
-		opt_set_bool,
-		NULL,
-		SET_BOOL(DEFAULT_BEEP)
-	},{	"BEEP_MAX",
-		OPT_INT,
-		0,
-		opt_set_int,
-		NULL,
-		SET_INT(DEFAULT_BEEP_MAX)
-	},{	"BEEP_ON_OUTPUT",
-		OPT_BOOL,
-		0,
-		opt_set_bool,
-		NULL,
-		SET_BOOL(DEFAULT_BEEP_ON_OUTPUT)
 	},{	"CMDCHARS",
 		OPT_CHAR,
 		0,
@@ -122,18 +92,6 @@ struct global_pref global_pref[] = {
 		opt_set_int,
 		NULL,
 		SET_INT(DEFAULT_CONNECT_TIMEOUT)
-	},{	"DOWNLOAD_DIR",
-		OPT_STR,
-		0,
-		opt_set_str,
-		NULL,
-		SET_STR(DEFAULT_DOWNLOAD_DIR),
-	},{	"DUMP_MSGS_TO_STATUS",
-		OPT_BOOL,
-		0,
-		opt_set_bool,
-		NULL,
-		SET_BOOL(DEFAULT_DUMP_MSGS_TO_STATUS),
 	},{	"FORMAT_ACTION_RECV",
 		OPT_FORMAT,
 		0,
@@ -1068,7 +1026,6 @@ void wopt_init(struct imwindow *imwindow, const char *target) {
 	memset(wopt, 0, sizeof(pref_val_t) * WOPT_NUM_OPTS);
 
 	wopt[WOPT_ACTIVITY_TYPES].i = opt_get_int(OPT_ACTIVITY_TYPES);
-	wopt[WOPT_BEEP_ON_OUTPUT].b = opt_get_bool(OPT_BEEP_ON_OUTPUT);
 	wopt[WOPT_HISTORY_LEN].i = opt_get_int(OPT_HISTORY_LEN);
 	wopt[WOPT_LOG].b = opt_get_bool(OPT_LOG);
 	wopt[WOPT_LOG_TYPES].i = opt_get_int(OPT_LOG_TYPES);
@@ -1193,31 +1150,6 @@ int opt_set_str(uint32_t opt, char *args) {
 	return (0);
 }
 
-int opt_set_color(uint32_t opt, char *args) {
-	attr_t attr = 0;
-
-	if (*args != '%') {
-		if (color_parse_code(args, &attr) == -1)
-			return (-1);
-	} else {
-		char buf[32];
-		chtype ch[4];
-
-		snprintf(buf, sizeof(buf), "%s ", args);
-		if (plaintext_to_cstr(ch, array_elem(ch), buf, NULL) != 1)
-			return (-1);
-
-		attr = ch[0] & A_ATTRIBUTES;
-	}
-
-	global_pref[opt].val.i = attr;
-
-	if (global_pref[opt].updated != NULL)
-		global_pref[opt].updated();
-
-	return (0);
-}
-
 int opt_set(uint32_t opt, char *args) {
 	struct global_pref *var = &global_pref[opt];
 
@@ -1292,7 +1224,7 @@ static int wopt_set_str(struct imwindow *imwindow, uint32_t opt, char *args) {
 	return (0);
 }
 
-inline int wopt_set(struct imwindow *imwindow, uint32_t opt, char *args) {
+int wopt_set(struct imwindow *imwindow, uint32_t opt, char *args) {
 	struct window_var *var = &window_var[opt];
 
 	return (var->set(imwindow, opt, args));

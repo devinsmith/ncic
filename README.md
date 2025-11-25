@@ -17,17 +17,17 @@ ncic
 
    Probably any Unix or Unix derivative that supports NCurses.
 
-   I have tested it on the following platforms. I regularly use it on Linux so that is the best supported option. 
+   I have tested it on the following platforms. I regularly use it on Linux so that is the best supported option.
 
-   | OS              | Versions | Arch     |
-   | --------------- | -------- | -------- |
-   | OpenBSD         | 4.2-5.9  | PowerPC  |
-   | OpenBSD         | 4.2-4.5  | i386     |
-   | FreeBSD         | 10.2     | amd64    |
-   | MacOS X Server  | 10.4.10  | i386     |
-   | Slackware Linux | 12.2+     | i386     |
-   | Ubuntu          | 16.04+    | amd64    |
-   | Debian          | 9 (Stretch) and higher   | amd64    |
+   | OS              | Versions               | Arch       |
+   | --------------- | ---------------------- | ---------- |
+   | OpenBSD         | 4.2-5.9                | PowerPC    |
+   | OpenBSD         | 4.2-4.5                | i386       |
+   | FreeBSD         | 10.2                   | amd64      |
+   | MacOS X Server  | 10.4.10                | i386       |
+   | Slackware Linux | 12.2+                  | i386       |
+   | Ubuntu          | 16.04+                 | amd64      |
+   | Debian          | 9 (Stretch) and higher | amd64      |
 
 # Screenshot
 

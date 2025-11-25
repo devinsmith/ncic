@@ -11,6 +11,8 @@
 #ifndef __NCIC_SWINDOW_H__
 #define __NCIC_SWINDOW_H__
 
+#include "ncic_list.h"
+
 #define SWINDOW_FIND_ICASE		0x01
 #define SWINDOW_FIND_BASIC		0x02
 
@@ -57,7 +59,6 @@ struct swindow {
 	uint32_t visible:1;
 	uint32_t dirty:1;
 	uint32_t activity:1;
-	uint32_t beep_on_output:1;
 	uint32_t scroll_on_input:1;
 	uint32_t scroll_on_output:1;
 	uint32_t timestamp:1;

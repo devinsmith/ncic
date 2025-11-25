@@ -1,5 +1,0 @@
-SYNTAX: laddr [<hostname|IP addr>]
-	Sets the local address for all outgoing connections.
-
-PARAMETERS
-	<hostname|IP addr>: (Optional) The address to use. If this parameter is omitted, the current local address that outgoing connections will use is displayed.

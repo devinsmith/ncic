@@ -16,7 +16,6 @@
 
 #include "ncic_util.h"
 #include "ncic_color.h"
-#include "ncic_set.h"
 #include "ncic_cstr.h"
 
 /*
@@ -36,7 +35,7 @@
 ** by "ch"
 */
 
-inline size_t cstrlen(chtype *ch) {
+size_t cstrlen(chtype *ch) {
 	size_t i = 0;
 
 	while (*ch++ != 0)
@@ -52,7 +51,7 @@ inline size_t cstrlen(chtype *ch) {
 ** that comprise it.
 */
 
-char *cstr_to_plaintext(chtype *cstr, size_t len) {
+char *cstr_to_plaintext(const chtype *cstr, size_t len) {
 	char *str = xmalloc(len + 1);
 	size_t i;
 
@@ -91,14 +90,14 @@ int plaintext_to_cstr(chtype *ch, size_t len, ...) {
 				if (str[spos + 1] != '\0' && str[++spos] != '%') {
 					int ret = color_parse_code(&str[spos], &color_attr);
 					if (ret == -1)
-						ch[i] = str[--spos];
+						ch[i] = (unsigned char)str[--spos];
 					else {
 						i--;
 						spos += ret;
 						continue;
 					}
 				} else
-					ch[i] = str[spos];
+					ch[i] = (unsigned char)str[spos];
 			} else if (str[spos] == '\t') {
 				size_t pad = PORK_TABSTOP - i % PORK_TABSTOP;
 				size_t j;
@@ -107,7 +106,7 @@ int plaintext_to_cstr(chtype *ch, size_t len, ...) {
 					ch[i++] = ' ' | color_attr;
 				i--;
 			} else
-				ch[i] = str[spos];
+				ch[i] = (unsigned char)str[spos];
 
 			ch[i] |= color_attr;
 
@@ -145,7 +144,7 @@ int plaintext_to_cstr_nocolor(chtype *ch, size_t len, ...) {
 					ch[i++] = ' ';
 				i--;
 			} else
-				ch[i] = *str;
+				ch[i] = (unsigned char)*str;
 
 			str++;
 		}
@@ -157,25 +156,6 @@ int plaintext_to_cstr_nocolor(chtype *ch, size_t len, ...) {
 	return (i);
 }
 
-/*
-** Duplicate a chtype * string of length "len".
-*/
-
-chtype *cstrndup(chtype *ch, size_t len) {
-	size_t i;
-	chtype *result;
-
-	if (len < 1)
-		return (NULL);
-
-	result = xmalloc((len + 1) * sizeof(chtype));
-
-	for (i = 0 ; i < len ; i++)
-		result[i] = ch[i];
-
-	result[i] = 0;
-	return (result);
-}
 
 /*
 ** Write the cstring pointed to by "ch"
@@ -184,18 +164,11 @@ chtype *cstrndup(chtype *ch, size_t len) {
 
 inline size_t wputstr(WINDOW *win, chtype *ch) {
 	size_t i = 0;
-	u_int32_t beeps = 0;
-	u_int32_t beeps_max = opt_get_int(OPT_BEEP_MAX);
 
 	while (ch[i] != 0) {
 		int c = chtype_get(ch[i]);
 
 		if (iscntrl(c)) {
-			if (c == 0x07 && opt_get_bool(OPT_BEEP) && beeps < beeps_max) {
-				beep();
-				beeps++;
-			}
-
 			waddch(win, chtype_ctrl(c));
 		} else
 			waddch(win, ch[i]);
@@ -211,7 +184,7 @@ inline size_t wputstr(WINDOW *win, chtype *ch) {
 ** to the screen at the position (x, y).
 */
 
-inline size_t mvwputstr(WINDOW *win, int y, int x, chtype *ch) {
+size_t mvwputstr(WINDOW *win, int y, int x, chtype *ch) {
 	wmove(win, y, x);
 
 	return (wputstr(win, ch));
@@ -222,20 +195,13 @@ inline size_t mvwputstr(WINDOW *win, int y, int x, chtype *ch) {
 ** to the screen at the current cursor position.
 */
 
-inline size_t wputnstr(WINDOW *win, chtype *ch, size_t n) {
+size_t wputnstr(WINDOW *win, chtype *ch, size_t n) {
 	size_t i;
-	u_int32_t beeps = 0;
-	u_int32_t beeps_max = opt_get_int(OPT_BEEP_MAX);
 
 	for (i = 0 ; i < n && ch[i] != 0 ; i++) {
 		int c = chtype_get(ch[i]);
 
 		if (iscntrl(c)) {
-			if (c == 0x07 && opt_get_bool(OPT_BEEP) && beeps < beeps_max) {
-				beep();
-				beeps++;
-			}
-
 			waddch(win, chtype_ctrl(c));
 		} else
 			waddch(win, ch[i]);
@@ -244,14 +210,14 @@ inline size_t wputnstr(WINDOW *win, chtype *ch, size_t n) {
 	return (i);
 }
 
-inline size_t wputncstr(WINDOW *win, char *str, size_t n) {
+size_t wputncstr(WINDOW *win, char *str, size_t n) {
 	size_t i;
 
 	for (i = 0 ; i < n && *str != '\0' ; i++) {
 		if (iscntrl(*str))
 			waddch(win, chtype_ctrl(*str));
 		else
-			waddch(win, *str);
+			waddch(win, (unsigned char)*str);
 
 		str++;
 	}
@@ -264,7 +230,7 @@ inline size_t wputncstr(WINDOW *win, char *str, size_t n) {
 ** to the screen at position (x, y).
 */
 
-inline size_t mvwputnstr(WINDOW *win, int y, int x, chtype *ch, size_t n) {
+size_t mvwputnstr(WINDOW *win, int y, int x, chtype *ch, size_t n) {
 	wmove(win, y, x);
 
 	return (wputnstr(win, ch, n));

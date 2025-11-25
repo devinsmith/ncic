@@ -13,20 +13,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 
 #include "ncic_opt.h"
 
-#define OPTSTRING "vH:p:h"
+char *g_log_file = NULL;
 
-static u_int32_t flags;
+static void print_help_text()
+{
+  const char usage[] =
+          "Usage: ncic [options]\n"
+          "-h or --help           Display this help text\n"
+          "-v or --version        Display version information and exit\n";
 
-static void print_help_text(void);
+  printf("%s", usage);
+}
 
-struct sockaddr_storage local_addr;
-in_port_t local_port;
+static void args_required(char * arg, const char *argname)
+{
+  fprintf(stderr, "ncic: option '%s' expects a parameter (%s)\n", arg,
+    argname);
+
+  exit(1);
+}
 
 int get_options(int argc, char *const argv[])
 {
@@ -37,11 +45,16 @@ int get_options(int argc, char *const argv[])
 	  if (!strcmp(p, "-v")) {
       printf("ncic version %s\n", VERSION);
       printf("Written by Devin Smith <devin@devinsmith.net>\n");
-      printf("http://devinsmith.net/programs/ncic.php\n");
+      printf("http://devinsmith.net/programs/ncic.html\n");
       exit(0);
 	  } else if (!strcmp(p, "-h")) {
       print_help_text();
       exit(0);
+    } else if (!strcmp(p, "--log")) {
+      if (!argv[1]) {
+        args_required(p, "log");
+      }
+      g_log_file = *++argv, --argc;
 	  } else {
 	    print_help_text();
 	    exit(1);
@@ -49,15 +62,4 @@ int get_options(int argc, char *const argv[])
 	}
 
 	return (0);
-}
-
-static void print_help_text(void) {
-	const char usage[] =
-"Usage: ncic [options]\n"
-"-H or --host <addr>    Use the local address specified for outgoing connections\n"
-"-p or --port <port>    Use the local port specified for the main connection\n"
-"-h or --help           Display this help text\n"
-"-v or --version        Display version information and exit\n";
-
-	printf("%s", usage);
 }

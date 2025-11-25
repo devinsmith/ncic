@@ -30,12 +30,12 @@
 #include "ncic_irc.h"
 #include "ncic_naken.h"
 
-static int naken_process_input(irc_session_t *session, char *input, int len);
-static struct naken_input *naken_tokenize(irc_session_t *session, char *input);
+static int naken_process_input(struct irc_session_t *session, char *input, int len);
+static struct naken_input *naken_tokenize(struct irc_session_t *session, char *input);
 static int naken_handler_nick(struct pork_acct *acct, struct naken_input *in,
     char *old_name);
 
-static int naken_process_input(irc_session_t *session, char *input, int len)
+static int naken_process_input(struct irc_session_t *session, char *input, int len)
 {
 	struct pork_acct *acct = session->data;
 	struct naken_input *in;
@@ -108,7 +108,7 @@ static int naken_process_input(irc_session_t *session, char *input, int len)
 	return 0;
 }
 
-static struct naken_input *naken_tokenize(irc_session_t *session, char *input)
+static struct naken_input *naken_tokenize(struct irc_session_t *session, char *input)
 {
 	struct naken_input *in = xcalloc(1, sizeof(*in));
 	char *sender;
@@ -188,7 +188,7 @@ static struct naken_input *naken_tokenize(irc_session_t *session, char *input)
   return (in);
 }
 
-static ssize_t irc_read_data(irc_session_t *session, char *buf, size_t len) {
+static ssize_t irc_read_data(struct irc_session_t *session, char *buf, size_t len) {
 	int i;
 	ssize_t ret = 0;
 
@@ -217,7 +217,7 @@ static ssize_t irc_read_data(irc_session_t *session, char *buf, size_t len) {
 /*
 ** Returns -1 if the connection died, 0 otherwise.
 */
-int naken_input_dispatch(irc_session_t *session)
+int naken_input_dispatch(struct irc_session_t *session)
 {
   ssize_t i, nbytes;
   size_t j;

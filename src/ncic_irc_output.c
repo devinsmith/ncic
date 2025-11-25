@@ -9,7 +9,6 @@
 */
 
 #include <stdio.h>
-#include <ncurses.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
@@ -18,24 +17,20 @@
 
 #include "ncic.h"
 #include "ncic_util.h"
-#include "ncic_list.h"
 #include "ncic_queue.h"
 #include "ncic_inet.h"
 #include "ncic_io.h"
 #include "ncic_acct.h"
-#include "ncic_imwindow.h"
-#include "ncic_screen.h"
 #include "ncic_screen_io.h"
 
 #include "ncic_irc.h"
+#include "ncic_naken.h"
 
-static int irc_send_server(irc_session_t *session, char *cmd, size_t len) {
-	return SSL_write (session->sslHandle, cmd, len);
-
-	//return (sock_write(sock, cmd, len));
+static int irc_send_server(struct irc_session_t *session, char *cmd, size_t len) {
+  return SSL_write(session->sslHandle, cmd, len);
 }
 
-int irc_send(irc_session_t *session, char *command, size_t len) {
+int irc_send(struct irc_session_t *session, char *command, size_t len) {
 	int ret;
 
 	if (session->sock < 0) {
@@ -63,7 +58,7 @@ int irc_send(irc_session_t *session, char *command, size_t len) {
 	return (ret);
 }
 
-int irc_flush_outq(irc_session_t *session) {
+int irc_flush_outq(struct irc_session_t *session) {
 	struct irc_cmd_q *cmd;
 	int ret = 0;
 
@@ -88,7 +83,6 @@ int irc_connect(struct pork_acct *acct,
 	struct sockaddr_storage ss;
 	struct sockaddr_storage local;
 	in_port_t port_num;
-	char *irchost = getenv("IRCHOST");
 	char *port;
 	char buf[IRC_OUT_BUFLEN];
 	char *passwd = NULL;
@@ -103,19 +97,20 @@ int irc_connect(struct pork_acct *acct,
 	if (port != NULL) {
 		*port++ = '\0';
 
-		passwd = strchr(port, ':');
+    if (get_port(port, &port_num) != 0) {
+      screen_err_msg("Error: %s: Invalid IRC server port: %s",
+                     acct->username, port);
+      memset(buf, 0, sizeof(buf));
+      return (-1);
+    }
+
+    passwd = strchr(port, ':');
 		if (passwd != NULL) {
 			*passwd++ = '\0';
 		}
-	} else
-		port = DEFAULT_SECURE_PORT;
-
-	if (get_port(port, &port_num) != 0) {
-		screen_err_msg("Error: %s: Invalid IRC server port: %s",
-			acct->username, port);
-		memset(buf, 0, sizeof(buf));
-		return (-1);
-	}
+	} else {
+    port_num = DEFAULT_SECURE_PORT;
+  }
 
 	if (get_addr(buf, &ss) != 0) {
 		screen_err_msg("Error: %s: Invalid IRC server host: %s",
@@ -124,17 +119,11 @@ int irc_connect(struct pork_acct *acct,
 		return (-1);
 	}
 
-	if (irchost != NULL) {
-		if (get_addr(irchost, &local) != 0) {
-			screen_err_msg("Error: %s: Invalid local hostname: %s",
-				acct->username, irchost);
-			memcpy(&local, &acct->laddr, sizeof(local));
-		}
-	} else
-		memcpy(&local, &acct->laddr, sizeof(local));
-
 	free(acct->fport);
-	acct->fport = xstrdup(port);
+  acct->fport = NULL;
+  if (port != NULL) {
+    acct->fport = xstrdup(port);
+  }
 
 	free(acct->server);
 	acct->server = xstrdup(buf);
@@ -144,37 +133,11 @@ int irc_connect(struct pork_acct *acct,
 		acct->passwd = xstrdup(passwd);
 	}
 
-	sin_set_port(&local, acct->lport);
 	memset(buf, 0, sizeof(buf));
-	return (nb_connect(&ss, &local, port_num, sock));
+	return (nb_connect(&ss, port_num, sock));
 }
 
-int irc_send_raw(irc_session_t *session, char *str) {
-	int ret;
-	char *buf;
-	size_t len;
-
-	len = strlen(str) + 3;
-	buf = xmalloc(len);
-	snprintf(buf, len, "%s\r\n", str);
-
-	ret = irc_send(session, buf, len - 1);
-	free(buf);
-	return (ret);
-}
-
-int irc_send_mode(irc_session_t *session, char *mode_str) {
-	int ret;
-	char buf[IRC_OUT_BUFLEN];
-
-	ret = snprintf(buf, sizeof(buf), "MODE %s\r\n", mode_str);
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
-}
-
-int irc_send_pong(irc_session_t *session, char *dest) {
+int irc_send_pong(struct irc_session_t *session, char *dest) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 
@@ -185,7 +148,7 @@ int irc_send_pong(irc_session_t *session, char *dest) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_set_away(irc_session_t *session, char *msg) {
+int irc_set_away(struct irc_session_t *session, char *msg) {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
 
@@ -200,18 +163,7 @@ int irc_set_away(irc_session_t *session, char *msg) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_invite(irc_session_t *session, char *channel, char *user) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-
-	ret = snprintf(buf, sizeof(buf), "INVITE %s %s\r\n", user, channel);
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
-}
-
-int irc_send_login(irc_session_t *session) {
+int irc_send_login(struct irc_session_t *session) {
 	char buf[IRC_OUT_BUFLEN];
 	struct pork_acct *acct = session->data;
 	int ret;
@@ -231,19 +183,8 @@ int irc_send_login(irc_session_t *session) {
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_privmsg(irc_session_t *session, char *dest, char *msg) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-
-	ret = snprintf(buf, sizeof(buf), "PRIVMSG %s :%s\r\n", dest, msg);
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
-}
-
 int
-naken_send(irc_session_t *session, char *msg)
+naken_send(struct irc_session_t *session, char *msg)
 {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;
@@ -255,149 +196,15 @@ naken_send(irc_session_t *session, char *msg)
 	return (irc_send(session, buf, ret));
 }
 
-int irc_send_ctcp(irc_session_t *session, char *dest, char *msg) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
+int irc_send_quit(struct irc_session_t *session, const char *reason) {
+  char buf[IRC_OUT_BUFLEN];
+  int ret;
 
-	if (!strcmp(dest, "*"))
-		dest = cur_window()->target;
+  ret = snprintf(buf, sizeof(buf), ".q\r\n");
+  if (ret < 0 || (size_t) ret >= sizeof(buf))
+    return (-1);
 
-	ret = snprintf(buf, sizeof(buf), "PRIVMSG %s :\x01%s\x01\r\n", dest, msg);
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
+  pork_io_del(session);
 
-	return (irc_send(session, buf, ret));
-}
-
-int irc_send_ping(irc_session_t *session, char *str) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-	struct timeval tv;
-
-	gettimeofday(&tv, NULL);
-
-	ret = snprintf(buf, sizeof(buf), "PING %ld %ld", tv.tv_sec, tv.tv_usec);
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send_ctcp(session, str, buf));
-}
-
-int irc_send_ctcp_reply(irc_session_t *session, char *dest, char *msg) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-
-	ret = snprintf(buf, sizeof(buf), "NOTICE %s :\x01%s\x01\r\n", dest, msg);
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
-}
-
-int irc_send_names(irc_session_t *session, char *chan) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-
-	if (chan != NULL)
-		ret = snprintf(buf, sizeof(buf), "NAMES :%s\r\n", chan);
-	else
-		ret = snprintf(buf, sizeof(buf), "NAMES\r\n");
-
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
-}
-
-int irc_send_whois(irc_session_t *session, char *dest) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-	struct pork_acct *acct = session->data;
-
-	if (dest == NULL)
-		dest = acct->username;
-
-	ret = snprintf(buf, sizeof(buf), ".i %s\r\n", dest);
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
-}
-
-int irc_send_whowas(irc_session_t *session, char *dest) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-	struct pork_acct *acct = session->data;
-
-	if (dest == NULL)
-		dest = acct->username;
-
-	ret = snprintf(buf, sizeof(buf), "WHOWAS %s\r\n", dest);
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
-}
-
-int irc_send_quit(irc_session_t *session, char *reason) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-
-	ret = snprintf(buf, sizeof(buf), ".q\r\n");
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	pork_io_del(session);
-	return (irc_send(session, buf, ret));
-}
-
-int irc_send_notice(irc_session_t *session, char *dest, char *msg) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-
-	ret = snprintf(buf, sizeof(buf), "NOTICE %s :%s\r\n", dest, msg);
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
-}
-
-int irc_send_kick(irc_session_t *session, char *chan, char *nick, char *msg) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-
-	ret = snprintf(buf, sizeof(buf), "KICK %s %s :%s\r\n", chan, nick, msg);
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
-}
-
-int irc_send_topic(irc_session_t *session, char *chan, char *topic) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-
-	if (topic != NULL)
-		ret = snprintf(buf, sizeof(buf), "TOPIC %s :%s\r\n", chan, topic);
-	else
-		ret = snprintf(buf, sizeof(buf), "TOPIC %s\r\n", chan);
-
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
-}
-
-int irc_send_action(irc_session_t *session, char *dest, char *msg) {
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
-
-	if (dest == NULL || msg == NULL)
-		return (-1);
-
-	ret = snprintf(buf, sizeof(buf), "ACTION %s", msg);
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send_ctcp(session, dest, buf));
+  return (irc_send(session, buf, ret));
 }

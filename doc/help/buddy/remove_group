@@ -1,5 +1,0 @@
-SYNTAX: buddy remove_group <group name>
-	Removes a group and all the buddies who are members of that group from the current account's buddy list.
-
-PARAMETERS
-	<group name>: The name of the group to remove.

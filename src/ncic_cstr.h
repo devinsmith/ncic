@@ -18,8 +18,7 @@
 #define chtype_ctrl(x)		(((x) + 'A' - 1) | A_REVERSE)
 
 size_t cstrlen(chtype *ch);
-chtype *cstrndup(chtype *ch, size_t len);
-char *cstr_to_plaintext(chtype *cstr, size_t n);
+char *cstr_to_plaintext(const chtype *cstr, size_t n);
 
 int plaintext_to_cstr(chtype *ch, size_t len, ...);
 int plaintext_to_cstr_nocolor(chtype *ch, size_t len, ...);

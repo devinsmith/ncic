@@ -12,7 +12,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
-#include <sys/time.h>
 #include <sys/types.h>
 
 #include "ncic.h"
@@ -29,102 +28,6 @@
 #include "ncic_screen.h"
 #include "ncic_msg.h"
 
-int pork_msg_autoreply(struct pork_acct *acct, char *dest, char *msg) {
-	struct imwindow *win;
-	char buf[4096];
-	int ret;
-
-	if (acct->proto->send_msg_auto == NULL)
-		return (-1);
-
-	if (acct->proto->send_msg_auto(acct, dest, msg) == -1)
-		return (-1);
-
-	screen_get_query_window(acct, dest, &win);
-	ret = fill_format_str(OPT_FORMAT_IM_SEND_AUTO, buf, sizeof(buf), acct, dest, msg);
-	if (ret < 1)
-		return (-1);
-	screen_print_str(win, buf, (size_t) ret, MSG_TYPE_PRIVMSG_SEND);
-	imwindow_send_msg(win);
-	return (0);
-}
-
-int pork_msg_send_auto(struct pork_acct *acct, char *sender) {
-	dlist_t *node;
-	u_int32_t hash_val;
-	int ret = 0;
-
-	if (acct->away_msg != NULL && acct->proto->send_msg_auto == NULL)
-		return (-1);
-
-	hash_val = string_hash(sender, acct->autoreply.order);
-	node = hash_find(&acct->autoreply, sender, hash_val);
-	if (node == NULL) {
-		struct autoresp *autoresp;
-
-		autoresp = xcalloc(1, sizeof(*autoresp));
-		autoresp->name = xstrdup(sender);
-		autoresp->last = time(NULL);
-
-		hash_add(&acct->autoreply, autoresp, hash_val);
-		ret = pork_msg_autoreply(acct, sender, acct->away_msg);
-	} else {
-		time_t time_now = time(NULL);
-		struct autoresp *autoresp = node->data;
-
-		/*
-		** Only send someone an auto-reply every 10 minutes.
-		** XXX: maybe this should be a configurable value.
-		*/
-		if (autoresp->last + 600 <= time_now) {
-			autoresp->last = time_now;
-			ret = pork_msg_autoreply(acct, sender, acct->away_msg);
-		}
-	}
-
-	return (ret);
-}
-
-int pork_recv_msg(	struct pork_acct *acct,
-					char *dest,
-					char *sender,
-					char *userhost,
-					char *msg,
-					int autoresp)
-{
-	struct imwindow *win;
-	int type;
-	char buf[4096];
-	int ret;
-
-	screen_get_query_window(acct, sender, &win);
-	win->typing = 0;
-
-	if (autoresp)
-		type = OPT_FORMAT_IM_RECV_AUTO;
-	else {
-		if (win == screen.status_win)
-			type = OPT_FORMAT_IM_RECV_STATUS;
-		else
-			type = OPT_FORMAT_IM_RECV;
-	}
-
-	ret = fill_format_str(type, buf, sizeof(buf), acct, dest,
-			sender, userhost, msg);
-	if (ret < 1)
-		return (-1);
-	screen_print_str(win, buf, (size_t) ret, MSG_TYPE_PRIVMSG_RECV);
-	imwindow_recv_msg(win);
-
-	if (acct->away_msg != NULL && !autoresp &&
-		opt_get_bool(OPT_AUTOSEND_AWAY))
-	{
-		pork_msg_send_auto(acct, sender);
-	}
-
-	return (0);
-}
-
 int ncic_recv_highlight_msg(struct pork_acct *acct, char *msg)
 {
   char buf[4096];
@@ -139,7 +42,7 @@ int ncic_recv_highlight_msg(struct pork_acct *acct, char *msg)
   return (0);
 }
 
-int ncic_recv_sys_alert(struct pork_acct *acct, char *msg)
+int ncic_recv_sys_alert(struct pork_acct *acct, const char *msg)
 {
 	int type;
 	char buf[4096];
@@ -225,61 +128,10 @@ int pork_set_back(struct pork_acct *acct) {
 int pork_msg_send(struct pork_acct *acct, char *dest, char *msg) {
 	int ret = 0;
 
-	if (acct->proto->send_msg != NULL) {
-		ret = acct->proto->send_msg(acct, dest, msg);
-		if (ret == -1) {
-			screen_err_msg("Error: the last message to %s could not be sent",
-				dest);
-		} else {
-			struct imwindow *win;
-			char buf[4096];
-			int type;
-			int ret;
-
-			if (acct->away_msg != NULL) {
-				if (opt_get_bool(OPT_SEND_REMOVES_AWAY))
-					pork_set_back(acct);
-			}
-
-			if (screen_get_query_window(acct, dest, &win) != 0)
-				screen_goto_window(win->refnum);
-
-			if (win == screen.status_win)
-				type = OPT_FORMAT_IM_SEND_STATUS;
-			else
-				type = OPT_FORMAT_IM_SEND;
-
-			ret = fill_format_str(type, buf, sizeof(buf), acct, dest, msg);
-			if (ret < 1)
-				return (-1);
-			screen_print_str(win, buf, (size_t) ret, MSG_TYPE_PRIVMSG_SEND);
-			imwindow_send_msg(win);
-		}
-	}
 
 	return (ret);
 }
 
-int pork_set_profile(struct pork_acct *acct, char *profile) {
-	int ret = 0;
-
-	free(acct->profile);
-	if (profile == NULL)
-		acct->profile = NULL;
-	else
-		acct->profile = xstrdup(profile);
-
-	if (acct->proto->set_profile != NULL)
-		ret = acct->proto->set_profile(acct, profile);
-
-	if (ret == 0) {
-		screen_win_msg(cur_window(), 1, 1, 0, MSG_TYPE_CMD_OUTPUT,
-			"Profile for %s was %s", acct->username,
-			(profile == NULL ? "cleared" : "set"));
-	}
-
-	return (ret);
-}
 
 int pork_set_idle_time(struct pork_acct *acct, u_int32_t seconds) {
 	char timebuf[32];
@@ -296,48 +148,6 @@ int pork_set_idle_time(struct pork_acct *acct, u_int32_t seconds) {
 	return (0);
 }
 
-int pork_send_warn(struct pork_acct *acct, char *user) {
-	int ret = 0;
-
-	if (acct->proto->warn == NULL)
-		return (-1);
-
-	ret = acct->proto->warn(acct, user);
-	if (ret == 0) {
-		struct imwindow *win;
-
-		win = imwindow_find(acct, user);
-		if (win == NULL)
-			win = cur_window();
-
-		screen_win_msg(win, 1, 1, 0,
-			MSG_TYPE_CMD_OUTPUT, "%s has warned %s", acct->username, user);
-	}
-
-	return (ret);
-}
-
-int pork_send_warn_anon(struct pork_acct *acct, char *user) {
-	int ret = 0;
-
-	if (acct->proto->warn_anon == NULL)
-		return (-1);
-
-	ret = acct->proto->warn_anon(acct, user);
-	if (ret == 0) {
-		struct imwindow *win;
-
-		win = imwindow_find(acct, user);
-		if (win == NULL)
-			win = cur_window();
-
-		screen_win_msg(win, 0, 0, 1,
-			MSG_TYPE_CMD_OUTPUT, "%s has warned %s anonymously",
-			acct->username, user);
-	}
-
-	return (ret);
-}
 
 int pork_change_nick(struct pork_acct *acct, char *nick) {
 	if (acct->proto->change_nick != NULL)
@@ -346,119 +156,7 @@ int pork_change_nick(struct pork_acct *acct, char *nick) {
 	return (-1);
 }
 
-int pork_recv_action(	struct pork_acct *acct,
-						char *dest,
-						char *sender,
-						char *userhost,
-						char *msg)
-{
-	struct imwindow *win;
-	char buf[4096];
-	int type;
-	int ret;
-
-	screen_get_query_window(acct, sender, &win);
-
-	if (win == screen.status_win)
-		type = OPT_FORMAT_ACTION_RECV_STATUS;
-	else
-		type = OPT_FORMAT_ACTION_RECV;
-
-	ret = fill_format_str(type, buf, sizeof(buf), acct,
-			dest, sender, userhost, msg);
-	if (ret < 1)
-		return (-1);
-	screen_print_str(win, buf, (size_t) ret, MSG_TYPE_PRIVMSG_RECV);
-	imwindow_recv_msg(win);
-
-	return (0);
-}
-
-int pork_action_send(struct pork_acct *acct, char *dest, char *msg) {
-	if (acct->proto->send_action == NULL || dest == NULL)
-		return (-1);
-
-	if (acct->proto->send_action(acct, dest, msg) != -1) {
-		char buf[4096];
-		struct imwindow *win;
-		int type;
-		int ret;
-
-		screen_get_query_window(acct, dest, &win);
-
-		if (win == screen.status_win)
-			type = OPT_FORMAT_ACTION_SEND_STATUS;
-		else
-			type = OPT_FORMAT_ACTION_SEND;
-
-		ret = fill_format_str(type, buf, sizeof(buf), acct, dest, msg);
-		if (ret < 1)
-			return (-1);
-		screen_print_str(win, buf, (size_t) ret, MSG_TYPE_PRIVMSG_SEND);
-		imwindow_send_msg(win);
-	}
-
-	return (0);
-}
-
-int pork_notice_send(struct pork_acct *acct, char *dest, char *msg) {
-	struct imwindow *win;
-
-	if (acct->proto->send_notice == NULL)
-		return (-1);
-
-	win = imwindow_find(acct, dest);
-	if (win == NULL)
-		win = cur_window();
-
-	char buf[4096];
-	int type;
-	int ret;
-
-	if (win == screen.status_win)
-		type = OPT_FORMAT_NOTICE_SEND_STATUS;
-	else
-		type = OPT_FORMAT_NOTICE_SEND;
-
-	ret = fill_format_str(type, buf, sizeof(buf), acct, dest, msg);
-	if (ret < 1)
-		return (-1);
-	screen_print_str(win, buf, (size_t) ret, MSG_TYPE_NOTICE_SEND);
-	imwindow_send_msg(win);
-
-	return (0);
-}
-
-int pork_recv_notice(	struct pork_acct *acct,
-						char *dest,
-						char *sender,
-						char *userhost,
-						char *msg)
-{
-	struct imwindow *win;
-	int type;
-
-	win = imwindow_find(acct, sender);
-	if (win == NULL) {
-		win = screen.status_win;
-		type = OPT_FORMAT_NOTICE_RECV_STATUS;
-	} else
-		type = OPT_FORMAT_NOTICE_RECV;
-
-	char buf[4096];
-	int ret;
-
-	ret = fill_format_str(type, buf, sizeof(buf), acct,
-			dest, sender, userhost, msg);
-	if (ret < 1)
-		return (-1);
-	screen_print_str(win, buf, (size_t) ret, MSG_TYPE_NOTICE_RECV);
-	imwindow_recv_msg(win);
-
-	return (0);
-}
-
-int pork_signoff(struct pork_acct *acct, char *msg) {
+int pork_signoff(struct pork_acct *acct, const char *msg) {
   if (acct == NULL) {
     return 0;
   }

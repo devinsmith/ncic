@@ -26,7 +26,7 @@
 */
 
 static const struct keyval {
-	char *name;
+	const char *name;
 	int key;
 } keyval[] = {
 	{ "BACKSPACE",			KEY_BACKSPACE	},
@@ -110,7 +110,7 @@ int bind_exec(struct key_binds *bind_set, int key) {
 ** Remove the binding for key "key" if it exists.
 */
 
-inline int bind_remove(struct key_binds *bind_set, int key) {
+int bind_remove(struct key_binds *bind_set, int key) {
 	int ret;
 
 	ret = hash_remove(&bind_set->hash,
@@ -123,9 +123,9 @@ inline int bind_remove(struct key_binds *bind_set, int key) {
 ** Execute the command "command" when key "key" is pressed.
 */
 
-void bind_add(struct key_binds *bind_set, int key, char *command) {
+void bind_add(struct key_binds *bind_set, int key, const char *command) {
 	u_int32_t hash = int_hash(key, bind_set->hash.order);
-	struct binding *binding = xmalloc(sizeof(*binding));
+	struct binding *binding = (struct binding *)xmalloc(sizeof(*binding));
 
 	bind_remove(bind_set, key);
 
@@ -150,13 +150,10 @@ static void bind_add_default(struct binds *binds) {
 ** Initialize the bind hash.
 */
 
-inline int bind_init(struct binds *binds) {
+int bind_init(struct binds *binds) {
 	memset(binds, 0, sizeof(*binds));
 
 	if (hash_init(&binds->main.hash, 5, bind_compare, bind_hash_remove) != 0)
-		return (-1);
-
-	if (hash_init(&binds->blist.hash, 3, bind_compare, bind_hash_remove) != 0)
 		return (-1);
 
 	bind_add_default(binds);
@@ -165,10 +162,9 @@ inline int bind_init(struct binds *binds) {
 
 void bind_destroy(struct binds *binds) {
 	hash_destroy(&binds->main.hash);
-	hash_destroy(&binds->blist.hash);
 }
 
-inline void bind_set_handlers(	struct key_binds *bind_set,
+void bind_set_handlers(	struct key_binds *bind_set,
 								void (*success)(struct binding *binding),
 								void (*failure)(int key))
 {
@@ -186,7 +182,7 @@ struct binding *bind_find(struct key_binds *bind_set, int key) {
 
 	node = hash_find(&bind_set->hash, (void *)(intptr_t)(key), hash);
 	if (node != NULL)
-		return (node->data);
+		return (struct binding *)(node->data);
 
 	return (NULL);
 }
@@ -204,8 +200,8 @@ int bind_get_keycode(char *keystr) {
 	struct keyval *kv;
 	int key;
 
-	kv = bsearch(keystr, keyval, array_elem(keyval), sizeof(struct keyval),
-			key_compare);
+	kv = (struct keyval *)bsearch(keystr, keyval, array_elem(keyval),
+          sizeof(struct keyval), key_compare);
 
 	if (kv != NULL)
 		return (kv->key);
@@ -246,8 +242,8 @@ int bind_get_keycode(char *keystr) {
 		} else
 			return (-1);
 
-		kv = bsearch(keystr, keyval, array_elem(keyval), sizeof(struct keyval),
-				key_compare);
+		kv = (struct keyval *)bsearch(keystr, keyval, array_elem(keyval),
+            sizeof(struct keyval), key_compare);
 
 		if (kv != NULL)
 			return (META_KEY(kv->key, meta_num));

@@ -13,8 +13,6 @@
 #include <unistd.h>
 #include <ncurses.h>
 #include <stdio.h>
-#include <limits.h>
-#include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <dirent.h>
@@ -38,7 +36,7 @@ static int pork_help_is_section(char *string) {
 	return (1);
 }
 
-int pork_help_get_cmds(char *section, char *buf, size_t len) {
+int pork_help_get_cmds(const char *section, char *buf, size_t len) {
 	DIR *dir;
 	struct dirent *de;
 	char path[4096];
@@ -94,7 +92,7 @@ out_fail:
 	return (-1);
 }
 
-int pork_help_print(char *section, char *command) {
+int pork_help_print(const char *section, char *command) {
 	FILE *fp;
 	char buf[8192];
 	int ret;

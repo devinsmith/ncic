@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2009 Devin Smith <devin@devinsmith.net>
+ * Copyright (c) 2008 Devin Smith <devin@devinsmith.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -14,23 +14,23 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#ifndef NCIC_LOG_H
+#define NCIC_LOG_H
+
 #include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
+#include <stdarg.h>
 
-#include "ncic_irc.h"
-#include "ncic_naken.h"
+void log_init();
+void log_exit();
 
-int
-naken_set_back(struct irc_session_t *session, char *msg)
-{
-	char buf[IRC_OUT_BUFLEN];
-	int ret;
+void log_set_fp(FILE *fp);
+int log_set_logfile(const char *file);
+void log_msg(int lvl, const char *fmt, ...);
+void log_msgraw(int lvl, const char *fmt, ...);
+void log_tmsg(int lvl, const char *fmt, ...);
+void log_flush();
+void log_set_level(int lvl);
 
-	ret = snprintf(buf, sizeof(buf), "%% is back\r\n");
-
-	if (ret < 0 || (size_t) ret >= sizeof(buf))
-		return (-1);
-
-	return (irc_send(session, buf, ret));
-}
+#endif /* NCIC_LOG_H */
 

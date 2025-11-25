@@ -1,2 +1,0 @@
-SYNTAX: blist warn_anon
-	Warns the user the buddy list cursor is on anonymously. If the buddy list cursor is on a group entry, no action is taken.

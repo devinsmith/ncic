@@ -33,7 +33,7 @@ static void alias_hash_remove(void *param __notused, void *data) {
 	free(alias);
 }
 
-inline int alias_remove(hash_t *alias_hash, char *alias) {
+int alias_remove(hash_t *alias_hash, char *alias) {
 	int ret;
 
 	ret = hash_remove(alias_hash, alias,
@@ -77,7 +77,7 @@ struct alias *alias_find(hash_t *alias_hash, char *str) {
 
 	node = hash_find(alias_hash, str, hash);
 	if (node != NULL)
-		return (node->data);
+		return (struct alias *)(node->data);
 
 	return (NULL);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007-2009 Devin Smith <devin@devinsmith.net>
+ * Copyright (c) 2007-2025 Devin Smith <devin@devinsmith.net>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -17,13 +17,12 @@
 #include <unistd.h>
 #include <ncurses.h>
 #include <stdlib.h>
-#include <string.h>
 #include <limits.h>
 #include <pwd.h>
 #include <signal.h>
 #include <sys/ioctl.h>
 #include <time.h>
-#include <sys/time.h>
+#include <locale.h>
 
 #ifdef HAVE_TERMIOS_H
 #	include <termios.h>
@@ -32,8 +31,6 @@
 #endif
 
 #include "ncic.h"
-#include "ncic_util.h"
-#include "ncic_list.h"
 #include "ncic_set.h"
 #include "ncic_imsg.h"
 #include "ncic_imwindow.h"
@@ -49,12 +46,9 @@
 #include "ncic_conf.h"
 #include "ncic_color.h"
 #include "ncic_command.h"
-#include "ncic_timer.h"
 #include "ncic_io.h"
 #include "ncic_proto.h"
-#include "ncic_screen.h"
-#include "ncic_queue.h"
-#include "ncic_inet.h"
+#include "ncic_log.h"
 
 struct screen screen;
 
@@ -88,8 +82,7 @@ static inline void binding_run(struct binding *binding) {
 		run_mcommand(binding->binding);
 }
 
-static void
-resize_display(void) {
+static void resize_display() {
 	struct winsize size;
 
 	if (ioctl(1, TIOCGWINSZ, &size) != 0) {
@@ -121,7 +114,7 @@ keyboard_input(int fd, uint32_t cond, void *data)
 	** The screen can't be resized from inside a signal handler..
 	*/
 	if (cond == IO_COND_ALWAYS) {
-		pork_io_del_cond(&screen, IO_COND_ALWAYS);
+    pork_io_del_cond(&screen, IO_COND_ALWAYS);
 		resize_display();
 		return;
 	}
@@ -129,6 +122,8 @@ keyboard_input(int fd, uint32_t cond, void *data)
 	key = wgetinput(screen.status_bar);
 	if (key == -1)
 		return;
+
+  log_tmsg(0, "Key is: %d", key);
 
 	time(&acct->last_input);
 	bind_exec(imwindow->active_binds, key);
@@ -142,8 +137,15 @@ keyboard_input(int fd, uint32_t cond, void *data)
 	}
 }
 
-int
-main(int argc, char *argv[])
+static void init_logging()
+{
+  if (g_log_file != NULL) {
+    log_init();
+    log_set_logfile(g_log_file);
+  }
+}
+
+int main(int argc, char *argv[])
 {
 	struct passwd *pw;
 	char buf[PATH_MAX];
@@ -165,6 +167,11 @@ main(int argc, char *argv[])
 		fprintf(stderr, "Fatal: Error getting options.\n");
 		exit(-1);
 	}
+
+  setlocale(LC_ALL, "en_US.UTF-8");
+
+  init_logging();
+  log_tmsg(0, "Starting up!");
 
 	if (initialize_environment() != 0) {
 		fprintf(stderr, "Fatal: Error initializing the terminal.\n");
@@ -189,7 +196,6 @@ main(int argc, char *argv[])
 
 	bind_init(&screen.binds);
 	bind_set_handlers(&screen.binds.main, binding_run, binding_insert);
-	bind_set_handlers(&screen.binds.blist, binding_run, NULL);
 
 	alias_init(&screen.alias_hash);
 
@@ -205,11 +211,11 @@ main(int argc, char *argv[])
 	screen_doupdate();
 
 	time(&timer_last_run);
-	while (1) {
+	while (true) {
 		time_t time_now;
 		int dirty = 0;
 
-		pork_io_run();
+    pork_io_run();
 		pork_acct_update();
 
 		/*
@@ -219,7 +225,6 @@ main(int argc, char *argv[])
 		time(&time_now);
 		if (timer_last_run < time_now) {
 			timer_last_run = time_now;
-			timer_run(&screen.timer_list);
 			pork_acct_reconnect_all();
 		}
 
@@ -252,10 +257,12 @@ main(int argc, char *argv[])
 ** is given, print it to the screen.
 */
 
-void pork_exit(int status, char *msg, char *fmt, ...) {
+void pork_exit(int status, const char *msg, const char *fmt, ...) {
 	pork_acct_del_all(msg);
 	screen_destroy();
-	pork_io_destroy();
+
+  pork_io_destroy();
+
 	proto_destroy();
 
 	wclear(stdscr);

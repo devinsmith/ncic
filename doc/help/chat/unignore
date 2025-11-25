@@ -1,9 +1,0 @@
-SYNTAX: chat ignore [<chat room>] <user>
-	Unignores a user in a chat room. The <chat room> parameter may be omitted of the current window is a chat window, in which case the chat room displayed in the current window is assumed.
-
-PARAMETERS
-	<chat room>: The name/exchange combination of the chat room in which to unignore the specified user.
-	<user>     : The user to unignore.
-
-SEE ALSO
-	chat

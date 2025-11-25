@@ -11,6 +11,8 @@
 #ifndef __NCIC_OPT_H__
 #define __NCIC_OPT_H__
 
+extern char *g_log_file;
+
 int get_options(int argc, char *const argv[]);
 
 #endif /* __NCIC_OPT_H__ */

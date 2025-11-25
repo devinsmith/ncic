@@ -1,5 +1,0 @@
-SYNTAX: file cancel <transfer refnum>
-	Cancels the file transfer with the specified reference number. If the transfer is a receive, the partially transferred file is not deleted.
-
-PARAMETERS
-	<transfer refnum>: The reference number of the transfer to cancel.

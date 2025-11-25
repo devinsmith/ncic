@@ -1,5 +1,0 @@
-SYNTAX: lport [<port num>]
-	Sets the port number for the main connection.
-
-PARAMETERS
-	<port num>: (Optional) The port number to use. If this parameter is omitted, the current local port number that the main connection will use is displayed.

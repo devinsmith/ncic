@@ -1,3 +1,0 @@
-SYNTAX: blist toggle
-	Shows the buddy list in the current window, if it is hidden.
-	Hides the buddy list in the current window, if it is visible.

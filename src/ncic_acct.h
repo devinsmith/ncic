@@ -14,47 +14,46 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <stdbool.h>
 
 #include "ncic_inet.h"
 #include "ncic_list.h"
 
-struct pork_proto;
+struct irc_session_t;
 
 /* Account states */
 enum {
-	STATE_DISCONNECTED,
-	STATE_CONNECTING,
-	STATE_READY
+  STATE_DISCONNECTED,
+  STATE_CONNECTING,
+  STATE_READY
 };
+
+struct pork_proto;
 
 struct pork_acct {
 	char *username;
 	char *passwd;
-	char *profile;
 	char *userhost;
 	char *away_msg;
-	char umode[64];
 
 	time_t last_input;
-
-	struct timeval last_flush;
 
 	int id;
 	int state;
 
 	u_int16_t idle_time;
 
-	u_int16_t report_idle:1;
-	u_int16_t marked_idle:1;
-	u_int16_t can_connect:1;
+	bool report_idle;
+	bool marked_idle;
+	bool can_connect;
 	/* presently connected */
-	u_int16_t connected:1;
+	bool connected;
 	/* ever successfully connected */
-	u_int16_t successful_connect:1;
+	bool successful_connect;
 	/* presently disconnected */
-	u_int16_t disconnected:1;
+	bool disconnected;
 	/* presently in the process of reconnecting */
-	u_int16_t reconnecting:1;
+	bool reconnecting;
 
 	u_int32_t reconnect_tries;
 	time_t reconnect_next_try;
@@ -68,18 +67,15 @@ struct pork_acct {
 	char *fport;
 	char *server;
 
-	in_port_t lport;
-	struct sockaddr_storage laddr;
-
 	struct pork_proto *proto;
-	void *data;
+	struct irc_session_t *data;
 };
 
-int pork_acct_del_refnum(u_int32_t refnum, char *reason);
-void pork_acct_del(struct pork_acct *acct, char *reason);
-void pork_acct_del_all(char *reason);
-struct pork_acct *pork_acct_find(u_int32_t refnum);
-struct pork_acct *pork_acct_get_data(u_int32_t refnum);
+int pork_acct_del_refnum(char *reason);
+void pork_acct_del(struct pork_acct *acct, const char *reason);
+void pork_acct_del_all(const char *reason);
+struct pork_acct *pork_acct_find();
+struct pork_acct *pork_acct_get_data();
 void pork_acct_update(void);
 int pork_acct_disconnected(struct pork_acct *acct);
 void pork_acct_reconnect_all(void);
@@ -87,6 +83,5 @@ void pork_acct_connected(struct pork_acct *acct);
 int pork_acct_connect(const char *user, char *args, int protocol);
 int pork_acct_next_refnum(u_int32_t cur_refnum, u_int32_t *next);
 struct pork_acct *pork_acct_init(const char *user, int protocol);
-int pork_acct_save(struct pork_acct *acct);
 
 #endif /* __NCIC_ACCT_H__ */
