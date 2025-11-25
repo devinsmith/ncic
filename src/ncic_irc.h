@@ -11,10 +11,6 @@
 #ifndef __NCIC_IRC_H__
 #define __NCIC_IRC_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define IRC_OUT_BUFLEN		2048
 #define IRC_IN_BUFLEN		8192
 
@@ -86,9 +82,5 @@ int irc_chan_free(struct pork_acct *acct, void *data);
 
 int naken_input_dispatch(struct irc_session_t *session);
 char *irc_text_filter(const char *str);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* __NCIC_IRC_H__ */

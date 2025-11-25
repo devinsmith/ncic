@@ -13,10 +13,6 @@
 
 #include "ncic_list.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define SWINDOW_FIND_ICASE		0x01
 #define SWINDOW_FIND_BASIC		0x02
 
@@ -103,9 +99,5 @@ void swindow_prune(struct swindow *swindow);
 void swindow_scroll_to_end(struct swindow *swindow);
 void swindow_scroll_to_start(struct swindow *swindow);
 int swindow_scroll_by(struct swindow *swindow, int lines);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* __NCIC_SWINDOW_H__ */

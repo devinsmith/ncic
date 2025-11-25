@@ -13,10 +13,6 @@
 
 #include "ncic_list.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef struct {
 	dlist_t *head;
 	dlist_t *tail;
@@ -29,9 +25,5 @@ int queue_add(pork_queue_t *q, void *data);
 int queue_putback_head(pork_queue_t *q, void *data);
 void *queue_get(pork_queue_t *q);
 void queue_destroy(pork_queue_t *q, void (*cleanup)(void *));
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* __NCIC_QUEUE_H__ */

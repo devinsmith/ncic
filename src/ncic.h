@@ -11,10 +11,6 @@
 #ifndef __NCIC_H__
 #define __NCIC_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #ifdef __GNUC__
 #define __format(x) __attribute__((format x ))
 #else
@@ -38,10 +34,6 @@ extern "C" {
 
 void pork_exit(int status, const char *msg, const char *fmt, ...) __format((printf, 3, 4));
 void keyboard_input(int fd, uint32_t condition, void *data);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* __NCIC_H__ */
 

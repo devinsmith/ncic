@@ -9,9 +9,9 @@
 */
 
 #include <ncurses.h>
-#include <cstdio>
-#include <cctype>
-#include <cstring>
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
 #include <sys/types.h>
 
 #include "ncic_util.h"
@@ -52,7 +52,7 @@ size_t cstrlen(chtype *ch) {
 */
 
 char *cstr_to_plaintext(const chtype *cstr, size_t len) {
-	char *str = (char *)xmalloc(len + 1);
+	char *str = xmalloc(len + 1);
 	size_t i;
 
 	for (i = 0 ; i < len && cstr[i] != 0 ; i++)
@@ -81,7 +81,7 @@ int plaintext_to_cstr(chtype *ch, size_t len, ...) {
 
 	len--;
 
-	while ((str = va_arg(ap, char *)) != nullptr) {
+	while ((str = va_arg(ap, char *)) != NULL) {
 		u_int32_t spos = 0;
 		attr_t color_attr = 0;
 
@@ -134,7 +134,7 @@ int plaintext_to_cstr_nocolor(chtype *ch, size_t len, ...) {
 
 	va_start(ap, len);
 
-	while ((str = va_arg(ap, char *)) != nullptr) {
+	while ((str = va_arg(ap, char *)) != NULL) {
 		for (; i < len && *str != '\0' ; i++) {
 			if (*str == '\t') {
 				size_t pad = PORK_TABSTOP - i % PORK_TABSTOP;

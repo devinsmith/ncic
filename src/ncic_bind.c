@@ -10,9 +10,9 @@
 
 #include <unistd.h>
 #include <ncurses.h>
-#include <cstring>
-#include <cstdlib>
-#include <cctype>
+#include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
 #include <sys/types.h>
 
 #include "ncic.h"
@@ -62,20 +62,20 @@ static const struct keyval {
 
 static int bind_compare(void *l, void *r) {
 	int key = (intptr_t)(l);
-	struct binding *binding = static_cast<struct binding *>(r);
+	struct binding *binding = r;
 
 	return (key - binding->key);
 }
 
 static int key_compare(const void *l, const void *r) {
-	const char *str = static_cast<const char *>(l);
-	const struct keyval *kv = static_cast<const struct keyval *>(r);
+	const char *str = l;
+	const struct keyval *kv = r;
 
 	return (strcasecmp(str, kv->name));
 }
 
 static void bind_hash_remove(void *param __notused, void *data) {
-	struct binding *binding = static_cast<struct binding *>(data);
+	struct binding *binding = data;
 
 	free(binding->binding);
 	free(binding);
@@ -95,11 +95,11 @@ int bind_exec(struct key_binds *bind_set, int key) {
 	struct binding *binding;
 
 	binding = bind_find(bind_set, key);
-	if (binding == nullptr) {
-		if (bind_set->failure != nullptr)
+	if (binding == NULL) {
+		if (bind_set->failure != NULL)
 			bind_set->failure(key);
 	} else {
-		if (bind_set->success != nullptr)
+		if (bind_set->success != NULL)
 			bind_set->success(binding);
 	}
 
@@ -181,10 +181,10 @@ struct binding *bind_find(struct key_binds *bind_set, int key) {
 	u_int32_t hash = int_hash(key, bind_set->hash.order);
 
 	node = hash_find(&bind_set->hash, (void *)(intptr_t)(key), hash);
-	if (node != nullptr)
+	if (node != NULL)
 		return (struct binding *)(node->data);
 
-	return (nullptr);
+	return (NULL);
 }
 
 /*
@@ -203,7 +203,7 @@ int bind_get_keycode(char *keystr) {
 	kv = (struct keyval *)bsearch(keystr, keyval, array_elem(keyval),
           sizeof(struct keyval), key_compare);
 
-	if (kv != nullptr)
+	if (kv != NULL)
 		return (kv->key);
 
 	if (!strncasecmp(keystr, "0x", 2)) {
@@ -231,7 +231,7 @@ int bind_get_keycode(char *keystr) {
 				return (-1);
 
 			p = strchr(meta_str, '-');
-			if (p == nullptr)
+			if (p == NULL)
 				return (-1);
 			*p++ = '\0';
 
@@ -245,7 +245,7 @@ int bind_get_keycode(char *keystr) {
 		kv = (struct keyval *)bsearch(keystr, keyval, array_elem(keyval),
             sizeof(struct keyval), key_compare);
 
-		if (kv != nullptr)
+		if (kv != NULL)
 			return (META_KEY(kv->key, meta_num));
 
 		if (keystr[0] == '^' && keystr[1] != '\0' && keystr[2] == '\0')

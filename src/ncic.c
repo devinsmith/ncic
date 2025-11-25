@@ -16,13 +16,13 @@
 
 #include <unistd.h>
 #include <ncurses.h>
-#include <cstdlib>
-#include <climits>
+#include <stdlib.h>
+#include <limits.h>
 #include <pwd.h>
-#include <csignal>
+#include <signal.h>
 #include <sys/ioctl.h>
-#include <ctime>
-#include <clocale>
+#include <time.h>
+#include <locale.h>
 
 #ifdef HAVE_TERMIOS_H
 #	include <termios.h>
@@ -129,7 +129,7 @@ keyboard_input(int fd, uint32_t cond, void *data)
 	bind_exec(imwindow->active_binds, key);
 
 	if (acct->connected && acct->marked_idle && opt_get_bool(OPT_REPORT_IDLE)) {
-		if (acct->proto->set_idle_time != nullptr)
+		if (acct->proto->set_idle_time != NULL)
 			acct->proto->set_idle_time(acct, 0);
 		acct->marked_idle = 0;
 		screen_win_msg(cur_window(), 1, 1, 0,
@@ -139,7 +139,7 @@ keyboard_input(int fd, uint32_t cond, void *data)
 
 static void init_logging()
 {
-  if (g_log_file != nullptr) {
+  if (g_log_file != NULL) {
     log_init();
     log_set_logfile(g_log_file);
   }

@@ -11,11 +11,11 @@
 #include "config.h"
 
 #include <unistd.h>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
-#include <cerrno>
-#include <cstdarg>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include <stdarg.h>
 #include <sys/types.h>
 #include <fcntl.h>
 #include <sys/socket.h>
@@ -121,7 +121,7 @@ int get_port(const char *name, in_port_t *port) {
 	struct servent *servent;
 
 	servent = getservbyname(name, "tcp");
-	if (servent != nullptr)
+	if (servent != NULL)
 		*port = ntohs(servent->s_port);
 	else {
 		char *end;
@@ -145,12 +145,12 @@ int get_port(const char *name, in_port_t *port) {
 */
 
 int get_addr(const char *hostname, struct sockaddr_storage *addr) {
-	struct addrinfo *res = nullptr;
+	struct addrinfo *res = NULL;
 	size_t len;
 	int ret;
 
 	if ((ret = getaddrinfo(hostname, NULL, NULL, &res)) != 0) {
-		if (res != nullptr)
+		if (res != NULL)
 			freeaddrinfo(res);
 
 		debug("getaddrinfo: %s: %s", hostname, gai_strerror(ret));

@@ -11,10 +11,6 @@
 #ifndef __NCIC_PROTO_H__
 #define __NCIC_PROTO_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 struct pork_acct;
 struct imwindow;
 struct chatroom;
@@ -60,9 +56,5 @@ struct pork_proto {
 int proto_init(void);
 void proto_destroy(void);
 struct pork_proto *proto_get(int protocol);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* __NCIC_PROTO_H__ */

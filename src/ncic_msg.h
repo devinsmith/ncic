@@ -11,10 +11,6 @@
 #ifndef __NCIC_MSG_H__
 #define __NCIC_MSG_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 struct autoresp {
 	char *name;
 	time_t last;
@@ -29,9 +25,5 @@ int pork_msg_send(struct pork_acct *acct, char *dest, char *msg);
 int pork_change_nick(struct pork_acct *acct, char *nick);
 int pork_notice_send(struct pork_acct *acct, char *dest, char *msg);
 int pork_signoff(struct pork_acct *acct, const char *msg);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* __NCIC_MSG_H__ */

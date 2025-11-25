@@ -10,8 +10,8 @@
 */
 
 #include <ncurses.h>
-#include <cctype>
-#include <cstring>
+#include <ctype.h>
+#include <string.h>
 
 #include "ncic_util.h"
 #include "ncic_color.h"
@@ -234,7 +234,7 @@ char *color_quote_codes(const char *str) {
 	size_t i = 0;
 	char *p;
 
-	if (strchr(str, '%') == nullptr)
+	if (strchr(str, '%') == NULL)
 		return (xstrdup(str));
 
 	len = (strlen(str) * 3) / 2;

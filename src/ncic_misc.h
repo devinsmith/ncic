@@ -11,10 +11,6 @@
 #ifndef __NCIC_MISC_H__
 #define __NCIC_MISC_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define NUSER_LEN	128
 
 int initialize_environment(void);
@@ -26,9 +22,5 @@ int time_to_str(uint32_t timespec, char *buf, size_t len);
 int time_to_str_full(uint32_t timespec, char *buf, size_t len);
 int date_to_str(time_t timespec, char *buf, size_t len);
 int wgetinput(WINDOW *win);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* __NCIC_MISC_H__ */

@@ -17,10 +17,6 @@
 #ifndef NCIC_NAKEN_H
 #define NCIC_NAKEN_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* Message types */
 enum {
   MSG_NORMAL,
@@ -43,9 +39,5 @@ struct naken_input {
 int naken_send(struct irc_session_t *session, char *msg);
 int naken_set_back(struct irc_session_t *session, char *msg);
 int irc_send(struct irc_session_t *session, char *command, size_t len);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* NCIC_NAKEN_H */

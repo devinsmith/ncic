@@ -8,8 +8,8 @@
 ** as published by the Free Software Foundation.
 */
 
-#include <cstring>
-#include <cstdlib>
+#include <string.h>
+#include <stdlib.h>
 #include <sys/types.h>
 
 #include "ncic.h"
@@ -18,14 +18,14 @@
 #include "ncic_alias.h"
 
 static int alias_compare(void *l, void *r) {
-	const char *str = static_cast<const char *>(l);
-	const struct alias *alias = static_cast<struct alias *>(r);
+	const char *str = l;
+	const struct alias *alias = r;
 
 	return (strcasecmp(str, alias->alias));
 }
 
 static void alias_hash_remove(void *param __notused, void *data) {
-	auto *alias = static_cast<struct alias *>(data);
+	struct alias *alias = data;
 
 	free(alias->alias);
 	free(alias->orig);
@@ -50,17 +50,17 @@ int alias_add(hash_t *alias_hash, char *alias, char *str) {
 
 	alias_remove(alias_hash, alias);
 
-	new_alias = (struct alias *)xmalloc(sizeof(*new_alias));
+	new_alias = xmalloc(sizeof(*new_alias));
 	new_alias->alias = xstrdup(alias);
 
 	temp = xstrdup(str);
 
 	args = strchr(temp, ' ');
-	if (args != nullptr) {
+	if (args != NULL) {
 		new_alias->args = xstrdup(args);
 		*args = '\0';
 	} else
-		new_alias->args = nullptr;
+		new_alias->args = NULL;
 
 	new_alias->orig = xstrdup(temp);
 
@@ -76,10 +76,10 @@ struct alias *alias_find(hash_t *alias_hash, char *str) {
 	u_int32_t hash = string_hash(str, alias_hash->order);
 
 	node = hash_find(alias_hash, str, hash);
-	if (node != nullptr)
+	if (node != NULL)
 		return (struct alias *)(node->data);
 
-	return (nullptr);
+	return (NULL);
 }
 
 /*
@@ -115,7 +115,7 @@ int alias_resolve(hash_t *alias_hash, char *str, char **result) {
 	u_int32_t iterations;
 
 	p = strchr(str, ' ');
-	if (p != nullptr)
+	if (p != NULL)
 		*p = '\0';
 
 	/*
@@ -123,15 +123,15 @@ int alias_resolve(hash_t *alias_hash, char *str, char **result) {
 	** passed to us isn't an alias.
 	*/
 
-	if (alias_find(alias_hash, str) == nullptr) {
-		if (p != nullptr)
+	if (alias_find(alias_hash, str) == NULL) {
+		if (p != NULL)
 			*p = ' ';
 		return (-1);
 	}
 
 	buf[num_left] = '\0';
 
-	if (p != nullptr) {
+	if (p != NULL) {
 		size_t len;
 
 		*p = ' ';
@@ -160,7 +160,7 @@ int alias_resolve(hash_t *alias_hash, char *str, char **result) {
 		*/
 
 		alias = alias_find(alias_hash, str);
-		if (alias == nullptr) {
+		if (alias == NULL) {
 			size_t len = strlen(str);
 
 			if (len > num_left)
@@ -173,7 +173,7 @@ int alias_resolve(hash_t *alias_hash, char *str, char **result) {
 			return (0);
 		}
 
-		if (alias->args != nullptr) {
+		if (alias->args != NULL) {
 			size_t len = strlen(alias->args);
 
 			if (len > num_left)

@@ -11,10 +11,10 @@
 
 #include <ncurses.h>
 #include <sys/types.h>
-#include <cstring>
-#include <cstdlib>
-#include <climits>
-#include <cerrno>
+#include <string.h>
+#include <stdlib.h>
+#include <limits.h>
+#include <errno.h>
 
 #include "ncic.h"
 #include "ncic_util.h"
@@ -208,7 +208,7 @@ USER_COMMAND(cmd_input_end) {
 }
 
 USER_COMMAND(cmd_input_insert) {
-	if (args != nullptr)
+	if (args != NULL)
 		input_insert_str(cur_window()->input, args);
 }
 
@@ -221,8 +221,8 @@ USER_COMMAND(cmd_input_prev_word) {
 }
 
 USER_COMMAND(cmd_input_prompt) {
-	if (args == nullptr) {
-		input_set_prompt(cur_window()->input, nullptr);
+	if (args == NULL) {
+		input_set_prompt(cur_window()->input, NULL);
 		screen_cmd_output("Input prompt cleared");
 	} else {
 		if (input_set_prompt(cur_window()->input, args) == -1)
@@ -251,18 +251,18 @@ USER_COMMAND(cmd_input_send) {
 	** isn't to crash when someone types "/input send"
 	*/
 
-	if (recursion == 1 && args == nullptr)
+	if (recursion == 1 && args == NULL)
 		return;
 
 	recursion = 1;
 
-	if (args != nullptr)
+	if (args != NULL)
 		input_set_buf(input, args);
 
 	if (input->len > 0) {
 		char *input_str = xstrdup(input_get_buf_str(input));
 
-		if (args == nullptr)
+		if (args == NULL)
 			input_history_add(input);
 
 		input_clear_line(input);
@@ -299,7 +299,7 @@ static struct command scroll_command[] = {
 USER_COMMAND(cmd_scroll_by) {
 	int lines;
 
-	if (args == nullptr)
+	if (args == NULL)
 		return;
 
 	if (str_to_int(args, &lines) != 0) {
@@ -362,8 +362,8 @@ USER_COMMAND(cmd_win_bind) {
 	u_int32_t refnum;
 	int ret;
 
-	if (args == nullptr || blank_str(args)) {
-		if (imwindow->owner != nullptr && imwindow->owner->username != nullptr) {
+	if (args == NULL || blank_str(args)) {
+		if (imwindow->owner != NULL && imwindow->owner->username != NULL) {
 			screen_cmd_output("This window is bound to account %s [refnum %u]",
 				imwindow->owner->username, imwindow->owner->refnum);
 		} else
@@ -404,7 +404,7 @@ USER_COMMAND(cmd_win_close) {
 }
 
 USER_COMMAND(cmd_win_dump) {
-	if (args == nullptr || blank_str(args)) {
+	if (args == NULL || blank_str(args)) {
 		screen_err_msg("No output file specified");
 	} else {
 		char buf[4096];
@@ -421,7 +421,7 @@ USER_COMMAND(cmd_win_erase) {
 USER_COMMAND(cmd_win_ignore) {
 	struct imwindow *win;
 
-	if (args != nullptr && !blank_str(args)) {
+	if (args != NULL && !blank_str(args)) {
 		u_int32_t refnum;
 
 		if (str_to_uint(args, &refnum) != 0) {
@@ -430,7 +430,7 @@ USER_COMMAND(cmd_win_ignore) {
 		}
 
 		win = imwindow_find_refnum(refnum);
-		if (win == nullptr) {
+		if (win == NULL) {
 			screen_err_msg("No window with refnum %u", refnum);
 			return;
 		}
@@ -470,7 +470,7 @@ USER_COMMAND(cmd_win_prev) {
 USER_COMMAND(cmd_win_rename) {
 	struct imwindow *win = cur_window();
 
-	if (args == nullptr)
+	if (args == NULL)
 		screen_cmd_output("Window %u has name \"%s\"", win->refnum, win->name);
 	else
 		imwindow_rename(win, args);
@@ -482,7 +482,7 @@ USER_COMMAND(cmd_win_set) {
 	int opt;
 
 	variable = strsep(&args, " ");
-	if (variable == nullptr || blank_str(variable)) {
+	if (variable == NULL || blank_str(variable)) {
 		wopt_print(cur_window());
 		return;
 	}
@@ -495,7 +495,7 @@ USER_COMMAND(cmd_win_set) {
 	}
 
 	value = args;
-	if (value == nullptr || blank_str(value)) {
+	if (value == NULL || blank_str(value)) {
 		wopt_print_var(cur_window(), opt, "is set to");
 		return;
 	}
@@ -509,7 +509,7 @@ USER_COMMAND(cmd_win_set) {
 USER_COMMAND(cmd_win_skip) {
 	struct imwindow *win;
 
-	if (args != nullptr && !blank_str(args)) {
+	if (args != NULL && !blank_str(args)) {
 		u_int32_t refnum;
 
 		if (str_to_uint(args, &refnum) != 0) {
@@ -518,7 +518,7 @@ USER_COMMAND(cmd_win_skip) {
 		}
 
 		win = imwindow_find_refnum(refnum);
-		if (win == nullptr) {
+		if (win == NULL) {
 			screen_err_msg("No window with refnum %u", refnum);
 			return;
 		}
@@ -531,7 +531,7 @@ USER_COMMAND(cmd_win_skip) {
 USER_COMMAND(cmd_win_swap) {
 	u_int32_t num;
 
-	if (args == nullptr || blank_str(args))
+	if (args == NULL || blank_str(args))
 		return;
 
 	if (str_to_uint(args, &num) != 0) {
@@ -546,7 +546,7 @@ USER_COMMAND(cmd_win_swap) {
 USER_COMMAND(cmd_win_unignore) {
 	struct imwindow *win;
 
-	if (args != nullptr && !blank_str(args)) {
+	if (args != NULL && !blank_str(args)) {
 		u_int32_t refnum;
 
 		if (str_to_uint(args, &refnum) != 0) {
@@ -555,7 +555,7 @@ USER_COMMAND(cmd_win_unignore) {
 		}
 
 		win = imwindow_find_refnum(refnum);
-		if (win == nullptr) {
+		if (win == NULL) {
 			screen_err_msg("No window with refnum %u", refnum);
 			return;
 		}
@@ -568,7 +568,7 @@ USER_COMMAND(cmd_win_unignore) {
 USER_COMMAND(cmd_win_unskip) {
 	struct imwindow *win;
 
-	if (args != nullptr && !blank_str(args)) {
+	if (args != NULL && !blank_str(args)) {
 		u_int32_t refnum;
 
 		if (str_to_uint(args, &refnum) != 0) {
@@ -577,7 +577,7 @@ USER_COMMAND(cmd_win_unskip) {
 		}
 
 		win = imwindow_find_refnum(refnum);
-		if (win == nullptr) {
+		if (win == NULL) {
 			screen_err_msg("No window with refnum %u", refnum);
 			return;
 		}
@@ -608,7 +608,7 @@ USER_COMMAND(cmd_history_list) {
 	dlist_t *cur = input->history_end;
 	u_int32_t i = 0;
 
-	if (cur == nullptr)
+	if (cur == NULL)
 		return;
 
 	screen_win_msg(win, 0, 0, 0, MSG_TYPE_CMD_OUTPUT, "Command history:");
@@ -617,7 +617,7 @@ USER_COMMAND(cmd_history_list) {
 		screen_win_msg(win, 0, 0, 0, MSG_TYPE_CMD_OUTPUT, "%u: %s", i++,
 			(char *) cur->data);
 		cur = cur->prev;
-	} while (cur != nullptr);
+	} while (cur != NULL);
 }
 
 USER_COMMAND(cmd_history_next) {
@@ -649,19 +649,19 @@ USER_COMMAND(cmd_alias) {
 	char *str;
 
 	alias = strsep(&args, " ");
-	if (alias == nullptr || blank_str(alias)) {
-		hash_iterate(&screen.alias_hash, print_alias, nullptr);
+	if (alias == NULL || blank_str(alias)) {
+		hash_iterate(&screen.alias_hash, print_alias, NULL);
 		return;
 	}
 
 	str = args;
-	if (str == nullptr || blank_str(str)) {
+	if (str == NULL || blank_str(str)) {
 		struct alias *lalias = alias_find(&screen.alias_hash, alias);
 
-		if (lalias != nullptr) {
+		if (lalias != NULL) {
 			screen_cmd_output("%s is aliased to %s%s",
 				lalias->alias, lalias->orig,
-				(lalias->args != nullptr ? lalias->args : ""));
+				(lalias->args != NULL ? lalias->args : ""));
 		} else
 			screen_err_msg("There is no alias for %s", alias);
 
@@ -671,10 +671,10 @@ USER_COMMAND(cmd_alias) {
 	if (alias_add(&screen.alias_hash, alias, str) == 0) {
 		struct alias *lalias = alias_find(&screen.alias_hash, alias);
 
-		if (lalias != nullptr) {
+		if (lalias != NULL) {
 			screen_cmd_output("%s is aliased to %s%s",
 				lalias->alias, lalias->orig,
-				(lalias->args != nullptr ? lalias->args : ""));
+				(lalias->args != NULL ? lalias->args : ""));
 
 			return;
 		}
@@ -686,7 +686,7 @@ USER_COMMAND(cmd_alias) {
 USER_COMMAND(cmd_away) {
 	struct pork_acct *acct = cur_window()->owner;
 
-	if (args == nullptr)
+	if (args == NULL)
 		pork_set_back(acct);
 	else
 		pork_set_away(acct, args);
@@ -700,8 +700,8 @@ USER_COMMAND(cmd_bind) {
 	struct binding *binding;
 
 	key_str = strsep(&args, " ");
-	if (key_str == nullptr || blank_str(key_str)) {
-		hash_iterate(&target_binds->hash, print_binding, nullptr);
+	if (key_str == NULL || blank_str(key_str)) {
+		hash_iterate(&target_binds->hash, print_binding, NULL);
 		return;
 	}
 
@@ -715,8 +715,8 @@ USER_COMMAND(cmd_bind) {
 
 		key_str = strsep(&args, " ");
 
-		if (key_str == nullptr || blank_str(key_str)) {
-			hash_iterate(&target_binds->hash, print_binding, nullptr);
+		if (key_str == NULL || blank_str(key_str)) {
+			hash_iterate(&target_binds->hash, print_binding, NULL);
 			return;
 		}
 	}
@@ -728,16 +728,16 @@ USER_COMMAND(cmd_bind) {
 	}
 
 	func = args;
-	if (func != nullptr) {
+	if (func != NULL) {
 		if (*func == opt_get_char(OPT_CMDCHARS) && *(func + 1) != '\0')
 			func++;
 		if (blank_str(func))
-			func = nullptr;
+			func = NULL;
 	}
 
-	if (func == nullptr) {
+	if (func == NULL) {
 		binding = bind_find(target_binds, key);
-		if (binding != nullptr)
+		if (binding != NULL)
 			screen_cmd_output("%s is bound to %s", key_str, binding->binding);
 		else
 			screen_cmd_output("%s is not bound", key_str);
@@ -747,7 +747,7 @@ USER_COMMAND(cmd_bind) {
 
 	bind_add(target_binds, key, func);
 	binding = bind_find(target_binds, key);
-	if (binding != nullptr) {
+	if (binding != NULL) {
 		screen_cmd_output("%s is bound to %s", key_str, binding->binding);
 		return;
 	}
@@ -758,7 +758,7 @@ USER_COMMAND(cmd_bind) {
 static void cmd_connect(char *args) {
 	char *user;
 
-	if (args == nullptr || blank_str(args))
+	if (args == NULL || blank_str(args))
 		return;
 
 	user = strsep(&args, " ");
@@ -772,7 +772,7 @@ static void cmd_disconnect(char *args) {
 	if (!acct->can_connect)
 		return;
 
-	if (args == nullptr || blank_str(args))
+	if (args == NULL || blank_str(args))
 		dest = acct->refnum;
 	else {
 		char *refnum = strsep(&args, " ");
@@ -782,12 +782,12 @@ static void cmd_disconnect(char *args) {
 			return;
 		}
 
-		if (args != nullptr && blank_str(args))
-			args = nullptr;
+		if (args != NULL && blank_str(args))
+			args = NULL;
 	}
 
 	acct = pork_acct_find();
-	if (acct == nullptr) {
+	if (acct == NULL) {
 		screen_err_msg("Account refnum %u is not logged in", dest);
 		return;
 	}
@@ -801,7 +801,7 @@ static void cmd_disconnect(char *args) {
 USER_COMMAND(cmd_help) {
 	char *section;
 
-	if (args == nullptr) {
+	if (args == NULL) {
 		char buf[8192];
 
 		if (pork_help_get_cmds("main", buf, sizeof(buf)) != -1) {
@@ -815,12 +815,12 @@ USER_COMMAND(cmd_help) {
 	}
 
 	section = strsep(&args, " ");
-	if (section == nullptr) {
+	if (section == NULL) {
 		screen_err_msg("Error: Can't find the help files");
 		return;
 	}
 
-	if (args == nullptr) {
+	if (args == NULL) {
 		char buf[8192];
 
 		if (pork_help_print("main", section) == -1) {
@@ -849,7 +849,7 @@ USER_COMMAND(cmd_help) {
 USER_COMMAND(cmd_lastlog) {
 	int opts = 0;
 
-	if (args == nullptr)
+	if (args == NULL)
 		return;
 
 	if (*args == '-') {
@@ -889,7 +889,7 @@ USER_COMMAND(cmd_load) {
 	int quiet;
 	char buf[PATH_MAX];
 
-	if (args == nullptr)
+	if (args == NULL)
 		return;
 
 	quiet = screen_set_quiet(1);
@@ -906,22 +906,22 @@ USER_COMMAND(cmd_msg) {
 	char *target;
 	struct chatroom *chat;
 
-	if (args == nullptr || !acct->connected)
+	if (args == NULL || !acct->connected)
 		return;
 
 	target = strsep(&args, " ");
-	if (target == nullptr || args == nullptr)
+	if (target == NULL || args == NULL)
 		return;
 
 	chat = chat_find(acct, target);
-	if (chat != nullptr)
+	if (chat != NULL)
 		chat_send_msg(acct, chat, target, args);
 	else
 		pork_msg_send(acct, target, args);
 }
 
 USER_COMMAND(cmd_quit) {
-	pork_exit(0, args, nullptr);
+	pork_exit(0, args, NULL);
 }
 
 USER_COMMAND(cmd_refresh) {
@@ -939,21 +939,21 @@ USER_COMMAND(cmd_send) {
 	struct imwindow *imwindow = cur_window();
 	struct pork_acct *acct = imwindow->owner;
 
-	if (args == nullptr || !acct->connected)
+	if (args == NULL || !acct->connected)
 		return;
 
 	if (imwindow->type == WIN_TYPE_PRIVMSG)
 		pork_msg_send(acct, imwindow->target, args);
 	else if (imwindow->type == WIN_TYPE_CHAT) {
-		struct chatroom *chat = (chatroom *)imwindow->data;
+		struct chatroom *chat = imwindow->data;
 
-		if (chat == nullptr) {
+		if (chat == NULL) {
 			screen_err_msg("%s is not a member of %s",
 				acct->username, imwindow->target);
 		} else
 			chat_send_msg(acct, chat, chat->title, args);
 	} else if (imwindow->type == WIN_TYPE_STATUS) {
-		chat_send_msg(acct, (chatroom *)imwindow->data, "main", args);
+		chat_send_msg(acct, imwindow->data, "main", args);
 	}
 }
 
@@ -964,7 +964,7 @@ USER_COMMAND(cmd_unbind) {
 	int c;
 
 	binding = strsep(&args, " ");
-	if (binding == nullptr || blank_str(binding))
+	if (binding == NULL || blank_str(binding))
 		return;
 
 	if (binding[0] == '-' && binding[1] != '\0') {
@@ -977,7 +977,7 @@ USER_COMMAND(cmd_unbind) {
 
 		binding = strsep(&args, " ");
 
-		if (binding == nullptr || blank_str(binding))
+		if (binding == NULL || blank_str(binding))
 			return;
 	}
 
@@ -994,7 +994,7 @@ USER_COMMAND(cmd_unbind) {
 }
 
 USER_COMMAND(cmd_unalias) {
-	if (args == nullptr)
+	if (args == NULL)
 		return;
 
 	if (alias_remove(&screen.alias_hash, args) == -1)
@@ -1004,33 +1004,33 @@ USER_COMMAND(cmd_unalias) {
 }
 
 USER_COMMAND(cmd_nick) {
-	if (args == nullptr || blank_str(args))
+	if (args == NULL || blank_str(args))
 		return;
 
 	pork_change_nick(cur_window()->owner, args);
 }
 
 USER_COMMAND(cmd_win) {
-	if (args != nullptr)
+	if (args != NULL)
 		run_one_command(args, CMDSET_WIN);
 	else
 		run_one_command("list", CMDSET_WIN);
 }
 
 USER_COMMAND(cmd_input) {
-	if (args != nullptr)
+	if (args != NULL)
 		run_one_command(args, CMDSET_INPUT);
 }
 
 USER_COMMAND(cmd_history) {
-	if (args != nullptr)
+	if (args != NULL)
 		run_one_command(args, CMDSET_HISTORY);
 	else
 		run_one_command("list", CMDSET_HISTORY);
 }
 
 USER_COMMAND(cmd_scroll) {
-	if (args != nullptr)
+	if (args != NULL)
 		run_one_command(args, CMDSET_SCROLL);
 }
 
@@ -1040,7 +1040,7 @@ USER_COMMAND(cmd_set) {
 	int opt;
 
 	variable = strsep(&args, " ");
-	if (variable == nullptr || blank_str(variable)) {
+	if (variable == NULL || blank_str(variable)) {
 		opt_print();
 		return;
 	}
@@ -1053,7 +1053,7 @@ USER_COMMAND(cmd_set) {
 	}
 
 	value = args;
-	if (value == nullptr || blank_str(value)) {
+	if (value == NULL || blank_str(value)) {
 		opt_print_var(opt, "is set to");
 		return;
 	}
@@ -1076,10 +1076,10 @@ int run_mcommand(char *str) {
 	char *curcmd;
 
 	curcmd = strsep(&cmdstr, ";");
-	if (curcmd == nullptr)
+	if (curcmd == NULL)
 		i = run_one_command(cmdstr, CMDSET_MAIN);
 	else {
-		while (curcmd != nullptr && i != -1) {
+		while (curcmd != NULL && i != -1) {
 			char cmdchars = opt_get_char(OPT_CMDCHARS);
 
 			while (*curcmd == ' ')
@@ -1119,7 +1119,7 @@ static int run_one_command(char *str, u_int32_t set) {
 	cmd = (struct command *)bsearch(cmd_str, command_set[set].set, command_set[set].elem,
 			sizeof(struct command), cmd_compare);
 
-	if (cmd == nullptr) {
+	if (cmd == NULL) {
     screen_err_msg("Unknown %scommand: %s",
       command_set[set].type, cmd_str);
 
@@ -1131,7 +1131,7 @@ static int run_one_command(char *str, u_int32_t set) {
 }
 
 static void print_binding(void *data, void *nothing __notused) {
-	struct binding *binding = static_cast<struct binding *>(data);
+	struct binding *binding = data;
 	char key_name[32];
 
 	bind_get_keyname(binding->key, key_name, sizeof(key_name));
@@ -1139,10 +1139,10 @@ static void print_binding(void *data, void *nothing __notused) {
 }
 
 static void print_alias(void *data, void *nothing __notused) {
-	struct alias *alias = static_cast<struct alias *>(data);
+	struct alias *alias = data;
 
 	screen_cmd_output("%s is aliased to %s%s",
-		alias->alias, alias->orig, (alias->args != nullptr ? alias->args : ""));
+		alias->alias, alias->orig, (alias->args != NULL ? alias->args : ""));
 }
 
 static int cmd_compare(const void *l, const void *r) {
@@ -1160,7 +1160,7 @@ USER_COMMAND(cmd_input_find_next_cmd) {
 	size_t elements = 0;
 	char *input_buf;
 	struct input *input;
-	struct command *cmd = nullptr;
+	struct command *cmd = NULL;
 
 	input = cur_window()->input;
 	cur_pos = input->cur - input->prompt_len;

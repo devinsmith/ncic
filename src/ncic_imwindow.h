@@ -11,10 +11,6 @@
 #ifndef __NCIC_IMWINDOW_H__
 #define __NCIC_IMWINDOW_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define IMWINDOW(x)	((struct imwindow *) (x))
 
 struct pork_acct;
@@ -87,9 +83,5 @@ void imwindow_scroll_start(struct imwindow *imwindow);
 void imwindow_scroll_end(struct imwindow *imwindow);
 void imwindow_clear(struct imwindow *imwindow);
 void imwindow_erase(struct imwindow *imwindow);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* __NCIC_IMWINDOW_H__ */

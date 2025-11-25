@@ -11,10 +11,6 @@
 #ifndef __NCIC_CSTR_H__
 #define __NCIC_CSTR_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define PORK_TABSTOP		4
 
 #define chtype_set(x, c)	((x) = ((x) & ~A_CHARTEXT) | (c))
@@ -32,9 +28,5 @@ size_t wputnstr(WINDOW *win, chtype *ch, size_t n);
 size_t wputncstr(WINDOW *win, char *str, size_t n);
 size_t mvwputstr(WINDOW *win, int y, int x, chtype *ch);
 size_t mvwputnstr(WINDOW *win, int y, int x, chtype *ch, size_t n);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* __NCIC_CSTR_H__ */

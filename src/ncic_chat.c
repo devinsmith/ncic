@@ -8,7 +8,7 @@
 ** as published by the Free Software Foundation.
 */
 
-#include <cstdlib>
+#include <stdlib.h>
 #include <ncurses.h>
 
 #include "ncic.h"
@@ -28,7 +28,7 @@ static void chat_destroy_user_list_cb(void *param, void *data) {
 	struct pork_acct *acct = (struct pork_acct *) param;
 	struct chat_user *chat_user = (struct chat_user *) data;
 
-	if (acct->proto->chat_user_free != nullptr)
+	if (acct->proto->chat_user_free != NULL)
 		acct->proto->chat_user_free(acct, chat_user);
 
 	free(chat_user->host);
@@ -44,7 +44,7 @@ struct chatroom *chat_new(struct pork_acct *acct,
 {
 	struct chatroom *chat;
 
-	chat = (struct chatroom *)xcalloc(1, sizeof(*chat));
+	chat = xcalloc(1, sizeof(*chat));
 	chat->title = xstrdup(chat_title);
 	chat->title_quoted = acct->proto->filter_text(chat_title);
 	chat->title_full = xstrdup(chat_title_full);
@@ -62,7 +62,7 @@ int chat_send_msg(	struct pork_acct *acct,
 					const char *target,
 					char *msg)
 {
-	if (acct->proto->chat_send == nullptr || msg == nullptr)
+	if (acct->proto->chat_send == NULL || msg == NULL)
 		return (-1);
 
 	if (acct->proto->chat_send(acct, chat, target, msg) != -1) {
@@ -86,7 +86,7 @@ int chat_send_notice(	struct pork_acct *acct,
 						char *target,
 						char *msg)
 {
-	if (acct->proto->chat_send == nullptr || msg == nullptr)
+	if (acct->proto->chat_send == NULL || msg == NULL)
 		return (-1);
 
 	if (acct->proto->chat_send_notice(acct, chat, target, msg) != -1) {
@@ -110,12 +110,12 @@ int chat_leave(struct pork_acct *acct, char *chat_name, int close_window) {
 	struct imwindow *win;
 
 	chat = chat_find(acct, chat_name);
-	if (chat == nullptr)
+	if (chat == NULL)
 		return (-1);
 
 	win = chat->win;
-	win->data = nullptr;
-	chat->win = nullptr;
+	win->data = NULL;
+	chat->win = NULL;
 
 	if (close_window)
 		screen_close_window(win);
@@ -127,7 +127,7 @@ int chat_leave_all(struct pork_acct *acct) {
 	dlist_t *cur;
 
 	cur = acct->chat_list;
-	while (cur != nullptr) {
+	while (cur != NULL) {
 		struct chatroom *chat = (struct chatroom *)cur->data;
 		dlist_t *next = cur->next;
 
@@ -139,8 +139,8 @@ int chat_leave_all(struct pork_acct *acct) {
 }
 
 struct chatroom *chat_find(struct pork_acct *acct, const char *chat_name) {
-	if (acct->proto->chat_find == nullptr)
-		return (nullptr);
+	if (acct->proto->chat_find == NULL)
+		return (NULL);
 
 	return (acct->proto->chat_find(acct, chat_name));
 }
@@ -148,15 +148,15 @@ struct chatroom *chat_find(struct pork_acct *acct, const char *chat_name) {
 int chat_free(struct pork_acct *acct, struct chatroom *chat, int silent) {
 	dlist_t *cur;
 
-	cur = dlist_find(acct->chat_list, chat, nullptr);
-	if (cur == nullptr) {
+	cur = dlist_find(acct->chat_list, chat, NULL);
+	if (cur == NULL) {
 		debug("tried to free unknown chat: %s", chat->title_quoted);
 		return (-1);
 	}
 
 	acct->chat_list = dlist_remove(acct->chat_list, cur);
 
-	if (chat->win != nullptr) {
+	if (chat->win != NULL) {
 		if (!silent) {
 			char buf[4096];
 			int ret;
@@ -169,11 +169,11 @@ int chat_free(struct pork_acct *acct, struct chatroom *chat, int silent) {
 				MSG_TYPE_CHAT_STATUS);
 		}
 
-		chat->win->data = nullptr;
-		chat->win = nullptr;
+		chat->win->data = NULL;
+		chat->win = NULL;
 	}
 
-	if (acct->proto->chat_free != nullptr)
+	if (acct->proto->chat_free != NULL)
 		acct->proto->chat_free(acct, chat->data);
 
 	dlist_destroy(chat->user_list, acct, chat_destroy_user_list_cb);
@@ -196,7 +196,7 @@ static dlist_t *chat_find_user_node(struct pork_acct *acct,
 	dlist_t *cur;
 
 	cur = chat->user_list;
-	while (cur != nullptr) {
+	while (cur != NULL) {
 		struct chat_user *chat_user = (struct chat_user *)cur->data;
 
 		if (!acct->proto->user_compare(user, chat_user->nname))
@@ -214,14 +214,14 @@ struct chat_user *chat_find_user(struct pork_acct *acct,
 {
 	dlist_t *cur = chat_find_user_node(acct, chat, user);
 
-	if (cur == nullptr)
-		return (nullptr);
+	if (cur == NULL)
+		return (NULL);
 
 	return (struct chat_user *)(cur->data);
 }
 
 int chat_rejoin(struct pork_acct *acct, struct chatroom *chat) {
-	if (acct->proto->chat_rejoin == nullptr)
+	if (acct->proto->chat_rejoin == NULL)
 		return (-1);
 
 	return (acct->proto->chat_rejoin(acct, chat));
@@ -230,10 +230,10 @@ int chat_rejoin(struct pork_acct *acct, struct chatroom *chat) {
 int chat_rejoin_all(struct pork_acct *acct) {
 	dlist_t *cur;
 
-	if (acct->proto->chat_rejoin == nullptr)
+	if (acct->proto->chat_rejoin == NULL)
 		return (-1);
 
-	for (cur = acct->chat_list ; cur != nullptr ; cur = cur->next)
+	for (cur = acct->chat_list ; cur != NULL ; cur = cur->next)
 		chat_rejoin(acct, (struct chatroom *)cur->data);
 
 	return (0);
@@ -243,12 +243,12 @@ int chat_nick_change(struct pork_acct *acct, char *old, char *new_nick) {
 	dlist_t *cur;
 
 	cur = acct->chat_list;
-	while (cur != nullptr) {
+	while (cur != NULL) {
 		struct chat_user *user;
 		struct chatroom *chat = (struct chatroom *)cur->data;
 
 		user = chat_find_user(acct, chat, old);
-		if (user != nullptr) {
+		if (user != NULL) {
 			char buf[4096];
 			int ret;
 

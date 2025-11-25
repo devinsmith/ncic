@@ -11,10 +11,6 @@
 #ifndef __NCIC_SET_H__
 #define __NCIC_SET_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #define opt_set_format opt_set_str
 
 enum {
@@ -227,9 +223,5 @@ int wopt_get_val(	struct imwindow *imwindow,
 #define wopt_get_bool(wopt, opt) ((wopt)[(opt)].b)
 
 #include "ncic_set_defaults.h"
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* __NCIC_SET_H__ */

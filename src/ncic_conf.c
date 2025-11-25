@@ -10,12 +10,12 @@
 
 #include <unistd.h>
 #include <ncurses.h>
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <pwd.h>
-#include <cerrno>
-#include <climits>
+#include <errno.h>
+#include <limits.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 
@@ -56,19 +56,19 @@ int read_conf(const char *path) {
 	u_int32_t line = 0;
 
 	fp = fopen(path, "r");
-	if (fp == nullptr) {
+	if (fp == NULL) {
 		if (errno != -ENOENT)
 			debug("fopen: %s: %s", path, strerror(errno));
 		return (-1);
 	}
 
-	while (fgets(buf, sizeof(buf), fp) != nullptr) {
+	while (fgets(buf, sizeof(buf), fp) != NULL) {
 		char *p;
 
 		++line;
 
 		p = strchr(buf, '\n');
-		if (p == nullptr) {
+		if (p == NULL) {
 			debug("line %u too long", line);
 			fclose(fp);
 			return (-1);
@@ -76,7 +76,7 @@ int read_conf(const char *path) {
 
 		*p = '\0';
 
-		while ((p = strchr(p, '\t')) != nullptr)
+		while ((p = strchr(p, '\t')) != NULL)
 			*p++ = ' ';
 
 		p = buf;
@@ -100,7 +100,7 @@ static int read_acct_conf(struct pork_acct *acct, const char *filename) {
 	int line = 0;
 
 	fp = fopen(filename, "r");
-	if (fp == nullptr) {
+	if (fp == NULL) {
 		if (errno != ENOENT) {
 			debug("fopen: %s: %s", filename, strerror(errno));
 			return (-1);
@@ -109,13 +109,13 @@ static int read_acct_conf(struct pork_acct *acct, const char *filename) {
 		return (0);
 	}
 
-	while (fgets(buf, sizeof(buf), fp) != nullptr) {
+	while (fgets(buf, sizeof(buf), fp) != NULL) {
 		char *p;
 
 		++line;
 
 		p = strchr(buf, '\n');
-		if (p == nullptr) {
+		if (p == NULL) {
 			debug("line %u too long", line);
 			fclose(fp);
 			return (-1);
@@ -123,7 +123,7 @@ static int read_acct_conf(struct pork_acct *acct, const char *filename) {
 
 		*p = '\0';
 
-		while ((p = strchr(p, '\t')) != nullptr)
+		while ((p = strchr(p, '\t')) != NULL)
 			*p++ = ' ';
 
 		p = buf;
@@ -131,7 +131,7 @@ static int read_acct_conf(struct pork_acct *acct, const char *filename) {
 			continue;
 
 		p = strchr(buf, ':');
-		if (p == nullptr)
+		if (p == NULL)
 			continue;
 		*p++ = '\0';
 
@@ -142,7 +142,7 @@ static int read_acct_conf(struct pork_acct *acct, const char *filename) {
 			free(acct->username);
 			acct->username = xstrdup(p);
 		} else if (!strcasecmp(buf, "password")) {
-			if (acct->passwd != nullptr) {
+			if (acct->passwd != NULL) {
 				memset(acct->passwd, 0, strlen(acct->passwd));
 				free(acct->passwd);
 			}
@@ -163,7 +163,7 @@ int read_user_config(struct pork_acct *acct) {
 	char buf[PATH_MAX];
 	char *pork_dir = opt_get_str(OPT_NCIC_DIR);
 
-	if (acct == nullptr || pork_dir == nullptr)
+	if (acct == NULL || pork_dir == NULL)
 		return (-1);
 
 	normalize(nname, acct->username, sizeof(nname));
@@ -193,19 +193,19 @@ static int save_acct_conf(struct pork_acct *acct, char *filename) {
 	FILE *fp;
 
 	len = strlen(filename) + sizeof("-TEMP");
-	fn = (char *)xmalloc(len);
+	fn = xmalloc(len);
 	snprintf(fn, len, "%s-TEMP", filename);
 
 	fp = fopen(fn, "w");
-	if (fp == nullptr) {
+	if (fp == NULL) {
 		debug("fopen: %s: %s", fn, strerror(errno));
 		free(fn);
 		return (-1);
 	}
 
-	if (acct->username != nullptr)
+	if (acct->username != NULL)
 		fprintf(fp, "username: %s\n", acct->username);
-	if (opt_get_bool(OPT_SAVE_PASSWD) && acct->passwd != nullptr)
+	if (opt_get_bool(OPT_SAVE_PASSWD) && acct->passwd != NULL)
 		fprintf(fp, "password: %s\n", acct->passwd);
 
 	fchmod(fileno(fp), 0600);
@@ -227,7 +227,7 @@ int save_user_config(struct pork_acct *acct) {
 	char buf[PATH_MAX];
 	char *pork_dir = opt_get_str(OPT_NCIC_DIR);
 
-	if (acct == nullptr || pork_dir == nullptr) {
+	if (acct == NULL || pork_dir == NULL) {
 		debug("acct=%p port_dir=%p", acct, pork_dir);
 		return (-1);
 	}
@@ -253,13 +253,13 @@ int read_global_config(void) {
   }
 
   pw = getpwuid(getuid());
-	if (pw == nullptr) {
+	if (pw == NULL) {
 		debug("getpwuid: %s", strerror(errno));
 		return (-1);
 	}
 
 	pork_dir = opt_get_str(OPT_NCIC_DIR);
-	if (pork_dir == nullptr) {
+	if (pork_dir == NULL) {
 		snprintf(buf, sizeof(buf), "%s/.ncic", pw->pw_dir);
 		opt_set(OPT_NCIC_DIR, buf);
 
@@ -280,16 +280,16 @@ int read_global_config(void) {
 }
 
 static void write_alias_line(void *data, void *filep) {
-	struct alias *alias = static_cast<struct alias *>(data);
-	FILE *fp = static_cast<FILE *>(filep);
+	struct alias *alias = data;
+	FILE *fp = filep;
 
 	fprintf(fp, "alias %s %s%s\n",
 		alias->alias, alias->orig, (alias->args ? alias->args : ""));
 }
 
 static void write_bind_line(void *data, void *filep) {
-	struct binding *binding = static_cast<struct binding *>(data);
-  FILE *fp = static_cast<FILE *>(filep);
+	struct binding *binding = data;
+  FILE *fp = filep;
 	char key_name[32];
 
 	bind_get_keyname(binding->key, key_name, sizeof(key_name));
@@ -297,8 +297,8 @@ static void write_bind_line(void *data, void *filep) {
 }
 
 static void write_bind_blist_line(void *data, void *filep) {
-  struct binding *binding = static_cast<struct binding *>(data);
-  FILE *fp = static_cast<FILE *>(filep);
+  struct binding *binding = data;
+  FILE *fp = filep;
 	char key_name[32];
 
 	bind_get_keyname(binding->key, key_name, sizeof(key_name));
@@ -312,17 +312,17 @@ int save_global_config(void) {
 	FILE *fp;
 	char *pork_dir = opt_get_str(OPT_NCIC_DIR);
 
-	if (pork_dir == nullptr)
+	if (pork_dir == NULL)
 		return (-1);
 
 	snprintf(porkrc, sizeof(porkrc), "%s/ncicrc", pork_dir);
 
 	len = strlen(porkrc) + sizeof("-TEMP");
-	fn = (char *)xmalloc(len);
+	fn = xmalloc(len);
 	snprintf(fn, len, "%s-TEMP", porkrc);
 
 	fp = fopen(fn, "w");
-	if (fp == nullptr) {
+	if (fp == NULL) {
 		debug("fopen: %s: %s", fn, strerror(errno));
 		return (-1);
 	}
