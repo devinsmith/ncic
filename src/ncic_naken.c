@@ -14,14 +14,14 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <cstdio>
-#include <cstring>
+#include <stdio.h>
+#include <string.h>
 
 #include "ncic_irc.h"
 #include "ncic_naken.h"
 
 int
-naken_set_back(irc_session_t *session, char *msg)
+naken_set_back(struct irc_session_t *session, char *msg)
 {
 	char buf[IRC_OUT_BUFLEN];
 	int ret;

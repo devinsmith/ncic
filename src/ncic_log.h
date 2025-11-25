@@ -17,9 +17,13 @@
 #ifndef NCIC_LOG_H
 #define NCIC_LOG_H
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstdarg>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void log_init();
 void log_exit();
@@ -31,6 +35,10 @@ void log_msgraw(int lvl, const char *fmt, ...);
 void log_tmsg(int lvl, const char *fmt, ...);
 void log_flush();
 void log_set_level(int lvl);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* NCIC_LOG_H */
 

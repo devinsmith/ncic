@@ -14,12 +14,13 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <ctime>
+#include <stdbool.h>
+#include <time.h>
 
 #include "ncic_log.h"
 
 static int s_log_level = -1;
-static FILE	*s_log_fp = nullptr;
+static FILE *s_log_fp = NULL;
 static bool s_log_cleanup_added = false;
 
 void log_init()
@@ -39,7 +40,7 @@ void log_set_level(int lvl)
 
 void log_exit()
 {
-  if (s_log_fp != nullptr)
+  if (s_log_fp != NULL)
   {
     fflush(s_log_fp);
     fclose(s_log_fp);
@@ -49,7 +50,7 @@ void log_exit()
 int log_set_logfile(const char *file)
 {
   s_log_fp = fopen(file, "a");
-	if (s_log_fp == nullptr)
+	if (s_log_fp == NULL)
 		return -1;
 	return 0;
 }
@@ -65,7 +66,7 @@ void log_msg(int lvl, const char *fmt, ...)
 
   va_start(ap, fmt);
   if (s_log_level >= lvl) {
-    if (s_log_fp != nullptr) {
+    if (s_log_fp != NULL) {
       // fprintf it
       vfprintf(s_log_fp, fmt, ap);
       fprintf(s_log_fp, "\n");
@@ -86,7 +87,7 @@ void log_msgraw(int lvl, const char *fmt, ...)
 
   va_start(ap, fmt);
   if (s_log_level >= lvl) {
-    if (s_log_fp != nullptr) {
+    if (s_log_fp != NULL) {
       // fprintf it
       vfprintf(s_log_fp, fmt, ap);
       fflush(s_log_fp);
@@ -109,10 +110,10 @@ log_tmsg(int lvl, const char *fmt, ...)
 	va_start(ap, fmt);
 	if (s_log_level >= lvl) {
 
-		now = time(nullptr);
+		now = time(NULL);
 		tm_now = localtime(&now);
 
-		if (s_log_fp != nullptr) {
+		if (s_log_fp != NULL) {
 			fprintf(s_log_fp, "%04d.%02d.%02d-%02d:%02d:%02d ",
 			    tm_now->tm_year + 1900, tm_now->tm_mon + 1, tm_now->tm_mday,
 			    tm_now->tm_hour, tm_now->tm_min, tm_now->tm_sec);
@@ -136,7 +137,7 @@ log_tmsg(int lvl, const char *fmt, ...)
 
 void log_flush()
 {
-  if (s_log_fp != nullptr) {
+  if (s_log_fp != NULL) {
     fflush(s_log_fp);
   } else {
     fflush(stdout);

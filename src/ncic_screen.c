@@ -8,16 +8,19 @@
 ** as published by the Free Software Foundation.
 */
 
+#include "config.h"
+
 #include <unistd.h>
 #include <ncurses.h>
-#include <cstdlib>
-#include <cstring>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/types.h>
 
 #include "ncic.h"
 #include "ncic_util.h"
 #include "ncic_list.h"
 #include "ncic_misc.h"
+#include "ncic_imsg.h"
 #include "ncic_imwindow.h"
 #include "ncic_proto.h"
 #include "ncic_acct.h"
@@ -39,7 +42,7 @@ static dlist_t *screen_find_refnum(u_int32_t refnum) {
 	dlist_t *cur = screen.window_list;
 
 	do {
-		struct imwindow *imwindow = (struct imwindow *)cur->data;
+		struct imwindow *imwindow = cur->data;
 
 		if (imwindow->refnum == refnum)
 			return (cur);
@@ -50,11 +53,11 @@ static dlist_t *screen_find_refnum(u_int32_t refnum) {
 		cur = cur->next;
 	} while (cur != screen.window_list);
 
-	return (nullptr);
+	return (NULL);
 }
 
 static void screen_window_list_add(dlist_t *new_node) {
-	struct imwindow *imwindow = (struct imwindow *)new_node->data;
+	struct imwindow *imwindow = new_node->data;
 
 	/*
 	** The window list is a sorted circular doubly linked list.
@@ -62,7 +65,7 @@ static void screen_window_list_add(dlist_t *new_node) {
 	** refnum.
 	*/
 
-	if (screen.window_list == nullptr) {
+	if (screen.window_list == NULL) {
 		new_node->prev = new_node;
 		new_node->next = new_node;
 		screen.window_list = new_node;
@@ -70,7 +73,7 @@ static void screen_window_list_add(dlist_t *new_node) {
 		dlist_t *cur = screen.window_list;
 
 		do {
-			struct imwindow *imw = (struct imwindow *)cur->data;
+			struct imwindow *imw = cur->data;
 
 			if (imwindow->refnum < imw->refnum) {
 				if (cur == screen.window_list)
@@ -96,7 +99,7 @@ static void screen_window_list_remove(dlist_t *node) {
 		screen.window_list = node->next;
 
 	if (node == screen.window_list)
-		screen.window_list = nullptr;
+		screen.window_list = NULL;
 
 	save->prev->next = node->next;
 	save->next->prev = node->prev;
@@ -125,18 +128,19 @@ int screen_init(int rows, int cols) {
   log_tmsg(0, "Setting up NULL account");
 
 	acct = pork_acct_init(opt_get_str(OPT_TEXT_NO_NAME), PROTO_NULL);
-	if (acct == nullptr)
+	if (acct == NULL)
 		return (-1);
 	acct->refnum = 0;
 
 	screen.null_acct = acct;
 
-  pork_io_add(STDIN_FILENO, IO_COND_READ, &screen, &screen, keyboard_input);
+	pork_io_add(STDIN_FILENO, IO_COND_READ, &screen, &screen,
+		keyboard_input);
 
 	rows = max(1, (int) rows - STATUS_ROWS);
 
 	imwindow = imwindow_new(rows, cols, 1, WIN_TYPE_STATUS, acct, "Main");
-	if (imwindow == nullptr)
+	if (imwindow == NULL)
 		return (-1);
 
 	screen_add_window(imwindow);
@@ -150,7 +154,7 @@ void screen_destroy(void) {
 	do {
 		dlist_t *next = cur->next;
 
-		imwindow_destroy((imwindow *)cur->data);
+		imwindow_destroy(cur->data);
 		free(cur);
 
 		cur = next;
@@ -165,7 +169,7 @@ void screen_destroy(void) {
 }
 
 void screen_add_window(struct imwindow *imwindow) {
-	dlist_t *new_node = (dlist_t *)xmalloc(sizeof(*new_node));
+	dlist_t *new_node = xmalloc(sizeof(*new_node));
 
 	new_node->data = imwindow;
 	screen_window_list_add(new_node);
@@ -174,7 +178,7 @@ void screen_add_window(struct imwindow *imwindow) {
 	** If this is the first window, make it current.
 	*/
 
-	if (screen.cur_window == nullptr)
+	if (screen.cur_window == NULL)
 		screen_window_swap(new_node);
 }
 
@@ -189,7 +193,7 @@ void screen_resize(u_int32_t rows, u_int32_t cols) {
 
 	cur = screen.window_list;
 	do {
-		struct imwindow *imwindow = (struct imwindow *)cur->data;
+		struct imwindow *imwindow = cur->data;
 		u_int32_t im_cols = cols;
 
 		imwindow_resize(imwindow,
@@ -207,11 +211,11 @@ void screen_resize(u_int32_t rows, u_int32_t cols) {
 }
 
 void screen_window_swap(dlist_t *new_cur) {
-	struct imwindow *imwindow;
+	struct imwindow *imwindow = NULL;
 	u_int32_t last_own_input = 0;
 	u_int32_t cur_own_input;
 
-	if (screen.cur_window != nullptr) {
+	if (screen.cur_window != NULL) {
 		imwindow = cur_window();
 
 		last_own_input = wopt_get_bool(imwindow->opts, WOPT_PRIVATE_INPUT);
@@ -249,7 +253,7 @@ void screen_window_swap(dlist_t *new_cur) {
 int screen_goto_window(u_int32_t refnum) {
 	dlist_t *cur = screen_find_refnum(refnum);
 
-	if (cur == nullptr)
+	if (cur == NULL)
 		return (-1);
 
 	screen_window_swap(cur);
@@ -281,7 +285,7 @@ void screen_cycle_fwd(void) {
 
 	do {
 		cur = cur->next;
-		win = (imwindow *)cur->data;
+		win = cur->data;
 	} while (win->skip && cur != screen.cur_window);
 
 	screen_window_swap(cur);
@@ -293,7 +297,7 @@ void screen_cycle_bak(void) {
 
 	do {
 		cur = cur->prev;
-		win = (imwindow *)cur->data;
+		win = cur->data;
 	} while (win->skip && cur != screen.cur_window);
 
 	screen_window_swap(cur);
@@ -305,7 +309,7 @@ void screen_bind_all_unbound() {
 	node = screen.window_list;
 
 	do {
-		struct imwindow *imwindow = (struct imwindow *)node->data;
+		struct imwindow *imwindow = node->data;
 
 		if (imwindow->owner == screen.null_acct) {
 			imwindow_bind_acct(imwindow);
@@ -318,7 +322,7 @@ void screen_bind_all_unbound() {
 int screen_close_window(struct imwindow *imwindow) {
 	dlist_t *node = screen_find_refnum(imwindow->refnum);
 
-	if (node == nullptr)
+	if (node == NULL)
 		return (-1);
 
 	/*
@@ -329,7 +333,7 @@ int screen_close_window(struct imwindow *imwindow) {
 		return (-1);
 
 	if (imwindow->type == WIN_TYPE_CHAT && imwindow->data != NULL) {
-		struct chatroom *chat = (struct chatroom *)imwindow->data;
+		struct chatroom *chat = imwindow->data;
 
 		chat_leave(imwindow->owner, chat->title, 0);
 	}

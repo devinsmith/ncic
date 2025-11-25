@@ -10,13 +10,13 @@
 
 #include "config.h"
 
-#include <cstdio>
-#include <cstdlib>
-#include <cstring>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "ncic_opt.h"
 
-char *g_log_file = nullptr;
+char *g_log_file = NULL;
 
 static void print_help_text()
 {

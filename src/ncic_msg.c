@@ -9,9 +9,9 @@
 */
 
 #include <ncurses.h>
-#include <cstdlib>
-#include <ctime>
-#include <cstring>
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
 #include <sys/types.h>
 
 #include "ncic.h"
@@ -74,10 +74,10 @@ static int autoresp_compare_cb(void *l, void *r) {
 }
 
 int pork_set_away(struct pork_acct *acct, char *msg) {
-	if (msg == nullptr)
+	if (msg == NULL)
 		return (pork_set_back(acct));
 
-	if (acct->away_msg != nullptr) {
+	if (acct->away_msg != NULL) {
 		free(acct->away_msg);
 		hash_destroy(&acct->autoreply);
 	}
@@ -85,7 +85,7 @@ int pork_set_away(struct pork_acct *acct, char *msg) {
 	acct->away_msg = xstrdup(msg);
 	hash_init(&acct->autoreply, 3, autoresp_compare_cb, autoresp_destroy_cb);
 
-	if (acct->proto->set_away != nullptr) {
+	if (acct->proto->set_away != NULL) {
 		if (acct->proto->set_away(acct, msg) == -1) {
 			screen_err_msg("An error occurred while setting %s away",
 				acct->username);
@@ -100,15 +100,15 @@ int pork_set_away(struct pork_acct *acct, char *msg) {
 }
 
 int pork_set_back(struct pork_acct *acct) {
-	if (acct->away_msg == nullptr) {
+	if (acct->away_msg == NULL) {
 		screen_err_msg("%s is not away", acct->username);
 		return (-1);
 	}
 
 	free(acct->away_msg);
-	acct->away_msg = nullptr;
+	acct->away_msg = NULL;
 
-	if (acct->proto->set_back != nullptr) {
+	if (acct->proto->set_back != NULL) {
 		if (acct->proto->set_back(acct) == -1) {
 			screen_err_msg("An error occurred while setting %s unaway",
 				acct->username);
@@ -136,7 +136,7 @@ int pork_msg_send(struct pork_acct *acct, char *dest, char *msg) {
 int pork_set_idle_time(struct pork_acct *acct, u_int32_t seconds) {
 	char timebuf[32];
 
-	if (acct->proto->set_idle_time == nullptr)
+	if (acct->proto->set_idle_time == NULL)
 		return (-1);
 
 	acct->proto->set_idle_time(acct, seconds);
@@ -150,18 +150,18 @@ int pork_set_idle_time(struct pork_acct *acct, u_int32_t seconds) {
 
 
 int pork_change_nick(struct pork_acct *acct, char *nick) {
-	if (acct->proto->change_nick != nullptr)
+	if (acct->proto->change_nick != NULL)
 		return (acct->proto->change_nick(acct, nick));
 
 	return (-1);
 }
 
 int pork_signoff(struct pork_acct *acct, const char *msg) {
-  if (acct == nullptr) {
+  if (acct == NULL) {
     return 0;
   }
 
-	if (acct->proto->signoff != nullptr) {
+	if (acct->proto->signoff != NULL) {
 		ncic_recv_sys_alert(acct, ">> You have been disconnected");
 		return (acct->proto->signoff(acct, msg));
 	}

@@ -8,19 +8,19 @@
 ** as published by the Free Software Foundation.
 */
 
-#include <cstdlib>
-#include <cstring>
+#include <stdlib.h>
+#include <string.h>
 
 #include "ncic_util.h"
 #include "ncic_proto.h"
 
 static struct pork_proto *proto_table[PROTO_MAX + 1];
 
-extern "C" int irc_proto_init(struct pork_proto *proto);
+extern int irc_proto_init(struct pork_proto *proto);
 
 struct pork_proto *proto_get(int protocol) {
 	if (protocol > PROTO_MAX || protocol < -1)
-		return (nullptr);
+		return (NULL);
 
 	return (proto_table[protocol + 1]);
 }
@@ -33,12 +33,12 @@ static int proto_new(	int protocol,
 	int ret;
 
 	if (protocol < -1 || protocol > PROTO_MAX ||
-		proto_table[protocol + 1] != nullptr || init_func == nullptr)
+		proto_table[protocol + 1] != NULL || init_func == NULL)
 	{
 		return (-1);
 	}
 
-	new_proto = (struct pork_proto *)xcalloc(1, sizeof(*new_proto));
+	new_proto = xcalloc(1, sizeof(*new_proto));
 	xstrncpy(new_proto->name, name, sizeof(new_proto->name));
 
 	ret = init_func(new_proto);
