@@ -168,7 +168,7 @@ int main(int argc, char *argv[])
 		exit(-1);
 	}
 
-  setlocale(LC_ALL, "");
+  setlocale(LC_ALL, "en_US.UTF-8");
 
   init_logging();
   log_tmsg(0, "Starting up!");
