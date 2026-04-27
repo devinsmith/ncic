@@ -71,6 +71,10 @@ int pork_acct_del_refnum(char *reason) {
 void pork_acct_del(struct pork_acct *acct, const char *reason) {
 	dlist_t *cur;
 
+  if (acct == screen.acct) {
+    screen.acct = NULL;
+  }
+
   if (acct != NULL) {
     pork_signoff(acct, reason);
     chat_leave_all(acct);
