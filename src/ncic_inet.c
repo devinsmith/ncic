@@ -56,42 +56,6 @@ ssize_t sock_write(int sock, void *buf, size_t len) {
 }
 
 /*
-** printf-like function that writes to sockets.
-*/
-
-#ifdef HAVE_VASPRINTF
-
-int sockprintf(int fd, const char *fmt, ...) {
-	va_list ap;
-	char *buf;
-	ssize_t ret;
-
-	va_start(ap, fmt);
-	ret = vasprintf(&buf, fmt, ap);
-	va_end(ap);
-
-	ret = sock_write(fd, buf, ret);
-	free(buf);
-
-	return (ret);
-}
-
-#else
-
-int sockprintf(int fd, const char *fmt, ...) {
-	va_list ap;
-	char buf[4096];
-
-	va_start(ap, fmt);
-	vsnprintf(buf, sizeof(buf), fmt, ap);
-	va_end(ap);
-
-	return (sock_write(fd, buf, strlen(buf)));
-}
-
-#endif
-
-/*
 ** Returns the length of the sockaddr struct.
 */
 
