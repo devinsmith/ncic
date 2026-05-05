@@ -41,9 +41,7 @@ struct screen {
 int screen_init(int rows, int cols);
 void screen_destroy(void);
 
-void screen_add_window(struct imwindow *imwindow);
 void screen_resize(u_int32_t rows, u_int32_t cols);
-void screen_window_swap(dlist_t *new_cur);
 int screen_goto_window(u_int32_t refnum);
 void screen_refresh(void);
 void screen_bind_all_unbound();

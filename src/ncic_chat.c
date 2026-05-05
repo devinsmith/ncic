@@ -24,6 +24,8 @@
 #include "ncic_imwindow.h"
 #include "ncic_chat.h"
 
+static int chat_free(struct pork_acct *acct, struct chatroom *chat, int silent);
+
 static void chat_destroy_user_list_cb(void *param, void *data) {
 	struct pork_acct *acct = (struct pork_acct *) param;
 	struct chat_user *chat_user = (struct chat_user *) data;
@@ -121,7 +123,8 @@ struct chatroom *chat_find(struct pork_acct *acct, const char *chat_name) {
 	return (acct->proto->chat_find(acct, chat_name));
 }
 
-int chat_free(struct pork_acct *acct, struct chatroom *chat, int silent) {
+static int chat_free(struct pork_acct *acct, struct chatroom *chat, int silent)
+{
 	dlist_t *cur;
 
 	cur = dlist_find(acct->chat_list, chat, NULL);
@@ -196,7 +199,8 @@ struct chat_user *chat_find_user(struct pork_acct *acct,
 	return (struct chat_user *)(cur->data);
 }
 
-int chat_rejoin(struct pork_acct *acct, struct chatroom *chat) {
+static int chat_rejoin(struct pork_acct *acct, struct chatroom *chat)
+{
 	if (acct->proto->chat_rejoin == NULL)
 		return (-1);
 

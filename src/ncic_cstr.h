@@ -23,7 +23,6 @@ char *cstr_to_plaintext(const chtype *cstr, size_t n);
 int plaintext_to_cstr(chtype *ch, size_t len, ...);
 int plaintext_to_cstr_nocolor(chtype *ch, size_t len, ...);
 
-size_t wputstr(WINDOW *win, chtype *ch);
 size_t wputnstr(WINDOW *win, chtype *ch, size_t n);
 size_t wputncstr(WINDOW *win, char *str, size_t n);
 size_t mvwputstr(WINDOW *win, int y, int x, chtype *ch);

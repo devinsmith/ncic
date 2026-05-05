@@ -170,10 +170,6 @@ struct window_var {
 
 extern struct global_pref global_pref[OPT_NUM_OPTS];
 
-int opt_set_bool(uint32_t opt, char *args);
-int opt_set_char(uint32_t opt, char *args);
-int opt_set_int(uint32_t opt, char *args);
-int opt_set_str(uint32_t opt, char *args);
 int opt_set_color(uint32_t opt, char *args);
 
 #define SET_STR(x)	{ .s = (x) }

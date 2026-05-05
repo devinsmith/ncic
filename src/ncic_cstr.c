@@ -161,8 +161,7 @@ int plaintext_to_cstr_nocolor(chtype *ch, size_t len, ...) {
 ** Write the cstring pointed to by "ch"
 ** to the screen at the current cursor position.
 */
-
-inline size_t wputstr(WINDOW *win, chtype *ch) {
+static size_t wputstr(WINDOW *win, chtype *ch) {
 	size_t i = 0;
 
 	while (ch[i] != 0) {
@@ -183,7 +182,6 @@ inline size_t wputstr(WINDOW *win, chtype *ch) {
 ** Write the cstring pointed to by "ch"
 ** to the screen at the position (x, y).
 */
-
 size_t mvwputstr(WINDOW *win, int y, int x, chtype *ch) {
 	wmove(win, y, x);
 

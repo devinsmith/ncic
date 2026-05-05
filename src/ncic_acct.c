@@ -57,7 +57,7 @@ struct pork_acct *pork_acct_get_data() {
   return screen.acct;
 }
 
-int pork_acct_del_refnum(char *reason) {
+static int pork_acct_del_refnum(char *reason) {
 	struct pork_acct *acct;
 
 	acct = pork_acct_find();

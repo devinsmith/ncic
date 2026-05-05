@@ -312,7 +312,7 @@ static int irc_back(struct pork_acct *acct) {
   return (naken_set_back(session, NULL));
 }
 
-char *irc_text_filter(const char *str) {
+static char *irc_text_filter(const char *str) {
   if (str == NULL)
     return (xstrdup(""));
 
@@ -320,10 +320,11 @@ char *irc_text_filter(const char *str) {
 
 }
 
-int irc_chan_free(struct pork_acct *acct, void *data) {
-	free(data);
+static int irc_chan_free(struct pork_acct *acct, void *data)
+{
+  free(data);
 
-	return (0);
+  return (0);
 }
 
 int irc_proto_init(struct pork_proto *proto) {

@@ -38,6 +38,9 @@
 ** This depends on the list being sorted.
 */
 
+static void screen_add_window(struct imwindow *imwindow);
+static void screen_window_swap(dlist_t *new_cur);
+
 static dlist_t *screen_find_refnum(u_int32_t refnum) {
 	dlist_t *cur = screen.window_list;
 
@@ -168,7 +171,7 @@ void screen_destroy(void) {
 	wclear(curscr);
 }
 
-void screen_add_window(struct imwindow *imwindow) {
+static void screen_add_window(struct imwindow *imwindow) {
 	dlist_t *new_node = xmalloc(sizeof(*new_node));
 
 	new_node->data = imwindow;
@@ -210,7 +213,7 @@ void screen_resize(u_int32_t rows, u_int32_t cols) {
 	}
 }
 
-void screen_window_swap(dlist_t *new_cur) {
+static void screen_window_swap(dlist_t *new_cur) {
 	struct imwindow *imwindow = NULL;
 	u_int32_t last_own_input = 0;
 	u_int32_t cur_own_input;

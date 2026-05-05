@@ -23,6 +23,8 @@ static int s_log_level = -1;
 static FILE *s_log_fp = NULL;
 static bool s_log_cleanup_added = false;
 
+static void log_exit();
+
 void log_init()
 {
   if (!s_log_cleanup_added) {

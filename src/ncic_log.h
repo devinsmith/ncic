@@ -22,7 +22,6 @@
 #include <stdarg.h>
 
 void log_init();
-void log_exit();
 
 int log_set_logfile(const char *file);
 void log_tmsg(int lvl, const char *fmt, ...);

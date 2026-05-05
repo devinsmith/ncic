@@ -106,7 +106,7 @@ dlist_t *dlist_find(dlist_t *head, void *data, int (*comp)(void *, void *)) {
 ** the function func(node, "data") for each node.
 */
 
-void dlist_iterate(dlist_t *head, void (*func)(void *, void *), void *data) {
+static void dlist_iterate(dlist_t *head, void (*func)(void *, void *), void *data) {
 	dlist_t *cur;
 
 	for (cur = head ; cur != NULL ; cur = cur->next)
@@ -153,7 +153,7 @@ int hash_remove(hash_t *hash, void *data, uint32_t cur_hash) {
 	return (0);
 }
 
-void hash_clear(hash_t *hash) {
+static void hash_clear(hash_t *hash) {
 	if (hash->order > 0) {
 		uint32_t i;
 

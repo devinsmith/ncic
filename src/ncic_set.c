@@ -35,6 +35,10 @@ static int wopt_set_int(struct imwindow *imwindow, uint32_t opt, char *args);
 static int wopt_set_str(struct imwindow *imwindow, uint32_t opt, char *args);
 static int wopt_set_char(	struct imwindow *imwindow,
 							uint32_t opt, char *args) __notused;
+static int opt_set_bool(uint32_t opt, char *args);
+static int opt_set_char(uint32_t opt, char *args);
+static int opt_set_int(uint32_t opt, char *args);
+static int opt_set_str(uint32_t opt, char *args);
 
 static void opt_changed_prompt(void);
 
@@ -1010,7 +1014,7 @@ static int opt_tristate(char *args) {
 	return (-1);
 }
 
-int opt_set_bool(uint32_t opt, char *args) {
+static int opt_set_bool(uint32_t opt, char *args) {
 	int val = opt_tristate(args);
 
 	if (val == -1)
@@ -1027,7 +1031,7 @@ int opt_set_bool(uint32_t opt, char *args) {
 	return (0);
 }
 
-int opt_set_char(uint32_t opt, char *args) {
+static int opt_set_char(uint32_t opt, char *args) {
 	if (args == NULL || *args == '\0')
 		return (-1);
 
@@ -1047,7 +1051,7 @@ int opt_set_char(uint32_t opt, char *args) {
 	return (0);
 }
 
-int opt_set_int(uint32_t opt, char *args) {
+static int opt_set_int(uint32_t opt, char *args) {
 	uint32_t num;
 
 	if (args == NULL)
@@ -1064,7 +1068,7 @@ int opt_set_int(uint32_t opt, char *args) {
 	return (0);
 }
 
-int opt_set_str(uint32_t opt, char *args) {
+static int opt_set_str(uint32_t opt, char *args) {
 	if (global_pref[opt].dynamic == 1)
 		free(global_pref[opt].val.s);
 

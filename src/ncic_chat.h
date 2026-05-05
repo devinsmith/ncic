@@ -51,8 +51,6 @@ int chat_leave(struct pork_acct *acct, char *chat_name, int close_window);
 int chat_leave_all(struct pork_acct *acct);
 struct chatroom *chat_find(struct pork_acct *acct, const char *chat_name);
 void chat_list(struct pork_acct *acct);
-int chat_free(struct pork_acct *acct, struct chatroom *chat, int silent);
-int chat_rejoin(struct pork_acct *acct, struct chatroom *chat);
 int chat_rejoin_all(struct pork_acct *acct);
 int chat_nick_change(struct pork_acct *acct, char *old, char *new_nick);
 

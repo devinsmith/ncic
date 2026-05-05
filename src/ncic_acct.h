@@ -71,7 +71,6 @@ struct pork_acct {
 	struct irc_session_t *data;
 };
 
-int pork_acct_del_refnum(char *reason);
 void pork_acct_del(struct pork_acct *acct, const char *reason);
 void pork_acct_del_all(const char *reason);
 struct pork_acct *pork_acct_find();
