@@ -158,35 +158,6 @@ static int read_acct_conf(struct pork_acct *acct, const char *filename) {
 	return (0);
 }
 
-int read_user_config(struct pork_acct *acct) {
-	char nname[NUSER_LEN];
-	char buf[PATH_MAX];
-	char *pork_dir = opt_get_str(OPT_NCIC_DIR);
-
-	if (acct == NULL || pork_dir == NULL)
-		return (-1);
-
-	normalize(nname, acct->username, sizeof(nname));
-
-	snprintf(buf, sizeof(buf), "%s/%s", pork_dir, nname);
-	if (pork_mkdir(buf) != 0)
-		return (-1);
-
-	snprintf(buf, sizeof(buf), "%s/%s/logs", pork_dir, nname);
-	if (pork_mkdir(buf) != 0)
-		return (-1);
-
-	snprintf(buf, sizeof(buf), "%s/%s/ncicrc", pork_dir, nname);
-	if (read_conf(buf) != 0 && errno != ENOENT)
-		screen_err_msg("There was an error reading your ncicrc file");
-
-	snprintf(buf, sizeof(buf), "%s/%s/account", pork_dir, nname);
-	if (read_acct_conf(acct, buf) != 0)
-		screen_err_msg("Error: Can't read account config file, %s", buf);
-
-	return (0);
-}
-
 static int save_acct_conf(struct pork_acct *acct, char *filename) {
 	char *fn;
 	size_t len;
@@ -219,27 +190,6 @@ static int save_acct_conf(struct pork_acct *acct, char *filename) {
 	}
 
 	free(fn);
-	return (0);
-}
-
-int save_user_config(struct pork_acct *acct) {
-	char nname[NUSER_LEN];
-	char buf[PATH_MAX];
-	char *pork_dir = opt_get_str(OPT_NCIC_DIR);
-
-	if (acct == NULL || pork_dir == NULL) {
-		debug("acct=%p port_dir=%p", acct, pork_dir);
-		return (-1);
-	}
-
-	normalize(nname, acct->username, sizeof(nname));
-
-	snprintf(buf, sizeof(buf), "%s/%s/buddy_list", pork_dir, nname);
-
-	snprintf(buf, sizeof(buf), "%s/%s/account", pork_dir, nname);
-	if (save_acct_conf(acct, buf) != 0)
-		screen_err_msg("Error: Can't write account config file, %s.", buf);
-
 	return (0);
 }
 
@@ -294,15 +244,6 @@ static void write_bind_line(void *data, void *filep) {
 
 	bind_get_keyname(binding->key, key_name, sizeof(key_name));
 	fprintf(fp, "bind %s %s\n", key_name, binding->binding);
-}
-
-static void write_bind_blist_line(void *data, void *filep) {
-  struct binding *binding = data;
-  FILE *fp = filep;
-	char key_name[32];
-
-	bind_get_keyname(binding->key, key_name, sizeof(key_name));
-	fprintf(fp, "bind -buddy %s %s\n", key_name, binding->binding);
 }
 
 int save_global_config(void) {

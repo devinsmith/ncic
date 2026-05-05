@@ -130,7 +130,7 @@ int xstrncat(char *dest, const char *src, size_t n) {
 	return (xstrncpy(dest, src, n));
 }
 
-char *xstrndup(const char *str, size_t len) {
+static char *xstrndup(const char *str, size_t len) {
 	char *dst;
 	char *ret;
 

@@ -27,7 +27,6 @@
 char *xstrdup(const char *str);
 void *xmalloc(size_t len);
 void *xcalloc(size_t nmemb, size_t len);
-char *xstrndup(const char *str, size_t len);
 void *xrealloc(void *ptr, size_t size);
 
 void strtoupper(char *s);

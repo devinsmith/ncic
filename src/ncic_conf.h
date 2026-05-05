@@ -17,7 +17,4 @@ int read_conf(const char *path);
 int read_global_config(void);
 int save_global_config(void);
 
-int read_user_config(struct pork_acct *acct);
-int save_user_config(struct pork_acct *acct);
-
 #endif /* __NCIC_CONF_H__ */
