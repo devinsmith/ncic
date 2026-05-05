@@ -24,13 +24,8 @@
 void log_init();
 void log_exit();
 
-void log_set_fp(FILE *fp);
 int log_set_logfile(const char *file);
-void log_msg(int lvl, const char *fmt, ...);
-void log_msgraw(int lvl, const char *fmt, ...);
 void log_tmsg(int lvl, const char *fmt, ...);
-void log_flush();
-void log_set_level(int lvl);
 
 #endif /* NCIC_LOG_H */
 

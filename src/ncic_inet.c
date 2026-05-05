@@ -30,32 +30,6 @@
 #include "ncic_screen_io.h"
 
 /*
-** Write to a socket, deal with interrupted and incomplete writes. Returns
-** the number of characters written to the socket on success, -1 on failure.
-*/
-
-ssize_t sock_write(int sock, void *buf, size_t len) {
-	ssize_t n, written = 0;
-
-	while (len > 0) {
-		n = write(sock, buf, len);
-		if (n == -1) {
-			if (errno == EINTR || errno == EAGAIN)
-				continue;
-
-			debug("sock: %s", strerror(errno));
-			return (-1);
-		}
-
-		written += n;
-		len -= n;
-		buf = (char *) buf + n;
-	}
-
-	return (written);
-}
-
-/*
 ** Returns the length of the sockaddr struct.
 */
 
@@ -70,7 +44,8 @@ static size_t sin_len(const struct sockaddr_storage *ss) {
 ** Sets the port for the approprite socket family.
 */
 
-void sin_set_port(struct sockaddr_storage *ss, in_port_t port) {
+static void sin_set_port(struct sockaddr_storage *ss, in_port_t port)
+{
 	if (ss->ss_family == AF_INET6)
 		SIN6(ss)->sin6_port = port;
 

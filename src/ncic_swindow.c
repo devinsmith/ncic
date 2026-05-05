@@ -518,24 +518,6 @@ int swindow_add(struct swindow *swindow, struct imsg *imsg, uint32_t msgtype) {
 	return (0);
 }
 
-/* Called when a message sent by a user is written to a window. */
-inline int swindow_input(struct swindow *swindow) {
-	/*
-	** If the window is scrolled up, and the scroll on
-	** input flag is set, scroll to the bottom of the
-	** window before doing anything else.
-	*/
-
-	if ((swindow->scrollbuf_bot != swindow->scrollbuf ||
-		swindow->bottom_hidden != 0) &&
-		swindow->scroll_on_input)
-	{
-		swindow_scroll_to_end(swindow);
-	}
-
-	return (0);
-}
-
 /*
 ** Scroll to the end of the scroll buffer (the bottom line).
 */
@@ -693,64 +675,6 @@ int swindow_scroll_by(struct swindow *swindow, int lines) {
 
 			return (1);
 		}
-	}
-
-	return (0);
-}
-
-/*
-** Print all messages in the buffer for this window that match
-** the specified regular expression.
-*/
-
-int swindow_print_matching(	struct swindow *swindow,
-							const char *regex,
-							uint32_t options)
-{
-	int cflags = REG_EXTENDED;
-	regex_t preg;
-	dlist_t *cur;
-	dlist_t *match_list = NULL;
-
-	if (regex == NULL)
-		return (-1);
-
-	if (options & SWINDOW_FIND_ICASE)
-		cflags |= REG_ICASE;
-
-	if (options & SWINDOW_FIND_BASIC)
-		cflags &= ~REG_EXTENDED;
-
-	if (regcomp(&preg, regex, cflags) != 0)
-		return (-1);
-
-	for (cur = swindow->scrollbuf ; cur != NULL ; cur = cur->next) {
-		struct imsg *imsg = cur->data;
-		char *buf;
-
-		buf = cstr_to_plaintext(imsg->text, imsg->len);
-		if (buf != NULL) {
-			if (regexec(&preg, buf, 0, NULL, 0) == 0)
-				match_list = dlist_add_head(match_list, imsg);
-			free(buf);
-		}
-	}
-
-	regfree(&preg);
-
-	/*
-	** Better to compile a list of matches and print them after scanning
-	** the whole buffer. If we started scanning at the oldest message and
-	** printed matches as we traversed the scrollbuffer list, bad interactions
-	** with swindow_prune() could occur.
-	*/
-	cur = match_list;
-	while (cur != NULL) {
-		dlist_t *next = cur->next;
-
-		swindow_add(swindow, imsg_copy(swindow, cur->data), MSG_TYPE_LASTLOG);
-		free(cur);
-		cur = next;
 	}
 
 	return (0);

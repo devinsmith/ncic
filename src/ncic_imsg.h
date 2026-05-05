@@ -66,7 +66,6 @@ struct imsg {
 
 uint32_t imsg_lines(struct swindow *swindow, struct imsg *imsg);
 struct imsg *imsg_new(struct swindow *swindow, chtype *msg, size_t len);
-struct imsg *imsg_copy(struct swindow *swindow, struct imsg *imsg);
 chtype *imsg_partial(struct swindow *swindow, struct imsg *imsg, uint32_t n);
 
 #endif /* __NCIC_IMSG_H__ */

@@ -33,11 +33,6 @@ void log_init()
   s_log_level = 0;
 }
 
-void log_set_level(int lvl)
-{
-  s_log_level = lvl;
-}
-
 void log_exit()
 {
   if (s_log_fp != NULL)
@@ -53,51 +48,6 @@ int log_set_logfile(const char *file)
 	if (s_log_fp == NULL)
 		return -1;
 	return 0;
-}
-
-void log_set_fp(FILE *fp)
-{
-  s_log_fp = fp;
-}
-
-void log_msg(int lvl, const char *fmt, ...)
-{
-  va_list ap;
-
-  va_start(ap, fmt);
-  if (s_log_level >= lvl) {
-    if (s_log_fp != NULL) {
-      // fprintf it
-      vfprintf(s_log_fp, fmt, ap);
-      fprintf(s_log_fp, "\n");
-      fflush(s_log_fp);
-    }
-    else {
-      /* Just output to stdout */
-      (void) vfprintf(stdout, fmt, ap);
-      fprintf(stdout, "\n");
-    }
-  }
-  va_end(ap);
-}
-
-void log_msgraw(int lvl, const char *fmt, ...)
-{
-  va_list ap;
-
-  va_start(ap, fmt);
-  if (s_log_level >= lvl) {
-    if (s_log_fp != NULL) {
-      // fprintf it
-      vfprintf(s_log_fp, fmt, ap);
-      fflush(s_log_fp);
-    }
-    else {
-      /* Just output to stdout */
-      (void) vfprintf(stdout, fmt, ap);
-    }
-  }
-  va_end(ap);
 }
 
 void
@@ -133,14 +83,5 @@ log_tmsg(int lvl, const char *fmt, ...)
 		}
 	}
 	va_end(ap);
-}
-
-void log_flush()
-{
-  if (s_log_fp != NULL) {
-    fflush(s_log_fp);
-  } else {
-    fflush(stdout);
-  }
 }
 

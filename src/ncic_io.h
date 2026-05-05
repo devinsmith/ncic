@@ -30,10 +30,8 @@ int pork_io_init(void);
 void pork_io_destroy(void);
 int pork_io_del(void *key);
 int pork_io_run(void);
-int pork_io_dead(void *key);
 int pork_io_add_cond(void *key, u_int32_t new_cond);
 int pork_io_del_cond(void *key, u_int32_t new_cond);
-int pork_io_set_cond(void *key, u_int32_t new_cond);
 
 int pork_io_add(int fd,
 				u_int32_t cond,

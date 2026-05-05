@@ -74,7 +74,6 @@ int swindow_init(	struct swindow *swindow,
 
 int swindow_destroy(struct swindow *swindow);
 int swindow_add(struct swindow *swindow, struct imsg *imsg, uint32_t type);
-int swindow_input(struct swindow *swindow);
 void swindow_redraw(struct swindow *swindow);
 void swindow_clear(struct swindow *swindow);
 void swindow_erase(struct swindow *swindow);
@@ -83,10 +82,6 @@ int swindow_refresh(struct swindow *swindow);
 void swindow_resize(struct swindow *swindow,
 					uint32_t new_row,
 					uint32_t new_col);
-
-int swindow_print_matching(	struct swindow *swindow,
-							const char *regex,
-							uint32_t options);
 
 int swindow_dump_buffer(struct swindow *swindow, char *file);
 int swindow_set_log(struct swindow *swindow);

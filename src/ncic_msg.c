@@ -132,23 +132,6 @@ int pork_msg_send(struct pork_acct *acct, char *dest, char *msg) {
 	return (ret);
 }
 
-
-int pork_set_idle_time(struct pork_acct *acct, u_int32_t seconds) {
-	char timebuf[32];
-
-	if (acct->proto->set_idle_time == NULL)
-		return (-1);
-
-	acct->proto->set_idle_time(acct, seconds);
-	time_to_str_full(seconds, timebuf, sizeof(timebuf));
-
-	screen_win_msg(cur_window(), 1, 1, 0, MSG_TYPE_CMD_OUTPUT,
-		"%s's idle time set to %s", acct->username, timebuf);
-
-	return (0);
-}
-
-
 int pork_change_nick(struct pork_acct *acct, char *nick) {
 	if (acct->proto->change_nick != NULL)
 		return (acct->proto->change_nick(acct, nick));

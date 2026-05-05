@@ -198,12 +198,6 @@ int wopt_set(struct imwindow *imwindow, uint32_t opt, char *args);
 int opt_find(const char *name);
 int wopt_find(const char *name);
 
-int opt_get_val(const char *opt_name, char *buf, size_t len);
-int wopt_get_val(	struct imwindow *imwindow,
-					const char *opt_name,
-					char *buf,
-					size_t len);
-
 /*
 ** These used to be inline functions until I discovered
 ** how positively stupid GCC is. GCC refused to inline

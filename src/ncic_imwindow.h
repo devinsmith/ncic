@@ -53,13 +53,11 @@ void imwindow_resize(	struct imwindow *imwindow,
 						uint32_t cols);
 
 int imwindow_set_priv_input(struct imwindow *imwindow, int val);
-void imwindow_send_msg(struct imwindow *win);
 void imwindow_recv_msg(struct imwindow *win);
 int imwindow_bind_acct(struct imwindow *imwindow);
 int imwindow_bind_next_acct(struct imwindow *imwindow);
 int imwindow_refresh(struct imwindow *imwindow);
 void imwindow_destroy(struct imwindow *imwindow);
-void imwindow_buffer_find(struct imwindow *imwindow, char *str, uint32_t opt);
 
 struct imwindow *imwindow_find_refnum(uint32_t refnum);
 struct imwindow *imwindow_find(struct pork_acct *owner, const char *target);

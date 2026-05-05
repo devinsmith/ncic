@@ -43,7 +43,6 @@ int screen_make_query_window(struct pork_acct *acct,
 
 int screen_draw_input(void);
 int screen_set_quiet(int status);
-int screen_prompt_user(char *prompt, char *buf, size_t len);
 void screen_doupdate(void);
 
 /* yeah, yeah */

@@ -129,12 +129,6 @@ int imwindow_refresh(struct imwindow *imwindow) {
 	return (was_dirty_win);
 }
 
-void imwindow_buffer_find(struct imwindow *imwindow, char *str, uint32_t opt) {
-	screen_win_msg(cur_window(), 1, 1, 0, MSG_TYPE_LASTLOG, "Matching lines:");
-	swindow_print_matching(&imwindow->swindow, str, opt);
-	screen_win_msg(cur_window(), 1, 1, 0, MSG_TYPE_LASTLOG, "End of matches");
-}
-
 void imwindow_destroy(struct imwindow *imwindow) {
 	swindow_destroy(&imwindow->swindow);
 
@@ -165,10 +159,6 @@ struct imwindow *imwindow_find_refnum(uint32_t refnum) {
 	} while (cur != screen.window_list);
 
 	return (NULL);
-}
-
-void imwindow_send_msg(struct imwindow *win) {
-	swindow_input(&win->swindow);
 }
 
 void imwindow_recv_msg(struct imwindow *win) {

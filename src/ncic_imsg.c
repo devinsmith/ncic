@@ -101,29 +101,6 @@ struct imsg *imsg_new(struct swindow *swindow, chtype *msg, size_t len) {
 	return (imsg);
 }
 
-struct imsg *imsg_copy(struct swindow *swindow, struct imsg *imsg) {
-	struct imsg *new_imsg;
-	size_t msg_size;
-
-	/*
-	** I could add reference counting to imsg to avoid
-	** having to make a copy, but I think it'd be a net
-	** loss, considering the frequency of use of this function
-	** relative to the overhead of the reference counting.
-	*/
-
-	new_imsg = xmalloc(sizeof(*new_imsg));
-	new_imsg->len = imsg->len;
-	new_imsg->lines = imsg->lines;
-	new_imsg->serial = swindow->serial++;
-
-	msg_size = (imsg->len + 1) * sizeof(imsg->text[0]);
-	new_imsg->text = xmalloc(msg_size);
-	memcpy(new_imsg->text, imsg->text, msg_size);
-
-	return (new_imsg);
-}
-
 /*
 ** Return a pointer to the first character of the nth
 ** line of the message, given the current screen width.

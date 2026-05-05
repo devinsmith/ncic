@@ -94,28 +94,6 @@ int pork_io_del(void *key) {
 	return (0);
 }
 
-int pork_io_dead(void *key) {
-	dlist_t *node;
-
-	node = dlist_find(io_list, key, pork_io_find_cb);
-	if (node == NULL)
-		return (-1);
-
-	((struct io_source *) node->data)->fd = -1;
-	return (0);
-}
-
-int pork_io_set_cond(void *key, u_int32_t new_cond) {
-	dlist_t *node;
-
-	node = dlist_find(io_list, key, pork_io_find_cb);
-	if (node == NULL)
-		return (-1);
-
-	((struct io_source *) node->data)->cond = new_cond;
-	return (0);
-}
-
 int pork_io_add_cond(void *key, u_int32_t new_cond) {
 	dlist_t *node;
 

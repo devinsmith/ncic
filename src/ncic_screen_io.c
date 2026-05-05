@@ -96,23 +96,6 @@ int screen_set_quiet(int status) {
 	return (ret);
 }
 
-int screen_prompt_user(char *prompt, char *buf, size_t len) {
-	int ret;
-
-	buf[0] = '\0';
-
-	wmove(screen.status_bar, 1, 0);
-	wclrtoeol(screen.status_bar);
-
-	if (prompt != NULL)
-		waddstr(screen.status_bar, prompt);
-
-	wrefresh(screen.status_bar);
-
-	ret = wgetnstr(screen.status_bar, buf, len);
-	return (ret);
-}
-
 static void int_screen_win_msg(	struct imwindow *win,
 								u_int32_t opt,
 								u_int32_t msgtype,
