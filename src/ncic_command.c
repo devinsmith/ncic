@@ -846,45 +846,6 @@ USER_COMMAND(cmd_help) {
 	}
 }
 
-USER_COMMAND(cmd_lastlog) {
-	int opts = 0;
-
-	if (args == NULL)
-		return;
-
-	if (*args == '-') {
-		if (args[1] == ' ' || args[1] == '\0')
-			goto done;
-
-		args++;
-		if (*args == '-' && args[1] == ' ') {
-			args += 2;
-			goto done;
-		}
-
-		do {
-			switch (*args) {
-				case 'b':
-					opts |= SWINDOW_FIND_BASIC;
-					break;
-
-				case 'i':
-					opts |= SWINDOW_FIND_ICASE;
-					break;
-			}
-
-			if (*++args == ' ') {
-				args++;
-				break;
-			}
-		} while (*args != '\0');
-	}
-done:
-
-	if (*args != '\0')
-		imwindow_buffer_find(cur_window(), args, opts);
-}
-
 USER_COMMAND(cmd_load) {
 	int quiet;
 	char buf[PATH_MAX];
