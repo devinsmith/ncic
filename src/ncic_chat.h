@@ -46,7 +46,6 @@ struct chatroom *chat_new(	struct pork_acct *acct,
 							struct imwindow *win);
 
 int chat_send_msg(struct pork_acct *acct, struct chatroom *chat, const char *target, char *msg);
-int chat_send_notice(struct pork_acct *acct, struct chatroom *chat, char *target, char *msg);
 int chat_unignore(struct pork_acct *acct, char *chat_name, char *user);
 int chat_leave(struct pork_acct *acct, char *chat_name, int close_window);
 int chat_leave_all(struct pork_acct *acct);

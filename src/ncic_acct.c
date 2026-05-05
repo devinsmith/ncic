@@ -323,4 +323,3 @@ void pork_acct_reconnect_all(void) {
 		}
 	}
 }
-

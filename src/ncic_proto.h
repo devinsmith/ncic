@@ -41,7 +41,6 @@ struct pork_proto {
 	int (*chat_free)(struct pork_acct *, void *chat_data);
 	int (*chat_rejoin)(struct pork_acct *, struct chatroom *);
 	int (*chat_send)(struct pork_acct *, struct chatroom *chat, const char *, char *);
-	int (*chat_send_notice)(struct pork_acct *, struct chatroom *, char *, char *);
 	int (*chat_user_free)(struct pork_acct *acct, struct chat_user *);
 
 	int (*set_idle_time)(struct pork_acct *, u_int32_t);

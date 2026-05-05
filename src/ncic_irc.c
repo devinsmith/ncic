@@ -36,24 +36,23 @@
 #include "ncic_irc.h"
 #include "ncic_naken.h"
 
-static void irc_event(int sock, u_int32_t cond, void *data) {
-    struct irc_session_t *session = data;
+static void irc_event(int sock, u_int32_t cond, void *data)
+{
+  struct irc_session_t *session = data;
 
-	if (cond & IO_COND_READ) {
-		if (naken_input_dispatch(session) == -1) {
-			struct pork_acct *acct = session->data;
+  if (cond & IO_COND_READ) {
+    if (naken_input_dispatch(session) == -1) {
+      struct pork_acct *acct = session->data;
 
-			pork_sock_err(acct, sock);
+      pork_sock_err(acct, sock);
       pork_io_del(data);
-			int ret = pork_acct_disconnected(acct);
-      log_tmsg(0, "Acct disconnected: %d", ret);
-      session->data = NULL;
+      log_tmsg(0, "Acct disconnected: %d", pork_acct_disconnected(acct));
 
-			return;
-		}
-	}
+      return;
+    }
+  }
 
-	irc_flush_outq(session);
+  irc_flush_outq(session);
 }
 
 static void irc_connected(int sock, u_int32_t cond, void *data) {
@@ -151,7 +150,6 @@ static int irc_init(struct pork_acct *acct) {
 
 static int irc_free(struct pork_acct *acct) {
 	struct irc_session_t *session = acct->data;
-	u_int32_t i;
 
 	if (session->sslHandle != NULL) {
 		SSL_shutdown(session->sslHandle);
@@ -174,15 +172,44 @@ static int irc_free(struct pork_acct *acct) {
 	return (0);
 }
 
+static int irc_disconnected(struct pork_acct *acct) {
+  struct irc_session_t *session = acct->data;
+
+  if (session == NULL)
+    return (0);
+
+  pork_io_del(session);
+
+  if (session->sock >= 0) {
+    close(session->sock);
+    session->sock = -1;
+  }
+
+  if (session->sslHandle != NULL) {
+    SSL_shutdown(session->sslHandle);
+    SSL_free(session->sslHandle);
+    session->sslHandle = NULL;
+  }
+
+  if (session->sslContext != NULL) {
+    SSL_CTX_free(session->sslContext);
+    session->sslContext = NULL;
+  }
+
+  session->input_offset = 0;
+  session->last_update = 0;
+  return (0);
+}
+
 static int irc_update(struct pork_acct *acct) {
 	struct irc_session_t *session = acct->data;
 	time_t time_now;
 
-	if (session == NULL)
+	if (session == NULL || !acct->connected)
 		return (-1);
 
 	time(&time_now);
-	if (session->last_update + 300 <= time_now && acct->connected) {
+	if (session->last_update + 300 <= time_now) {
 		irc_send_pong(session, acct->server);
 		session->last_update = time_now;
 	}
@@ -306,6 +333,7 @@ int irc_proto_init(struct pork_proto *proto) {
 	proto->connect = irc_do_connect;
 	proto->connect_abort = irc_connect_abort;
 	proto->reconnect = irc_reconnect;
+	proto->disconnected = irc_disconnected;
 	proto->free = irc_free;
 	proto->init = irc_init;
 	proto->signoff = irc_quit;

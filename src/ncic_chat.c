@@ -81,30 +81,6 @@ int chat_send_msg(	struct pork_acct *acct,
 	return (0);
 }
 
-int chat_send_notice(	struct pork_acct *acct,
-						struct chatroom *chat,
-						char *target,
-						char *msg)
-{
-	if (acct->proto->chat_send == NULL || msg == NULL)
-		return (-1);
-
-	if (acct->proto->chat_send_notice(acct, chat, target, msg) != -1) {
-		char buf[4096];
-		int ret;
-
-		ret = fill_format_str(OPT_FORMAT_CHAT_SEND_NOTICE, buf, sizeof(buf),
-			acct, chat, target, msg);
-		if (ret < 1)
-			return (-1);
-		screen_print_str(chat->win, buf, (size_t) ret,
-			MSG_TYPE_CHAT_NOTICE_SEND);
-		imwindow_send_msg(chat->win);
-	}
-
-	return (0);
-}
-
 int chat_leave(struct pork_acct *acct, char *chat_name, int close_window) {
 	struct chatroom *chat;
 	struct imwindow *win;
