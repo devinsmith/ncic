@@ -127,31 +127,31 @@ out_fail:
 
 void sock_setkeepalive(int sockfd)
 {
-	int keep_alive = 1;
-	int keep_idle = 30;
-	int keep_cnt = 5;
-	int keep_intvl = 10;
+  int keep_alive = 1;
+  int keep_idle = 120;
+  int keep_cnt = 5;
+  int keep_intvl = 30;
 
-	if (setsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, &keep_alive,
-	    sizeof(keep_alive))) {
-		debug("ERROR: setsockopt(), SO_KEEPALIVE: %s", strerror(errno));
-	}
+  if (setsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, &keep_alive,
+      sizeof(keep_alive))) {
+    debug("ERROR: setsockopt(), SO_KEEPALIVE: %s", strerror(errno));
+  }
 #ifdef __linux__
-	/* Linux specific socket options */
-	if (setsockopt(sockfd, IPPROTO_TCP, TCP_KEEPIDLE, (void *)&keep_idle,
-	    sizeof(keep_idle))) {
-		debug("ERROR: setsocketopt(), SO_KEEPIDLE: %s", strerror(errno));
-	}
+  /* Linux specific socket options */
+  if (setsockopt(sockfd, IPPROTO_TCP, TCP_KEEPIDLE, (void *)&keep_idle,
+      sizeof(keep_idle))) {
+    debug("ERROR: setsocketopt(), SO_KEEPIDLE: %s", strerror(errno));
+  }
 
-	if (setsockopt(sockfd, IPPROTO_TCP, TCP_KEEPCNT, (void *)&keep_cnt,
-	    sizeof(keep_cnt))) {
-		debug("ERROR: setsocketopt(), SO_KEEPCNT: %s", strerror(errno));
-	}
+  if (setsockopt(sockfd, IPPROTO_TCP, TCP_KEEPCNT, (void *)&keep_cnt,
+      sizeof(keep_cnt))) {
+    debug("ERROR: setsocketopt(), SO_KEEPCNT: %s", strerror(errno));
+  }
 
-	if (setsockopt(sockfd, IPPROTO_TCP, TCP_KEEPINTVL, (void *)&keep_intvl,
-	    sizeof(keep_intvl))) {
-		debug("ERROR: setsocketopt(), SO_KEEPINTVL: %s", strerror(errno));
-	}
+  if (setsockopt(sockfd, IPPROTO_TCP, TCP_KEEPINTVL, (void *)&keep_intvl,
+      sizeof(keep_intvl))) {
+    debug("ERROR: setsocketopt(), SO_KEEPINTVL: %s", strerror(errno));
+  }
 #endif /* __linux__ */
 }
 
