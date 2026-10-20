@@ -37,147 +37,183 @@ static int naken_handler_nick(struct pork_acct *acct, struct naken_input *in,
 
 static int naken_process_input(struct irc_session_t *session, char *input, int len)
 {
-	struct pork_acct *acct = session->data;
-	struct naken_input *in;
-	char *tmp;
-	int number;
+  struct pork_acct *acct = session->data;
+  struct naken_input *in;
+  char *tmp;
+  int number;
 
-	if (input[0] == '@') {
-		struct chatroom *chat;
+  if (input[0] == '@') {
+    struct chatroom *chat;
 
-		acct->state = STATE_READY;
-		pork_acct_connected(acct);
+    acct->state = STATE_READY;
+    pork_acct_connected(acct);
 
-		chat = chat_new(acct, "main", "main", screen.status_win);
-		return 0;
-	}
+    chat = chat_new(acct, "main", "main", screen.status_win);
+    return 0;
+  }
 
-	if (len < 1) {
-		screen_win_msg(cur_window(), 0, 0, 0, MSG_TYPE_CMD_OUTPUT, "%s", input);
-		return 0;
-	}
+  if (len < 1) {
+    screen_win_msg(cur_window(), 0, 0, 0, MSG_TYPE_CMD_OUTPUT, "%s", input);
+    return 0;
+  }
 
   // Best to use ngnc's solution at some point (for tab completion)
-	if (input[0] == '+' && input[1] == '[') {
-		int name_len;
+  if (input[0] == '+' && input[1] == '[') {
+    int name_len;
 
-		/* Add a user to the user list. Do a simple tokenization
-		 * of the input. +[#]User where
-		 * # = the user number (line/id)
-		 * User = the user name */
+    /* Add a user to the user list. Do a simple tokenization
+     * of the input. +[#]User where
+     * # = the user number (line/id)
+     * User = the user name */
 
-		tmp = strchr(input, ']');
-		*tmp = '\0';
+    tmp = strchr(input, ']');
+    *tmp = '\0';
 
-		number = atoi(input + 2);
+    number = atoi(input + 2);
 
-		return 0;
-	}
+    return 0;
+  }
 
-	if (input[0] == '-' && input[1] == '[') {
-		/* Remove a user from the user list */
-		tmp = strchr(input, ']');
-		*tmp = '\0';
+  if (input[0] == '-' && input[1] == '[') {
+    /* Remove a user from the user list */
+    tmp = strchr(input, ']');
+    *tmp = '\0';
 
-		number = atoi(input + 2);
+    number = atoi(input + 2);
 
-		return 0;
-	}
-	if (strstr(input, ">> At the tone")) {
-		return 0;
-	}
+    return 0;
+  }
+  if (strstr(input, ">> At the tone")) {
+    return 0;
+  }
 
-	if (acct->id <= 0) {
+  if (acct->id <= 0) {
 
-	}
+  }
 
-	in = naken_tokenize(session, input);
-	if (input[0] == '>') {
-		ncic_recv_sys_alert(acct, in->orig);
-	} else {
-	  if (in->msg_type == MSG_MINE) {
-	    ncic_recv_highlight_msg(acct, in->message);
-	  } else {
-      screen_win_msg(cur_window(), 0, 0, 0, MSG_TYPE_CMD_OUTPUT, "%s", in->orig);
+  in = naken_tokenize(session, input);
+  if (input[0] == '>') {
+    ncic_recv_sys_alert(acct, in->orig);
+  } else {
+    if (in->msg_type == MSG_MINE) {
+      ncic_recv_highlight_msg(acct, in->message);
+    } else {
+
+      // Highlight others with colors.
+      static const char *user_colors[] = {
+        "%R", "%B", "%G", "%M", "%C", "%Y", "%W", "%D"
+      };
+
+      char buf[4096];
+      int ci = in->sender % 8; // sizeof user_colors
+      char *bracket_end;
+      char *colon;
+
+      if (in->msg_type == MSG_PRIVATE) {
+        bracket_end = strchr(in->orig, '>');
+      } else if (in->msg_type == MSG_YELL) {
+        bracket_end = strchr(in->orig, '#');
+        if (bracket_end) {
+          bracket_end = strchr(bracket_end + 1, '#');
+        }
+      } else {
+        bracket_end = strchr(in->orig, ']');
+      }
+
+      colon = strchr(in->orig, ':');
+      if (bracket_end && colon && colon > bracket_end) {
+        int prefix_len = bracket_end - in->orig + 1;
+        int name_len = colon - bracket_end - 1;
+        if (name_len < 0) name_len = 0;
+        snprintf(buf, sizeof(buf), "%.*s%s%.*s%%x%s",
+          prefix_len, in->orig,
+          user_colors[ci],
+          name_len, bracket_end + 1,
+          colon + 1);
+      } else {
+         xstrncpy(buf, in->orig, sizeof(buf));
+      }
+      screen_win_msg(cur_window(), 0, 0, 1, MSG_TYPE_CMD_OUTPUT, "%s", buf);
+      //screen_win_msg(cur_window(), 0, 0, 0, MSG_TYPE_CMD_OUTPUT, "%s", in->orig);
     }
-	}
+  }
 
-	free(in->orig);
-	free(in->message);
-	free(in);
-	return 0;
+  free(in->orig);
+  free(in->message);
+  free(in);
+  return 0;
 }
 
 static struct naken_input *naken_tokenize(struct irc_session_t *session, char *input)
 {
-	struct naken_input *in = xcalloc(1, sizeof(*in));
-	char *sender;
-	char *message;
-	char *tmp;
-	struct pork_acct *acct = session->data;
+  struct naken_input *in = xcalloc(1, sizeof(*in));
+  char *sender;
+  char *message;
+  char *tmp;
+  struct pork_acct *acct = session->data;
 
-	in->orig = xstrdup(input);
+  in->orig = xstrdup(input);
 
-	/* Identify the type of message we received */
-	in->msg_type = MSG_NORMAL;
+  /* Identify the type of message we received */
+  in->msg_type = MSG_NORMAL;
 
-	if (input[0] == '>') {
-		in->msg_type = MSG_SYSTEM_ALERT;
-		/* Process system messages. They all start with >> */
-		if (strstr(input, ">> Your name is") != NULL) {
-			char *old_name;
+  if (input[0] == '>') {
+    in->msg_type = MSG_SYSTEM_ALERT;
+    /* Process system messages. They all start with >> */
+    if (strstr(input, ">> Your name is") != NULL) {
+      char *old_name;
 
-			/* Handle name change */
-			old_name = xstrdup(acct->username);
-			/* Search for the first colon in the input string. */
-			tmp = strchr(input, ':');
-			tmp += 2; /* Go past : and space */
-			in->args = tmp;
-			naken_handler_nick(acct, in, old_name);
-			free(old_name);
-		} else if (strstr(input, ">> You just logged on line") != NULL) {
-		  sscanf(input, "%*c%*c %*s %*s %*s %*s %*s %d", &acct->id);
-		}
-		return (in);
-	}
+      /* Handle name change */
+      old_name = xstrdup(acct->username);
+      /* Search for the first colon in the input string. */
+      tmp = strchr(input, ':');
+      tmp += 2; /* Go past : and space */
+      in->args = tmp;
+      naken_handler_nick(acct, in, old_name);
+      free(old_name);
+    } else if (strstr(input, ">> You just logged on line") != NULL) {
+      sscanf(input, "%*c%*c %*s %*s %*s %*s %*s %d", &acct->id);
+    }
+    return (in);
+  }
 
-	if (input[0] == '<') {
-		/* We got a private message */
-		in->msg_type = MSG_PRIVATE;
-	} else if (input[0] == '#') {
-		/* Got a yell */
-		in->msg_type = MSG_YELL;
-	}
+  if (input[0] == '<') {
+    /* We got a private message */
+    in->msg_type = MSG_PRIVATE;
+  } else if (input[0] == '#') {
+    /* Got a yell */
+    in->msg_type = MSG_YELL;
+  }
 
-	/* Now we will get the sender, the number, and the message, using
-	 * strchr and strstr processing. */
-	message = strchr(input, ':');
-	if (message != NULL) {
-		*message = '\0';
-		message += 2; /* Go past the NULL and the space */
-	} else {
-		in->msg_type = MSG_SYSTEM_NORMAL;
-		in->message = NULL;
-		return (in);
-	}
-	sender = input;
+  /* Now we will get the sender, the number, and the message, using
+   * strchr and strstr processing. */
+  message = strchr(input, ':');
+  if (message != NULL) {
+    *message = '\0';
+    message += 2; /* Go past the NULL and the space */
+  } else {
+    in->msg_type = MSG_SYSTEM_NORMAL;
+    in->message = NULL;
+    return (in);
+  }
+  sender = input;
 
-	/* Get the sender's number */
-	if (in->msg_type == MSG_PRIVATE) {
-		tmp = strchr(sender, '>');
-	} else if (in->msg_type == MSG_YELL) {
-		tmp = strchr(sender, '#');
-		tmp = strchr(tmp + 1, '#');
-	} else {
-		tmp = strchr(sender, ']');
-		if (tmp != NULL) {
-			in->msg_type = MSG_NORMAL;
-		} else {
-			in->message = NULL;
-			return (in);
-		}
-	}
-	*tmp = '\0';
+  /* Get the sender's number */
+  if (in->msg_type == MSG_PRIVATE) {
+    tmp = strchr(sender, '>');
+  } else if (in->msg_type == MSG_YELL) {
+    tmp = strchr(sender, '#');
+    tmp = strchr(tmp + 1, '#');
+  } else {
+    tmp = strchr(sender, ']');
+    if (tmp != NULL) {
+      in->msg_type = MSG_NORMAL;
+    } else {
+      in->message = NULL;
+      return (in);
+    }
+  }
+  *tmp = '\0';
 
   in->sender = atoi(input + 1);
   if (in->sender == acct->id && in->msg_type == MSG_NORMAL) {
