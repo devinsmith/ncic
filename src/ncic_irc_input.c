@@ -101,11 +101,11 @@ static int naken_process_input(struct irc_session_t *session, char *input, int l
 
       // Highlight others with colors.
       static const char *user_colors[] = {
-        "%R", "%B", "%G", "%M", "%C", "%Y", "%W", "%D"
+        "%B", "%G", "%M", "%C", "%Y", "%W", "%D"
       };
 
       char buf[4096];
-      int ci = in->sender % 8; // sizeof user_colors
+      int ci = in->sender % 7; // sizeof user_colors
       char *bracket_end;
       char *colon;
 
@@ -122,16 +122,13 @@ static int naken_process_input(struct irc_session_t *session, char *input, int l
 
       colon = strchr(in->orig, ':');
       if (bracket_end && colon && colon > bracket_end) {
-        int prefix_len = bracket_end - in->orig + 1;
-        int name_len = colon - bracket_end - 1;
-        if (name_len < 0) name_len = 0;
-        snprintf(buf, sizeof(buf), "%.*s%s%.*s%%x%s",
-          prefix_len, in->orig,
-          user_colors[ci],
-          name_len, bracket_end + 1,
+        int colored_len = colon - in->orig;
+        if (colored_len < 0) colored_len = 0;
+        snprintf(buf, sizeof(buf), "%s%.*s%%x%s",
+          user_colors[ci], colored_len, in->orig,
           colon + 1);
       } else {
-         xstrncpy(buf, in->orig, sizeof(buf));
+        xstrncpy(buf, in->orig, sizeof(buf));
       }
       screen_win_msg(cur_window(), 0, 0, 1, MSG_TYPE_CMD_OUTPUT, "%s", buf);
       //screen_win_msg(cur_window(), 0, 0, 0, MSG_TYPE_CMD_OUTPUT, "%s", in->orig);
