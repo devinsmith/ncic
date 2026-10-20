@@ -101,11 +101,11 @@ static int naken_process_input(struct irc_session_t *session, char *input, int l
 
       // Highlight others with colors.
       static const char *user_colors[] = {
-        "%B", "%G", "%M", "%C", "%Y", "%W", "%D"
+        "%G", "%M", "%C", "%Y", "%W", "%D"
       };
 
       char buf[4096];
-      int ci = in->sender % 7; // sizeof user_colors
+      int ci = in->sender % 6; // sizeof user_colors
       char *bracket_end;
       char *colon;
 
@@ -126,7 +126,7 @@ static int naken_process_input(struct irc_session_t *session, char *input, int l
         if (colored_len < 0) colored_len = 0;
         snprintf(buf, sizeof(buf), "%s%.*s%%x%s",
           user_colors[ci], colored_len, in->orig,
-          colon + 1);
+          colon);
       } else {
         xstrncpy(buf, in->orig, sizeof(buf));
       }
