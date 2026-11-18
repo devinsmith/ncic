@@ -83,13 +83,6 @@ static int naken_process_input(struct irc_session_t *session, char *input, int l
 
     return 0;
   }
-  if (strstr(input, ">> At the tone")) {
-    return 0;
-  }
-
-  if (acct->id <= 0) {
-
-  }
 
   in = naken_tokenize(session, input);
   if (input[0] == '>') {
