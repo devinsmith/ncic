@@ -1075,7 +1075,7 @@ static int run_one_command(const char *str, u_int32_t set)
 
   std::string_view input(str);
   size_t pos = input.find_first_of(" \t");
-  std::string_view cmd_str = input.substr(0, pos);
+  std::string cmd_str(input.substr(0, pos));
 
   if (pos != std::string_view::npos) {
     input.remove_prefix(pos + 1);
@@ -1083,7 +1083,7 @@ static int run_one_command(const char *str, u_int32_t set)
     input = {};
   }
 
-  cmd = (struct command *)bsearch(cmd_str.data(), command_set[set].set,
+  cmd = (struct command *)bsearch(cmd_str.c_str(), command_set[set].set,
       command_set[set].elem, sizeof(struct command), cmd_compare);
 
   if (cmd == nullptr) {
