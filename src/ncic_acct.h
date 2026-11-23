@@ -14,7 +14,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <stdbool.h>
 
 #include "ncic_inet.h"
 #include "ncic_list.h"
@@ -31,44 +30,46 @@ enum {
 struct pork_proto;
 
 struct pork_acct {
-	char *username;
-	char *passwd;
-	char *userhost;
-	char *away_msg;
+  char *username;
+  char *passwd;
+  char *userhost;
+  char *away_msg;
 
-	time_t last_input;
+  const char *gagged_users;
 
-	int id;
-	int state;
+  time_t last_input;
 
-	u_int16_t idle_time;
+  int id;
+  int state;
 
-	bool report_idle;
-	bool marked_idle;
-	bool can_connect;
-	/* presently connected */
-	bool connected;
-	/* ever successfully connected */
-	bool successful_connect;
-	/* presently disconnected */
-	bool disconnected;
-	/* presently in the process of reconnecting */
-	bool reconnecting;
+  u_int16_t idle_time;
 
-	u_int32_t reconnect_tries;
-	time_t reconnect_next_try;
+  bool report_idle;
+  bool marked_idle;
+  bool can_connect;
+  /* presently connected */
+  bool connected;
+  /* ever successfully connected */
+  bool successful_connect;
+  /* presently disconnected */
+  bool disconnected;
+  /* presently in the process of reconnecting */
+  bool reconnecting;
 
-	u_int32_t ref_count;
-	u_int32_t refnum;
+  u_int32_t reconnect_tries;
+  time_t reconnect_next_try;
 
-	dlist_t *chat_list;
-	hash_t autoreply;
+  u_int32_t ref_count;
+  u_int32_t refnum;
 
-	char *fport;
-	char *server;
+  dlist_t *chat_list;
+  hash_t autoreply;
 
-	struct pork_proto *proto;
-	struct irc_session_t *data;
+  char *fport;
+  char *server;
+
+  struct pork_proto *proto;
+  struct irc_session_t *data;
 };
 
 void pork_acct_del(struct pork_acct *acct, const char *reason);

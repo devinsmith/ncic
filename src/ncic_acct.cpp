@@ -197,27 +197,28 @@ static inline u_int32_t pork_acct_get_new_refnum() {
 
 struct pork_acct *pork_acct_init(const char *user, int protocol) {
   struct pork_acct *acct = (struct pork_acct *)xcalloc(1, sizeof(*acct));
-	acct->username = xstrdup(user);
-	acct->state = STATE_DISCONNECTED;
+  acct->username = xstrdup(user);
+  acct->state = STATE_DISCONNECTED;
+  acct->gagged_users = opt_get_str(OPT_GAGGED_USERS);
 
-	acct->proto = proto_get(protocol);
+  acct->proto = proto_get(protocol);
 
-	if (protocol < 0)
-		return (acct);
+  if (protocol < 0)
+    return (acct);
 
-	if (acct->proto->init != NULL && acct->proto->init(acct) == -1)
-		goto out_fail2;
+  if (acct->proto->init != NULL && acct->proto->init(acct) == -1)
+    goto out_fail2;
 
-	acct->can_connect = true;
-	acct->refnum = pork_acct_get_new_refnum();
+  acct->can_connect = true;
+  acct->refnum = pork_acct_get_new_refnum();
 
-	time(&acct->last_input);
-	return (acct);
+  time(&acct->last_input);
+  return (acct);
 
 out_fail2:
-	free(acct->username);
-	free(acct);
-	return (NULL);
+  free(acct->username);
+  free(acct);
+  return (NULL);
 }
 
 void pork_acct_connected(struct pork_acct *acct) {

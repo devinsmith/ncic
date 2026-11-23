@@ -27,45 +27,45 @@ struct chatroom;
 struct pork_acct;
 
 enum {
-	MODE_PLUS = '+',
-	MODE_MINUS = '-'
+  MODE_PLUS = '+',
+  MODE_MINUS = '-'
 };
 
 struct irc_session_t {
-	int sock;
+  int sock;
 
   bool use_ssl;
-	SSL *sslHandle;
-	SSL_CTX *sslContext;
+  SSL *sslHandle;
+  SSL_CTX *sslContext;
 
-	pork_queue_t *inq;
-	pork_queue_t *outq;
+  pork_queue_t *inq;
+  pork_queue_t *outq;
 
-	char *server;
+  char *server;
 
-	time_t last_update;
-	size_t input_offset;
-	char input_buf[IRC_IN_BUFLEN];
-	struct pork_acct *data;
+  time_t last_update;
+  size_t input_offset;
+  char input_buf[IRC_IN_BUFLEN];
+  struct pork_acct *data;
 };
 
 struct irc_cmd_q {
-	char *cmd;
-	size_t len;
+  char *cmd;
+  size_t len;
 };
 
 struct irc_input {
-	char *tokens[20];
-	char *args;
-	char *cmd;
-	char *orig;
-	int numeric;
-	u_int32_t num_tokens;
+  char *tokens[20];
+  char *args;
+  char *cmd;
+  char *orig;
+  int numeric;
+  u_int32_t num_tokens;
 };
 
 struct callback_handler {
-	char *str;
-	int (*handler)(struct pork_acct *acct, struct irc_input *in);
+  char *str;
+  int (*handler)(struct pork_acct *acct, struct irc_input *in);
 };
 
 int irc_proto_init(struct pork_proto *proto);

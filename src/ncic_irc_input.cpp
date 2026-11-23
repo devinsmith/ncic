@@ -91,14 +91,7 @@ static int naken_process_input(struct irc_session_t *session, char *input, int l
     if (in->msg_type == MSG_MINE) {
       ncic_recv_highlight_msg(acct, in->message);
     } else {
-
-      // Highlight others with colors.
-      static const char *user_colors[] = {
-        "%G", "%M", "%C", "%Y", "%W", "%D"
-      };
-
       char buf[4096];
-      int ci = in->sender % 6; // sizeof user_colors
       char *bracket_end;
       char *colon;
 
@@ -115,16 +108,18 @@ static int naken_process_input(struct irc_session_t *session, char *input, int l
 
       colon = strchr(in->orig, ':');
       if (bracket_end && colon && colon > bracket_end) {
-        int colored_len = colon - in->orig;
-        if (colored_len < 0) colored_len = 0;
-        snprintf(buf, sizeof(buf), "%s%.*s%%x%s",
-          user_colors[ci], colored_len, in->orig,
-          colon);
+        char *name_start = bracket_end + 1;
+        int name_len = colon - name_start;
+
+        if (name_len > 0 && strncmp(name_start, acct->gagged_users, name_len) == 0) {
+          snprintf(buf, sizeof(buf), "%s%s", "%d", in->orig);
+        } else {
+          xstrncpy(buf, in->orig, sizeof(buf));
+        }
       } else {
         xstrncpy(buf, in->orig, sizeof(buf));
       }
       screen_win_msg(cur_window(), 0, 0, 1, MSG_TYPE_CMD_OUTPUT, "%s", buf);
-      //screen_win_msg(cur_window(), 0, 0, 0, MSG_TYPE_CMD_OUTPUT, "%s", in->orig);
     }
   }
 

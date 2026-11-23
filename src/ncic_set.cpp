@@ -124,11 +124,12 @@ struct global_pref global_pref[] = {
     { "FORMAT_WHOIS_USERINFO",      OPT_FORMAT, 0, opt_set_format, nullptr, {}, SET_STR(DEFAULT_FORMAT_WHOIS_USERINFO) },
     { "FORMAT_WHOIS_WARNLEVEL",     OPT_FORMAT, 0, opt_set_format, nullptr, {}, SET_STR(DEFAULT_FORMAT_WHOIS_WARNLEVEL) },
 
+    { "GAGGED_USERS",               OPT_STR,    0, opt_set_str,    nullptr, {}, nullptr },
+
     { "HISTORY_LEN",                OPT_INT,    0, opt_set_int,    nullptr, SET_INT(DEFAULT_HISTORY_LEN) },
     { "IDLE_AFTER",                 OPT_INT,    0, opt_set_int,    nullptr, SET_INT(DEFAULT_IDLE_AFTER) },
     { "LOG",                        OPT_BOOL,   0, opt_set_bool,   nullptr, SET_BOOL(DEFAULT_LOG) },
     { "LOG_TYPES",                  OPT_INT,    0, opt_set_int,    nullptr, SET_INT(DEFAULT_LOG_TYPES) },
-    { "LOGIN_ON_STARTUP",           OPT_BOOL,   0, opt_set_bool,   nullptr, SET_BOOL(DEFAULT_LOGIN_ON_STARTUP) },
 
     { "OUTGOING_MSG_FONT",          OPT_STR,    0, opt_set_str,    nullptr, {}, SET_STR(DEFAULT_OUTGOING_MSG_FONT) },
     { "OUTGOING_MSG_FONT_BGCOLOR",  OPT_STR,    0, opt_set_str,    nullptr, {}, SET_STR(DEFAULT_OUTGOING_MSG_FONT_BGCOLOR) },
@@ -159,7 +160,7 @@ struct global_pref global_pref[] = {
     { "TRANSFER_PORT_MAX",          OPT_INT,    0, opt_set_int,    nullptr, SET_INT(DEFAULT_TRANSFER_PORT_MAX) },
     { "TRANSFER_PORT_MIN",          OPT_INT,    0, opt_set_int,    nullptr, SET_INT(DEFAULT_TRANSFER_PORT_MIN) },
     { "WORDWRAP",                   OPT_BOOL,   0, opt_set_bool,   nullptr, SET_BOOL(DEFAULT_WORDWRAP) },
-    { "WORDWRAP_CHAR",              OPT_CHAR,   0, opt_set_char,   nullptr, SET_CHAR(DEFAULT_WORDWRAP_CHAR) },
+    { "WORDWRAP_CHAR",              OPT_CHAR,   0, opt_set_char,   nullptr, SET_CHAR(DEFAULT_WORDWRAP_CHAR) }
 };
 
 /*
