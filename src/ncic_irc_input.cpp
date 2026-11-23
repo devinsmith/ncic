@@ -111,7 +111,8 @@ static int naken_process_input(struct irc_session_t *session, char *input, int l
         char *name_start = bracket_end + 1;
         int name_len = colon - name_start;
 
-        if (name_len > 0 && strncmp(name_start, acct->gagged_users, name_len) == 0) {
+        if (acct->gagged_users != nullptr && name_len > 0 &&
+            strncmp(name_start, acct->gagged_users, name_len) == 0) {
           snprintf(buf, sizeof(buf), "%s%s", "%d", in->orig);
         } else {
           xstrncpy(buf, in->orig, sizeof(buf));
