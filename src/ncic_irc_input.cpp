@@ -136,7 +136,7 @@ static int naken_process_input(struct irc_session_t *session, char *input, int l
 
 static struct naken_input *naken_tokenize(struct irc_session_t *session, char *input)
 {
-  struct naken_input *in = xcalloc(1, sizeof(*in));
+  struct naken_input *in = (struct naken_input *)xcalloc(1, sizeof(*in));
   char *sender;
   char *message;
   char *tmp;

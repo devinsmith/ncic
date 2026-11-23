@@ -109,7 +109,7 @@ USER_COMMAND(cmd_history_prev);
 static void print_binding(void *data, void *nothing);
 static void print_alias(void *data, void *nothing);
 static int cmd_compare(const void *l, const void *r);
-static int run_one_command(char *str, u_int32_t set);
+static int run_one_command(const char *str, u_int32_t set);
 
 enum {
   CMDSET_MAIN,
@@ -906,7 +906,7 @@ USER_COMMAND(cmd_send) {
 	if (imwindow->type == WIN_TYPE_PRIVMSG)
 		pork_msg_send(acct, imwindow->target, args);
 	else if (imwindow->type == WIN_TYPE_CHAT) {
-		struct chatroom *chat = imwindow->data;
+		struct chatroom *chat = (struct chatroom *)imwindow->data;
 
 		if (chat == NULL) {
 			screen_err_msg("%s is not a member of %s",
@@ -914,7 +914,7 @@ USER_COMMAND(cmd_send) {
 		} else
 			chat_send_msg(acct, chat, chat->title, args);
 	} else if (imwindow->type == WIN_TYPE_STATUS) {
-		chat_send_msg(acct, imwindow->data, "main", args);
+		chat_send_msg(acct, (struct chatroom *)imwindow->data, "main", args);
 	}
 }
 
@@ -1058,41 +1058,47 @@ int run_mcommand(char *str) {
 	return (i);
 }
 
-static int run_one_command(char *str, u_int32_t set) {
-	char *cmd_str;
-	struct command *cmd;
+static int run_one_command(const char *str, u_int32_t set)
+{
+  struct command *cmd;
+  std::string alias_str;
 
-	if (set == CMDSET_MAIN) {
-		int ret;
-		char *alias_str;
+  if (set == CMDSET_MAIN) {
+    int ret = alias_resolve(&screen.alias_hash, str, alias_str);
+    if (ret == 0) {
+      str = alias_str.c_str();
+    } else if (ret == 1) {
+      screen_err_msg("The alias chain is too long");
+      return -1;
+    }
+  }
 
-		ret = alias_resolve(&screen.alias_hash, str, &alias_str);
-		if (ret == 0)
-			str = alias_str;
-		else if (ret == 1) {
-			screen_err_msg("The alias chain is too long");
-			return (-1);
-		}
-	}
+  std::string_view input(str);
+  size_t pos = input.find_first_of(" \t");
+  std::string_view cmd_str = input.substr(0, pos);
 
-	cmd_str = strsep(&str, " \t");
+  if (pos != std::string_view::npos) {
+    input.remove_prefix(pos + 1);
+  } else {
+    input = {};
+  }
 
-	cmd = (struct command *)bsearch(cmd_str, command_set[set].set, command_set[set].elem,
-			sizeof(struct command), cmd_compare);
+  cmd = (struct command *)bsearch(cmd_str.data(), command_set[set].set,
+      command_set[set].elem, sizeof(struct command), cmd_compare);
 
-	if (cmd == NULL) {
+  if (cmd == nullptr) {
     screen_err_msg("Unknown %scommand: %s",
-      command_set[set].type, cmd_str);
+      command_set[set].type, cmd_str.data());
 
-		return (-1);
-	}
+    return -1;
+  }
 
-	cmd->cmd(str);
-	return (0);
+  cmd->cmd(const_cast<char *>(input.data()));
+  return 0;
 }
 
 static void print_binding(void *data, void *nothing __notused) {
-	struct binding *binding = data;
+	struct binding *binding = (struct binding *)data;
 	char key_name[32];
 
 	bind_get_keyname(binding->key, key_name, sizeof(key_name));
@@ -1100,7 +1106,7 @@ static void print_binding(void *data, void *nothing __notused) {
 }
 
 static void print_alias(void *data, void *nothing __notused) {
-	struct alias *alias = data;
+	struct alias *alias = (struct alias *)data;
 
 	screen_cmd_output("%s is aliased to %s%s",
 		alias->alias, alias->orig, (alias->args != NULL ? alias->args : ""));

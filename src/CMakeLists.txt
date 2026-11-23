@@ -8,15 +8,15 @@ set(CURSES_NEED_NCURSES TRUE)
 set(CURSES_NEED_WIDE TRUE)
 find_package(Curses REQUIRED)
 
-set(SOURCES ncic.c ncic_acct.c ncic_alias.c ncic_bind.c
-       ncic_chat.c ncic_color.c ncic_command.c ncic_conf.c
-       ncic_cstr.c ncic_format.c ncic_help.c ncic_imsg.c
-       ncic_imwindow.c ncic_inet.c ncic_input.c ncic_io.c
-       ncic_list.c ncic_misc.c ncic_msg.c ncic_opt.c ncic_proto.c
-       ncic_queue.c ncic_screen.c ncic_screen_io.c ncic_set.c
-       ncic_status.c ncic_swindow.c
-       ncic_util.c ncic_irc.c ncic_irc_input.c ncic_irc_output.c
-       ncic_naken.c ncic_log.c
+set(SOURCES ncic.cpp ncic_acct.cpp ncic_alias.cpp ncic_bind.cpp
+       ncic_chat.cpp ncic_color.cpp ncic_command.cpp ncic_conf.cpp
+       ncic_cstr.cpp ncic_format.cpp ncic_help.cpp ncic_imsg.cpp
+       ncic_imwindow.cpp ncic_inet.cpp ncic_input.cpp ncic_io.cpp
+       ncic_list.cpp ncic_misc.cpp ncic_msg.cpp ncic_opt.cpp ncic_proto.cpp
+       ncic_queue.cpp ncic_screen.cpp ncic_screen_io.cpp ncic_set.cpp
+       ncic_status.cpp ncic_swindow.cpp
+       ncic_util.cpp ncic_irc.cpp ncic_irc_input.cpp ncic_irc_output.cpp
+       ncic_naken.cpp ncic_log.cpp
 )
 
 set(HEADERS ncic_acct.h ncic_cstr.h ncic_irc.h     ncic_screen_io.h

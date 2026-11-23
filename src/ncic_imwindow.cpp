@@ -49,7 +49,7 @@ struct imwindow *imwindow_new(uint32_t rows,
 
 	xstrncpy(nname, target, sizeof(nname));
 
-	imwindow = xcalloc(1, sizeof(*imwindow));
+	imwindow = (struct imwindow *)xcalloc(1, sizeof(*imwindow));
 	imwindow->refnum = refnum;
 	imwindow->type = type;
 	imwindow->target = xstrdup(nname);
@@ -68,7 +68,7 @@ struct imwindow *imwindow_new(uint32_t rows,
 	*/
 
 	if (wopt_get_bool(imwindow->opts, WOPT_PRIVATE_INPUT)) {
-		input = xmalloc(sizeof(*input));
+		input = (struct input *)xmalloc(sizeof(*input));
 		input_init(input, cols);
 	} else
 		input = &screen.input;
@@ -103,7 +103,7 @@ int imwindow_set_priv_input(struct imwindow *imwindow, int val) {
 	** Give this imwindow its own input buffer and history.
 	*/
 	if (val == 1) {
-		struct input *input = xmalloc(sizeof(*input));
+		struct input *input = (struct input *)xmalloc(sizeof(*input));
 
 		input_init(input, imwindow->swindow.cols);
 		imwindow->input = input;
@@ -150,7 +150,7 @@ struct imwindow *imwindow_find_refnum(uint32_t refnum) {
 	dlist_t *cur = screen.window_list;
 
 	do {
-		struct imwindow *imwindow = cur->data;
+		struct imwindow *imwindow = (struct imwindow *)cur->data;
 
 		if (imwindow->refnum == refnum)
 			return (imwindow);

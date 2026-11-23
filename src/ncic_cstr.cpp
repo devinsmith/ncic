@@ -52,7 +52,7 @@ size_t cstrlen(chtype *ch) {
 */
 
 char *cstr_to_plaintext(const chtype *cstr, size_t len) {
-	char *str = xmalloc(len + 1);
+	char *str = (char *)xmalloc(len + 1);
 	size_t i;
 
 	for (i = 0 ; i < len && cstr[i] != 0 ; i++)

@@ -62,20 +62,20 @@ static const struct keyval {
 
 static int bind_compare(void *l, void *r) {
 	int key = (intptr_t)(l);
-	struct binding *binding = r;
+	struct binding *binding = (struct binding *)r;
 
 	return (key - binding->key);
 }
 
 static int key_compare(const void *l, const void *r) {
-	const char *str = l;
-	const struct keyval *kv = r;
+	const char *str = (const char *)l;
+	const struct keyval *kv = (const struct keyval *)r;
 
 	return (strcasecmp(str, kv->name));
 }
 
 static void bind_hash_remove(void *param __notused, void *data) {
-	struct binding *binding = data;
+	struct binding *binding = (struct binding *)data;
 
 	free(binding->binding);
 	free(binding);

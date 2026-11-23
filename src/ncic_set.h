@@ -146,19 +146,20 @@ enum {
 struct imwindow;
 
 typedef union {
-	uint32_t i;
-	uint32_t b;
-	char c;
-	char *s;
+  uint32_t i;
+  uint32_t b;
+  char c;
+  char *s;
 } pref_val_t;
 
 struct global_pref {
-	const char *name;
-	uint32_t type:31;
-	uint32_t dynamic:1;
-	int (*set)(uint32_t, char *);
-	void (*updated)();
-	pref_val_t val;
+  const char *name;
+  uint32_t type:31;
+  uint32_t dynamic:1;
+  int (*set)(uint32_t, char *);
+  void (*updated)();
+  pref_val_t val;
+  const char *default_val;
 };
 
 struct window_var {
@@ -172,7 +173,6 @@ extern struct global_pref global_pref[OPT_NUM_OPTS];
 
 int opt_set_color(uint32_t opt, char *args);
 
-#define SET_STR(x)	{ .s = (x) }
 #define SET_INT(x)	{ .i = (x) }
 #define SET_CHAR(x)	{ .c = (x) }
 #define SET_BOOL(x)	{ .b = (x) }
@@ -190,6 +190,7 @@ void opt_write(FILE *fp);
 
 int opt_set(uint32_t opt, char *args);
 int wopt_set(struct imwindow *imwindow, uint32_t opt, char *args);
+const char *opt_get_str(uint32_t opt);
 
 int opt_find(const char *name);
 int wopt_find(const char *name);
@@ -205,7 +206,6 @@ int wopt_find(const char *name);
 #define opt_get_color(opt) (global_pref[(opt)].val.i)
 #define opt_get_bool(opt) (global_pref[(opt)].val.b)
 #define opt_get_char(opt) (global_pref[(opt)].val.c)
-#define opt_get_str(opt) (global_pref[(opt)].val.s)
 
 #define wopt_get_int(wopt, opt) ((wopt)[(opt)].i)
 #define wopt_get_str(wopt, opt) ((wopt)[(opt)].s)

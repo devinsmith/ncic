@@ -11,6 +11,8 @@
 #ifndef __NCIC_ALIAS_H__
 #define __NCIC_ALIAS_H__
 
+#include <string>
+
 struct alias {
 	char *alias;
 	char *orig;
@@ -18,9 +20,9 @@ struct alias {
 };
 
 int alias_init(hash_t *alias_hash);
-struct alias *alias_find(hash_t *alias_hash, char *str);
+struct alias *alias_find(hash_t *alias_hash, const char *str);
 int alias_add(hash_t *alias_hash, char *alias, char *str);
 int alias_remove(hash_t *alias_hash, char *alias);
-int alias_resolve(hash_t *alias_hash, char *str, char **result);
+int alias_resolve(hash_t *alias_hash, const char *str, std::string& result);
 
 #endif /* __NCIC_ALIAS_H__ */

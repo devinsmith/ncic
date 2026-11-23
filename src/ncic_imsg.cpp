@@ -90,9 +90,7 @@ uint32_t imsg_lines(struct swindow *swindow, struct imsg *imsg) {
 }
 
 struct imsg *imsg_new(struct swindow *swindow, chtype *msg, size_t len) {
-	struct imsg *imsg;
-
-	imsg = xmalloc(sizeof(*imsg));
+	struct imsg *imsg = (struct imsg *)xmalloc(sizeof(*imsg));
 	imsg->text = msg;
 	imsg->serial = swindow->serial++;
 	imsg->len = len;

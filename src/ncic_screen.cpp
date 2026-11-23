@@ -16,6 +16,8 @@
 #include <string.h>
 #include <sys/types.h>
 
+#include <algorithm>
+
 #include "ncic.h"
 #include "ncic_util.h"
 #include "ncic_list.h"
@@ -45,7 +47,7 @@ static dlist_t *screen_find_refnum(u_int32_t refnum) {
 	dlist_t *cur = screen.window_list;
 
 	do {
-		struct imwindow *imwindow = cur->data;
+		struct imwindow *imwindow = (struct imwindow *)cur->data;
 
 		if (imwindow->refnum == refnum)
 			return (cur);
@@ -60,7 +62,7 @@ static dlist_t *screen_find_refnum(u_int32_t refnum) {
 }
 
 static void screen_window_list_add(dlist_t *new_node) {
-	struct imwindow *imwindow = new_node->data;
+	struct imwindow *imwindow = (struct imwindow *)new_node->data;
 
 	/*
 	** The window list is a sorted circular doubly linked list.
@@ -76,7 +78,7 @@ static void screen_window_list_add(dlist_t *new_node) {
 		dlist_t *cur = screen.window_list;
 
 		do {
-			struct imwindow *imw = cur->data;
+			struct imwindow *imw = (struct imwindow *)cur->data;
 
 			if (imwindow->refnum < imw->refnum) {
 				if (cur == screen.window_list)
@@ -140,7 +142,7 @@ int screen_init(int rows, int cols) {
 	pork_io_add(STDIN_FILENO, IO_COND_READ, &screen, &screen,
 		keyboard_input);
 
-	rows = max(1, (int) rows - STATUS_ROWS);
+	rows = std::max(1, (int) rows - STATUS_ROWS);
 
 	imwindow = imwindow_new(rows, cols, 1, WIN_TYPE_STATUS, acct, "Main");
 	if (imwindow == NULL)
@@ -157,7 +159,7 @@ void screen_destroy(void) {
 	do {
 		dlist_t *next = cur->next;
 
-		imwindow_destroy(cur->data);
+		imwindow_destroy((struct imwindow *)cur->data);
 		free(cur);
 
 		cur = next;
@@ -172,7 +174,7 @@ void screen_destroy(void) {
 }
 
 static void screen_add_window(struct imwindow *imwindow) {
-	dlist_t *new_node = xmalloc(sizeof(*new_node));
+	dlist_t *new_node = (dlist_t *)xmalloc(sizeof(*new_node));
 
 	new_node->data = imwindow;
 	screen_window_list_add(new_node);
@@ -196,17 +198,17 @@ void screen_resize(u_int32_t rows, u_int32_t cols) {
 
 	cur = screen.window_list;
 	do {
-		struct imwindow *imwindow = cur->data;
+		struct imwindow *imwindow = (struct imwindow *)cur->data;
 		u_int32_t im_cols = cols;
 
 		imwindow_resize(imwindow,
-			max(1, (int) rows - STATUS_ROWS), im_cols);
+			std::max(1, (int) rows - STATUS_ROWS), im_cols);
 		input_resize(imwindow->input, cols);
 
 		cur = cur->next;
 	} while (screen.window_list != cur);
 
-	ret = mvwin(screen.status_bar, max(0, (int) rows - STATUS_ROWS), 0);
+	ret = mvwin(screen.status_bar, std::max(0, (int) rows - STATUS_ROWS), 0);
 	if (ret == -1) {
 		delwin(screen.status_bar);
 		status_init();
@@ -288,7 +290,7 @@ void screen_cycle_fwd(void) {
 
 	do {
 		cur = cur->next;
-		win = cur->data;
+		win = (struct imwindow *)cur->data;
 	} while (win->skip && cur != screen.cur_window);
 
 	screen_window_swap(cur);
@@ -300,7 +302,7 @@ void screen_cycle_bak(void) {
 
 	do {
 		cur = cur->prev;
-		win = cur->data;
+		win = (struct imwindow *)cur->data;
 	} while (win->skip && cur != screen.cur_window);
 
 	screen_window_swap(cur);
@@ -312,7 +314,7 @@ void screen_bind_all_unbound() {
 	node = screen.window_list;
 
 	do {
-		struct imwindow *imwindow = node->data;
+		struct imwindow *imwindow = (struct imwindow *)node->data;
 
 		if (imwindow->owner == screen.null_acct) {
 			imwindow_bind_acct(imwindow);
@@ -336,7 +338,7 @@ int screen_close_window(struct imwindow *imwindow) {
 		return (-1);
 
 	if (imwindow->type == WIN_TYPE_CHAT && imwindow->data != NULL) {
-		struct chatroom *chat = imwindow->data;
+		struct chatroom *chat = (struct chatroom *)imwindow->data;
 
 		chat_leave(imwindow->owner, chat->title, 0);
 	}

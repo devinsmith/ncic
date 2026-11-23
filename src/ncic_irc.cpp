@@ -38,7 +38,7 @@
 
 static void irc_event(int sock, u_int32_t cond, void *data)
 {
-  struct irc_session_t *session = data;
+  struct irc_session_t *session = (struct irc_session_t *)data;
 
   if (cond & IO_COND_READ) {
     if (naken_input_dispatch(session) == -1) {
@@ -57,7 +57,7 @@ static void irc_event(int sock, u_int32_t cond, void *data)
 
 static void irc_connected(int sock, u_int32_t cond, void *data) {
 	int ret;
-  struct irc_session_t *session = data;
+  struct irc_session_t *session = (struct irc_session_t *)data;
 
   pork_io_del(data);
 
@@ -134,7 +134,7 @@ static void irc_connected(int sock, u_int32_t cond, void *data) {
 }
 
 static int irc_init(struct pork_acct *acct) {
-	struct irc_session_t *session = xcalloc(1, sizeof(*session));
+	struct irc_session_t *session = (struct irc_session_t *)xcalloc(1, sizeof(*session));
 
 	session->outq = queue_new(0);
 	session->inq = queue_new(0);

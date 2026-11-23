@@ -67,7 +67,7 @@ int pork_io_add(int fd,
 	if (node != NULL)
 		pork_io_remove(node);
 
-	io = xcalloc(1, sizeof(*io));
+	io = (struct io_source *)xcalloc(1, sizeof(*io));
 	io->fd = fd;
 	io->cond = cond;
 	io->data = data;
@@ -88,7 +88,7 @@ int pork_io_del(void *key) {
 	if (node == NULL)
 		return (-1);
 
-	io = node->data;
+	io = (struct io_source *)node->data;
 	io->fd = -2;
 	io->callback = NULL;
 	return (0);
@@ -121,7 +121,7 @@ static int pork_io_find_dead_fds(dlist_t *io_list) {
 	int bad_fd = 0;
 
 	while (cur != NULL) {
-		struct io_source *io = cur->data;
+		struct io_source *io = (struct io_source *)cur->data;
 		dlist_t *next = cur->next;
 
 		if (io->fd < 0 || sock_is_error(io->fd)) {
@@ -199,7 +199,7 @@ int pork_io_run(void) {
 
 	cur = io_list;
 	while (cur != NULL) {
-		struct io_source *io = cur->data;
+		struct io_source *io = (struct io_source *)cur->data;
 		dlist_t *next = cur->next;
 
 		if (io->fd >= 0) {

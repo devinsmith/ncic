@@ -15,6 +15,8 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
+#include <algorithm>
+
 #include "ncic.h"
 #include "ncic_util.h"
 #include "ncic_list.h"
@@ -194,9 +196,7 @@ static inline u_int32_t pork_acct_get_new_refnum() {
 */
 
 struct pork_acct *pork_acct_init(const char *user, int protocol) {
-	struct pork_acct *acct;
-
-	acct = xcalloc(1, sizeof(*acct));
+  struct pork_acct *acct = (struct pork_acct *)xcalloc(1, sizeof(*acct));
 	acct->username = xstrdup(user);
 	acct->state = STATE_DISCONNECTED;
 
@@ -272,7 +272,7 @@ static int pork_acct_connect_fail(struct pork_acct *acct) {
 	}
 
 	acct->reconnect_next_try = time(NULL) +
-		min(acct->reconnect_tries * connect_interval, connect_interval_max);
+		std::min(acct->reconnect_tries * connect_interval, connect_interval_max);
 	return (0);
 }
 

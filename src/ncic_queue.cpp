@@ -16,7 +16,7 @@
 #include "ncic_queue.h"
 
 pork_queue_t *queue_new(u_int32_t max_entries) {
-	pork_queue_t *q = xcalloc(1, sizeof(*q));
+	pork_queue_t *q = (pork_queue_t *)xcalloc(1, sizeof(*q));
 
 	q->max = max_entries;
 	return (q);
@@ -28,7 +28,7 @@ int queue_putback_head(pork_queue_t *q, void *data) {
 	if (q->max > 0 && q->entries >= q->max)
 		return (-1);
 
-	new_node = xcalloc(1, sizeof(*new_node));
+	new_node = (dlist_t *)xcalloc(1, sizeof(*new_node));
 	new_node->data = data;
 
 	if (q->entries == 0) {
@@ -54,7 +54,7 @@ int queue_add(pork_queue_t *q, void *data) {
 	if (q->max > 0 && q->entries >= q->max)
 		return (-1);
 
-	new_node = xcalloc(1, sizeof(*new_node));
+	new_node = (dlist_t *)xcalloc(1, sizeof(*new_node));
 	new_node->data = data;
 	new_node->next = NULL;
 

@@ -462,7 +462,7 @@ void input_history_clear(struct input *input) {
 */
 
 void input_init(struct input *input, u_int32_t width) {
-	char *prompt;
+	const char *prompt;
 
 	memset(input, 0, sizeof(*input));
 	input->width = width;
@@ -514,7 +514,7 @@ u_int32_t input_get_cursor_pos(struct input *input) {
 ** Set the input prompt to the string specified by "prompt"
 */
 
-int input_set_prompt(struct input *input, char *prompt) {
+int input_set_prompt(struct input *input, const char *prompt) {
 	u_int32_t cur;
 
 	if (prompt != NULL && strlen(prompt) >= input->width)

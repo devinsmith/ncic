@@ -34,7 +34,7 @@ int irc_send(struct irc_session_t *session, char *command, size_t len) {
 	int ret;
 
 	if (session->sock < 0) {
-		struct irc_cmd_q *cmd = xmalloc(sizeof(*cmd));
+		struct irc_cmd_q *cmd = (struct irc_cmd_q *)xmalloc(sizeof(*cmd));
 
 		cmd->cmd = xstrdup(command);
 		cmd->len = len;
@@ -62,7 +62,7 @@ int irc_flush_outq(struct irc_session_t *session) {
 	struct irc_cmd_q *cmd;
 	int ret = 0;
 
-	while ((cmd = queue_get(session->outq)) != NULL) {
+	while ((cmd = (struct irc_cmd_q *)queue_get(session->outq)) != NULL) {
 		if (irc_send_server(session, cmd->cmd, cmd->len) > 0) {
 			ret++;
 			free(cmd->cmd);

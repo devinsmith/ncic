@@ -150,7 +150,7 @@ static int format_status_typing(char opt, char *buf, size_t len, va_list ap) {
 		/* Typing status */
 		case 'Y':
 			if (imwindow->typing) {
-				char *str;
+				const char *str;
 
 				if (imwindow->typing == 1)
 					str = opt_get_str(OPT_TEXT_TYPING_PAUSED);
@@ -927,7 +927,7 @@ static int (*const format_handler[])(char, char *, size_t, va_list) = {
 
 int fill_format_str(int type, char *buf, size_t len, ...) {
 	va_list ap;
-	char *format;
+	const char *format;
 	size_t i = 0;
 	int (*handler)(char, char *, size_t, va_list);
 

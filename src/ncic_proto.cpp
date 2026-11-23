@@ -38,7 +38,7 @@ static int proto_new(	int protocol,
 		return (-1);
 	}
 
-	new_proto = xcalloc(1, sizeof(*new_proto));
+	new_proto = (struct pork_proto *)xcalloc(1, sizeof(*new_proto));
 	xstrncpy(new_proto->name, name, sizeof(new_proto->name));
 
 	ret = init_func(new_proto);

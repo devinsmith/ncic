@@ -44,9 +44,7 @@ struct chatroom *chat_new(struct pork_acct *acct,
 							const char *chat_title_full,
 							struct imwindow *win)
 {
-	struct chatroom *chat;
-
-	chat = xcalloc(1, sizeof(*chat));
+	struct chatroom *chat = (struct chatroom *)xcalloc(1, sizeof(*chat));
 	chat->title = xstrdup(chat_title);
 	chat->title_quoted = acct->proto->filter_text(chat_title);
 	chat->title_full = xstrdup(chat_title_full);

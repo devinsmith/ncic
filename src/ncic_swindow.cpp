@@ -21,6 +21,8 @@
 #include <regex.h>
 #include <sys/uio.h>
 
+#include <algorithm>
+
 #include "ncic.h"
 #include "ncic_util.h"
 #include "ncic_list.h"
@@ -112,7 +114,7 @@ static int swindow_print_msg(	struct swindow *swindow,
 	msg = imsg_partial(swindow, imsg, firstline);
 
 	mvwputnstr(swindow->win, y, x, msg,
-		min(swindow->rows * swindow->cols,
+		std::min(swindow->rows * swindow->cols,
 			(lastline - firstline + 1) * swindow->cols));
 
 	return (0);
@@ -187,7 +189,7 @@ void swindow_prune(struct swindow *swindow) {
 	serial_bot = ((struct imsg *) swindow->scrollbuf_bot->data)->serial;
 
 	while (cur != NULL && num > 0) {
-		struct imsg *imsg = cur->data;
+		struct imsg *imsg = (struct imsg *)cur->data;
 		dlist_t *next = cur->prev;
 
 		/* Don't prune anything that's still on the screen */
@@ -216,7 +218,7 @@ static void swindow_adjust_top(struct swindow *swindow, uint32_t n) {
 	dlist_t *cur = swindow->scrollbuf_top;
 
 	while (1) {
-		struct imsg *imsg = cur->data;
+		struct imsg *imsg = (struct imsg *)cur->data;
 		uint32_t visible_lines = imsg->lines;
 
 		if (swindow->top_hidden != 0) {
@@ -263,11 +265,11 @@ static void swindow_recalculate(struct swindow *swindow,
 		return;
 	}
 
-	imsg_top = swindow->scrollbuf_top->data;
+	imsg_top = (struct imsg *)swindow->scrollbuf_top->data;
 	old_top = imsg_top->lines;
 
 	while (cur != NULL) {
-		struct imsg *imsg = cur->data;
+		struct imsg *imsg = (struct imsg *)cur->data;
 
 		imsg->lines = imsg_lines(swindow, imsg);
 		total_lines += imsg->lines;
@@ -351,7 +353,7 @@ void swindow_redraw(struct swindow *swindow) {
 	** the pointer to the next message.
 	*/
 	if (swindow->top_hidden != 0) {
-		struct imsg *imsg = cur->data;
+		struct imsg *imsg = (struct imsg *)cur->data;
 
 		curs_pos += imsg->lines - swindow->top_hidden;
 		if (curs_pos > swindow->rows) {
@@ -367,7 +369,7 @@ void swindow_redraw(struct swindow *swindow) {
 	}
 
 	while (cur != NULL && curs_pos < swindow->rows) {
-		struct imsg *imsg = cur->data;
+		struct imsg *imsg = (struct imsg *)cur->data;
 
 		if (curs_pos + imsg->lines > swindow->rows) {
 			swindow->scrollbuf_bot = cur;
@@ -424,23 +426,22 @@ int swindow_add(struct swindow *swindow, struct imsg *imsg, uint32_t msgtype) {
 		swindow_scroll_to_end(swindow);
 	}
 
-	if (swindow->logged && (swindow->log_type & msgtype)) {
+  if (swindow->logged && (swindow->log_type & msgtype)) {
     struct iovec wvec[2];
-		char *plaintext;
+    char *plaintext = cstr_to_plaintext(imsg->text, imsg->len);
 
-		plaintext = cstr_to_plaintext(imsg->text, imsg->len);
-		wvec[0].iov_base = plaintext;
-		wvec[0].iov_len = imsg->len;
-		wvec[1].iov_base = "\n";
-		wvec[1].iov_len = 1;
+    wvec[0].iov_base = plaintext;
+    wvec[0].iov_len = imsg->len;
+    wvec[1].iov_base = const_cast<char *>("\n");
+    wvec[1].iov_len = 1;
 
-		if (writev(swindow->log_fd, wvec, 2) != (int) imsg->len + 1) {
-			screen_err_msg("Error writing logfile: %s",
-				strerror(errno));
-		}
+    if (writev(swindow->log_fd, wvec, 2) != (int) imsg->len + 1) {
+      screen_err_msg("Error writing logfile: %s",
+        strerror(errno));
+    }
 
-		free(plaintext);
-	}
+    free(plaintext);
+  }
 
 	swindow->scrollbuf = dlist_add_head(swindow->scrollbuf, imsg);
 	swindow->scrollbuf_len++;
@@ -538,7 +539,7 @@ void swindow_scroll_to_end(struct swindow *swindow) {
 
 	cur = swindow->scrollbuf;
 	do {
-		struct imsg *imsg = cur->data;
+		struct imsg *imsg = (struct imsg *)cur->data;
 
 		lines += imsg->lines;
 		if (lines >= swindow->rows) {
@@ -599,7 +600,7 @@ static uint32_t swindow_scroll_down_by(struct swindow *swindow, uint32_t lines) 
 			break;
 		}
 
-		imsg = swindow->scrollbuf_top->data;
+		imsg = (struct imsg *)swindow->scrollbuf_top->data;
 
 		if (++swindow->top_hidden == imsg->lines) {
 			swindow->top_hidden = 0;
@@ -612,7 +613,7 @@ static uint32_t swindow_scroll_down_by(struct swindow *swindow, uint32_t lines) 
 			swindow->bottom_hidden--;
 		else {
 			swindow->scrollbuf_bot = swindow->scrollbuf_bot->prev;
-			imsg = swindow->scrollbuf_bot->data;
+			imsg = (struct imsg *)swindow->scrollbuf_bot->data;
 			swindow->bottom_hidden = imsg->lines - 1;
 		}
 	}
@@ -636,7 +637,7 @@ static uint32_t swindow_scroll_up_by(struct swindow *swindow, uint32_t lines) {
 
 	cur = swindow->scrollbuf_top->next;
 	while (lines > 0 && cur != NULL) {
-		struct imsg *msg = cur->data;
+		struct imsg *msg = (struct imsg *)cur->data;
 
 		if (msg->lines >= lines) {
 			swindow->scrollbuf_top = cur;
@@ -684,11 +685,11 @@ int swindow_scroll_by(struct swindow *swindow, int lines) {
 ** Turn timestamping on or off, depending on the value of "value"
 */
 
-inline void swindow_set_timestamp(struct swindow *swindow, uint32_t value) {
+void swindow_set_timestamp(struct swindow *swindow, uint32_t value) {
 	swindow->timestamp = value;
 }
 
-inline void swindow_set_wordwrap(struct swindow *swindow, uint32_t value) {
+void swindow_set_wordwrap(struct swindow *swindow, uint32_t value) {
 	/*
 	** Allow for updating after the continued char changed but the
 	** wordwrap enabled setting didn't.
@@ -715,11 +716,11 @@ int swindow_dump_buffer(struct swindow *swindow, char *file) {
 	if (fd == -1)
 		return (-1);
 
-	wvec[1].iov_base = "\n";
+	wvec[1].iov_base = const_cast<char *>("\n");
 	wvec[1].iov_len = 1;
 
 	for (cur = swindow->scrollbuf_end ; cur != NULL ; cur = cur->prev) {
-		struct imsg *imsg = cur->data;
+		struct imsg *imsg = (struct imsg *)cur->data;
 
 		wvec[0].iov_base = cstr_to_plaintext(imsg->text, imsg->len);
 		wvec[0].iov_len = imsg->len;
@@ -830,7 +831,7 @@ void swindow_clear(struct swindow *swindow) {
 	if (swindow->scrollbuf == NULL)
 		return;
 
-	imsg = swindow->scrollbuf->data;
+	imsg = (struct imsg *)swindow->scrollbuf->data;
 
 	swindow->scrollbuf_top = swindow->scrollbuf;
 	swindow->scrollbuf_bot = swindow->scrollbuf;
@@ -848,7 +849,7 @@ void swindow_clear(struct swindow *swindow) {
 */
 
 static void swindow_free(void *param __notused, void *data) {
-	struct imsg *imsg = data;
+	struct imsg *imsg = (struct imsg *)data;
 
 	free(imsg->text);
 	free(imsg);

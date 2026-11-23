@@ -96,7 +96,7 @@ int read_conf(const char *path) {
 
 int read_global_config(void) {
 	struct passwd *pw;
-	char *pork_dir;
+	const char *pork_dir;
 	char buf[PATH_MAX];
 
 	if (read_conf(SYSTEM_NCICRC) != 0) {
@@ -131,16 +131,16 @@ int read_global_config(void) {
 }
 
 static void write_alias_line(void *data, void *filep) {
-	struct alias *alias = data;
-	FILE *fp = filep;
+	struct alias *alias = (struct alias *)data;
+	FILE *fp = (FILE *)filep;
 
 	fprintf(fp, "alias %s %s%s\n",
 		alias->alias, alias->orig, (alias->args ? alias->args : ""));
 }
 
 static void write_bind_line(void *data, void *filep) {
-	struct binding *binding = data;
-  FILE *fp = filep;
+	struct binding *binding = (struct binding *)data;
+  FILE *fp = (FILE *)filep;
 	char key_name[32];
 
 	bind_get_keyname(binding->key, key_name, sizeof(key_name));
@@ -152,7 +152,7 @@ int save_global_config(void) {
 	char *fn;
 	size_t len;
 	FILE *fp;
-	char *pork_dir = opt_get_str(OPT_NCIC_DIR);
+	const char *pork_dir = opt_get_str(OPT_NCIC_DIR);
 
 	if (pork_dir == NULL)
 		return (-1);
@@ -160,7 +160,7 @@ int save_global_config(void) {
 	snprintf(porkrc, sizeof(porkrc), "%s/ncicrc", pork_dir);
 
 	len = strlen(porkrc) + sizeof("-TEMP");
-	fn = xmalloc(len);
+	fn = (char *)xmalloc(len);
 	snprintf(fn, len, "%s-TEMP", porkrc);
 
 	fp = fopen(fn, "w");

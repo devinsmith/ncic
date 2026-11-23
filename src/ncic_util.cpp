@@ -137,7 +137,7 @@ static char *xstrndup(const char *str, size_t len) {
 	if (len == 0)
 		return (NULL);
 
-	dst = xmalloc(len + 1);
+	dst = (char *)xmalloc(len + 1);
 	ret = dst;
 
 	while (*str != '\0' && len > 0) {

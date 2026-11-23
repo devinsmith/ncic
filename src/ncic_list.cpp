@@ -20,7 +20,7 @@
 */
 
 dlist_t *dlist_add_head(dlist_t *head, void *data) {
-	dlist_t *new_node = xmalloc(sizeof(dlist_t));
+	dlist_t *new_node = (dlist_t *)xmalloc(sizeof(dlist_t));
 
 	new_node->data = data;
 	new_node->prev = NULL;
@@ -127,7 +127,7 @@ int hash_init(	hash_t *hash,
 	hash->order = order;
 	hash->compare = compare;
 	hash->remove = rem;
-	hash->map = xcalloc((uint32_t) (1 << order), sizeof(dlist_t *));
+	hash->map = (dlist_t **)xcalloc((uint32_t) (1 << order), sizeof(dlist_t *));
 
 	return (0);
 }

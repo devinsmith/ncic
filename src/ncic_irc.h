@@ -46,7 +46,7 @@ struct irc_session_t {
 	time_t last_update;
 	size_t input_offset;
 	char input_buf[IRC_IN_BUFLEN];
-	void *data;
+	struct pork_acct *data;
 };
 
 struct irc_cmd_q {

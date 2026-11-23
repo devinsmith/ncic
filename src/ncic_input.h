@@ -65,7 +65,7 @@ void input_history_next(struct input *input);
 void input_history_prev(struct input *input);
 void input_history_clear(struct input *input);
 int input_set_buf(struct input *input, char *str);
-int input_set_prompt(struct input *input, char *prompt);
+int input_set_prompt(struct input *input, const char *prompt);
 char *input_get_buf_str(struct input *input);
 uint32_t input_get_cursor_pos(struct input *input);
 

@@ -8,9 +8,11 @@
 ** as published by the Free Software Foundation.
 */
 
-#include <string.h>
-#include <stdlib.h>
+#include <cstring>
+#include <cstdlib>
 #include <sys/types.h>
+
+#include <string>
 
 #include "ncic.h"
 #include "ncic_util.h"
@@ -18,14 +20,14 @@
 #include "ncic_alias.h"
 
 static int alias_compare(void *l, void *r) {
-	const char *str = l;
-	const struct alias *alias = r;
+	const char *str = (const char *)l;
+	const struct alias *alias = (const struct alias *)r;
 
 	return (strcasecmp(str, alias->alias));
 }
 
 static void alias_hash_remove(void *param __notused, void *data) {
-	struct alias *alias = data;
+	struct alias *alias = (struct alias *)data;
 
 	free(alias->alias);
 	free(alias->orig);
@@ -50,7 +52,7 @@ int alias_add(hash_t *alias_hash, char *alias, char *str) {
 
 	alias_remove(alias_hash, alias);
 
-	new_alias = xmalloc(sizeof(*new_alias));
+	new_alias = (struct alias *)xmalloc(sizeof(*new_alias));
 	new_alias->alias = xstrdup(alias);
 
 	temp = xstrdup(str);
@@ -71,15 +73,16 @@ int alias_add(hash_t *alias_hash, char *alias, char *str) {
 	return (0);
 }
 
-struct alias *alias_find(hash_t *alias_hash, char *str) {
-	dlist_t *node;
-	u_int32_t hash = string_hash(str, alias_hash->order);
+struct alias *alias_find(hash_t *alias_hash, const char *str)
+{
+  u_int32_t hash = string_hash(str, alias_hash->order);
+  // XXX: const_cast temporary until we fix hash_find
+  dlist_t *node = hash_find(alias_hash, const_cast<char *>(str), hash);
+  if (node != nullptr) {
+    return static_cast<struct alias *>(node->data);
+  }
 
-	node = hash_find(alias_hash, str, hash);
-	if (node != NULL)
-		return (struct alias *)(node->data);
-
-	return (NULL);
+  return nullptr;
 }
 
 /*
@@ -108,85 +111,59 @@ static inline void alias_strcpy(char *dest, char *src, size_t len) {
 ** Returns 0 on success.
 */
 
-int alias_resolve(hash_t *alias_hash, char *str, char **result) {
-	static char buf[8192];
-	u_int32_t num_left = sizeof(buf) - 1;
-	char *p;
-	u_int32_t iterations;
+int alias_resolve(hash_t *alias_hash, const char *str, std::string& result)
+{
+  constexpr size_t MAX_SIZE = 8191;
+  constexpr unsigned MAX_ITERATIONS = 20000;
 
-	p = strchr(str, ' ');
-	if (p != NULL)
-		*p = '\0';
+  const char *p = strchr(str, ' ');
+  std::string command(str, p ? p - str : strlen(str));
+  std::string args;
 
-	/*
-	** Avoid doing extra work if first word of the string
-	** passed to us isn't an alias.
-	*/
+  /*
+  ** Avoid doing extra work if first word of the string
+  ** passed to us isn't an alias.
+  */
 
-	if (alias_find(alias_hash, str) == NULL) {
-		if (p != NULL)
-			*p = ' ';
-		return (-1);
-	}
+  if (alias_find(alias_hash, command.c_str()) == nullptr) {
+    return -1;
+  }
 
-	buf[num_left] = '\0';
+  if (p != nullptr) {
+    args = p;
+  }
 
-	if (p != NULL) {
-		size_t len;
+  /*
+  ** Keep people from doing stupid things.
+  ** I can't imagine this number has to be anywhere near as high
+  ** as 20000, but it's not like it matters. If they want to waste
+  ** some CPU time, let them, just don't loop forever.
+  */
 
-		*p = ' ';
-		len = strlen(p);
-		if (len > num_left)
-			return (1);
+  for (unsigned i = 0; i < MAX_ITERATIONS; ++i) {
+    struct alias *alias = alias_find(alias_hash, command.c_str());
 
-		num_left -= len;
-		alias_strcpy(&buf[num_left], p, len);
-		*p = '\0';
-	}
+    if (alias == nullptr) {
+      if (command.size() + args.size() > MAX_SIZE) {
+        return 1;
+      }
 
-	/*
-	** Keep people from doing stupid things.
-	** I can't imagine this number has to be anywhere near as high
-	** as 20000, but it's not like it matters. If they want to waste
-	** some CPU time, let them, just don't loop forever.
-	*/
+      result = command + args;
+      return 0;
+    }
 
-	for (iterations = 0 ; iterations < 20000 ; iterations++) {
-		struct alias *alias;
+    if (alias->args != nullptr) {
+      args.insert(0, alias->args);
 
-		/*
-		** If the current string is not an alias,
-		** we've completely resolved the original alias string.
-		*/
+      if (args.size() > MAX_SIZE) {
+        return 1;
+      }
+    }
 
-		alias = alias_find(alias_hash, str);
-		if (alias == NULL) {
-			size_t len = strlen(str);
+    command = alias->orig;
+  }
 
-			if (len > num_left)
-				return (1);
-
-			num_left -= len;
-			alias_strcpy(&buf[num_left], str, len);
-
-			*result = &buf[num_left];
-			return (0);
-		}
-
-		if (alias->args != NULL) {
-			size_t len = strlen(alias->args);
-
-			if (len > num_left)
-				return (1);
-
-			num_left -= len;
-			alias_strcpy(&buf[num_left], alias->args, len);
-		}
-
-		str = alias->orig;
-	}
-
-	return (1);
+  return 1;
 }
 
 int alias_init(hash_t *alias_hash) {
